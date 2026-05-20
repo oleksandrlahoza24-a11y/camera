@@ -1,1869 +1,537 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pixel Miner</title>
-    <style>
-        /* --- STYLES & OPTIMIZATIONS --- */
-        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+    <title>Quote Vault | Professional Edition</title>
+    
+    <!-- Professional Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-        body,
-        html {
+    <style>
+        :root {
+            /* Professional Dark Slate Color Palette */
+            --bg-color: #0f172a;
+            --surface-color: #1e293b;
+            --border-color: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-color: #3b82f6;
+            --accent-hover: #2563eb;
+            --danger-color: #ef4444;
+            --danger-hover: #dc2626;
+            --border-radius: 12px;
+            --transition: all 0.2s ease-in-out;
+        }
+
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            width: 100%;
-            height: 100%;
-            background: #1a0a00;
-            overflow: hidden;
-            touch-action: none;
-            font-family: 'Press Start 2P', 'Courier New', monospace;
-            user-select: none;
-            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        #gameCanvas {
-            display: block;
-            width: 100%;
-            height: 100%;
-            image-rendering: -moz-crisp-edges;
-            image-rendering: -webkit-optimize-contrast;
-            image-rendering: crisp-edges;
-            image-rendering: pixelated;
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
         }
 
-        #ui-layer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-        }
-
-        .btn {
-            position: absolute;
-            bottom: 28px;
-            width: 86px;
-            height: 86px;
-            background: rgba(0, 0, 0, 0.45);
-            border: 3px solid rgba(255, 255, 255, 0.35);
-            border-bottom: 5px solid rgba(255, 255, 255, 0.2);
-            border-radius: 14px;
-            color: rgba(255, 255, 255, 0.9);
-            font-weight: bold;
-            font-size: 34px;
+        /* Top Navigation / Header */
+        header {
+            max-width: 1200px;
+            margin: 0 auto 30px auto;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            pointer-events: auto;
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            transition: background 0.08s, transform 0.08s;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-        }
-
-        .btn:active {
-            background: rgba(255, 255, 255, 0.25);
-            transform: scale(0.93);
-            border-color: rgba(255, 255, 255, 0.6);
-        }
-
-        #btn-left {
-            left: 20px;
-        }
-
-        #btn-right {
-            left: 122px;
-        }
-
-        #btn-jump {
-            right: 20px;
-            width: 100px;
-            height: 100px;
-            border-radius: 50px;
-            font-size: 28px;
-            background: rgba(80, 160, 255, 0.25);
-            border-color: rgba(120, 200, 255, 0.5);
-        }
-
-        #btn-jump:active {
-            background: rgba(120, 200, 255, 0.45);
-        }
-
-
-
-
-        /* HUD */
-        #hud {
-            position: absolute;
-            top: 14px;
-            left: 14px;
-            background: rgba(0, 0, 0, 0.7);
-            border: 2px solid rgba(255, 255, 255, 0.15);
-            border-radius: 10px;
-            color: white;
-            font-size: 9px;
-            font-family: 'Press Start 2P', monospace;
-            padding: 10px 14px;
-            pointer-events: auto;
-            min-width: 130px;
-            line-height: 1.9;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
-        }
-
-        #hud-title {
-            font-size: 7px;
-            color: #aaffaa;
-            letter-spacing: 1px;
-            margin-bottom: 6px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-            padding-bottom: 5px;
-        }
-
-        #depth-meter {
-            position: absolute;
-            top: 14px;
-            right: 14px;
-            background: rgba(0, 0, 0, 0.65);
-            border: 2px solid rgba(255, 255, 255, 0.15);
-            border-radius: 10px;
-            color: #88ddff;
-            font-family: 'Press Start 2P', monospace;
-            font-size: 8px;
-            padding: 8px 12px;
-            text-align: right;
-            line-height: 1.8;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-        }
-
-        /* === SKILL TREE === */
-        #btn-skill {
-            position: absolute;
-            bottom: 28px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 76px;
-            height: 76px;
-            background: rgba(80, 40, 140, 0.55);
-            border: 3px solid rgba(180, 120, 255, 0.6);
-            border-bottom: 5px solid rgba(100, 60, 180, 0.4);
-            border-radius: 14px;
-            color: rgba(255, 220, 255, 0.95);
-            font-size: 28px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            pointer-events: auto;
-            backdrop-filter: blur(4px);
-            box-shadow: 0 0 18px rgba(160, 80, 255, 0.35), 0 4px 12px rgba(0, 0, 0, 0.4);
-            transition: background 0.08s, transform 0.08s;
-            cursor: pointer;
-            z-index: 10;
-        }
-
-        #btn-skill:active {
-            background: rgba(160, 80, 255, 0.5);
-            transform: translateX(-50%) scale(0.93);
-        }
-
-        #skill-notif {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: #ff4444;
-            color: white;
-            font-size: 7px;
-            font-family: 'Press Start 2P', monospace;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            pointer-events: none;
-            display: none;
-        }
-
-        #skill-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(5, 2, 18, 0.96);
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            pointer-events: auto;
-            z-index: 100;
-            overflow: hidden;
-        }
-
-        #skill-overlay.open {
-            display: flex;
-        }
-
-        #skill-header {
-            width: 100%;
-            display: flex;
-            align-items: center;
             justify-content: space-between;
-            padding: 14px 20px;
-            box-sizing: border-box;
-            border-bottom: 2px solid rgba(160, 80, 255, 0.3);
-            background: rgba(30, 10, 60, 0.9);
-            flex-shrink: 0;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
-        #skill-title {
-            font-family: 'Press Start 2P', monospace;
-            font-size: 13px;
-            color: #cc88ff;
-            text-shadow: 0 0 12px rgba(180, 80, 255, 0.8);
-            letter-spacing: 2px;
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        #skill-pts-display {
-            font-family: 'Press Start 2P', monospace;
-            font-size: 9px;
-            color: #ffe066;
-            text-shadow: 0 0 8px rgba(255, 200, 0, 0.6);
+        .logo i {
+            color: var(--accent-color);
         }
 
-        #skill-close {
-            font-family: 'Press Start 2P', monospace;
-            font-size: 11px;
-            color: #ff8888;
-            background: rgba(255, 80, 80, 0.15);
-            border: 2px solid rgba(255, 80, 80, 0.4);
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Buttons & Inputs (iPad touch optimized to min 44px height) */
+        button, input, textarea {
+            font-family: 'Inter', sans-serif;
             border-radius: 8px;
-            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            background-color: var(--surface-color);
+            color: var(--text-main);
+            outline: none;
+            transition: var(--transition);
+            font-size: 1rem;
+        }
+
+        button {
             cursor: pointer;
-            pointer-events: auto;
+            padding: 12px 20px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 48px; /* iPad Touch Target Standard */
         }
 
-        #skill-tree-scroll {
-            flex: 1;
+        button.primary {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        button.primary:hover {
+            background-color: var(--accent-hover);
+        }
+
+        button.secondary {
+            background-color: transparent;
+        }
+
+        button.secondary:hover {
+            background-color: var(--border-color);
+        }
+
+        button.icon-btn {
+            padding: 12px;
+            color: var(--text-muted);
+            background: transparent;
+            border: none;
+        }
+
+        button.icon-btn:hover {
+            color: var(--danger-color);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        input, textarea {
             width: 100%;
-            overflow: auto;
-            -webkit-overflow-scrolling: touch;
-            padding: 20px 0 40px 0;
-            box-sizing: border-box;
+            padding: 14px;
         }
 
-        #skill-tree-canvas {
-            display: block;
+        input:focus, textarea:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        /* Main Layout */
+        main {
+            max-width: 1200px;
             margin: 0 auto;
-            image-rendering: pixelated;
-            image-rendering: crisp-edges;
-            cursor: pointer;
-            touch-action: pan-x pan-y;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
         }
 
-        #skill-tooltip {
+        @media (min-width: 850px) {
+            main {
+                grid-template-columns: 350px 1fr; /* Two columns for iPad Landscape & Desktop */
+                align-items: start;
+            }
+        }
+
+        /* Input Section */
+        .input-panel {
+            background-color: var(--surface-color);
+            padding: 24px;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            position: sticky;
+            top: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        /* Quotes Section */
+        .quotes-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .search-bar {
+            position: relative;
+        }
+
+        .search-bar i {
             position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(20, 8, 40, 0.97);
-            border: 2px solid rgba(180, 100, 255, 0.5);
-            border-radius: 10px;
-            color: white;
-            font-family: 'Press Start 2P', monospace;
-            font-size: 8px;
-            padding: 10px 16px;
-            text-align: center;
-            max-width: 300px;
-            line-height: 1.8;
-            pointer-events: none;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .search-bar input {
+            padding-left: 45px;
+        }
+
+        .quotes-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 1100px) {
+            .quotes-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* Individual Quote Card */
+        .quote-card {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .quote-card:hover {
+            border-color: #475569;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .quote-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .quote-tag {
+            background-color: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .quote-date {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .quote-body {
+            font-family: 'Lora', serif;
+            font-size: 1.25rem;
+            line-height: 1.6;
+            color: var(--text-main);
+            font-style: italic;
+        }
+
+        .quote-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 15px;
+        }
+
+        .quote-author {
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Hidden File Input for Import */
+        #importFile {
             display: none;
-            z-index: 200;
-            box-shadow: 0 0 20px rgba(160, 80, 255, 0.4);
         }
 
-        #xp-bar-container {
-            position: absolute;
-            bottom: 130px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 180px;
-            pointer-events: none;
-        }
-
-        #xp-bar-label {
-            font-family: 'Press Start 2P', monospace;
-            font-size: 7px;
-            color: #aaffcc;
+        /* Empty State */
+        .empty-state {
             text-align: center;
-            margin-bottom: 4px;
-            text-shadow: 0 0 6px rgba(100, 255, 150, 0.5);
+            padding: 50px 20px;
+            color: var(--text-muted);
+            grid-column: 1 / -1;
         }
-
-        #xp-bar-outer {
-            width: 100%;
-            height: 10px;
-            background: rgba(0, 0, 0, 0.5);
-            border: 2px solid rgba(100, 255, 150, 0.3);
-            border-radius: 6px;
-            overflow: hidden;
-        }
-
-        #xp-bar-inner {
-            height: 100%;
-            background: linear-gradient(90deg, #22aa55, #44ff88);
-            border-radius: 4px;
-            width: 0%;
-            transition: width 0.3s;
-            box-shadow: 0 0 8px rgba(60, 255, 120, 0.6);
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
         }
     </style>
 </head>
-
 <body>
 
-    <canvas id="gameCanvas"></canvas>
+    <header>
+        <div class="logo">
+            <i class="fa-solid fa-vault"></i> SecureVault
+        </div>
+        <div class="header-actions">
+            <!-- Hidden file input for importing data -->
+            <input type="file" id="importFile" accept=".json" onchange="importData(event)">
+            
+            <button class="secondary" onclick="document.getElementById('importFile').click()" title="Restore from file">
+                <i class="fa-solid fa-file-import"></i> <span class="hide-mobile">Import</span>
+            </button>
+            <button class="secondary" onclick="exportData()" title="Backup to file">
+                <i class="fa-solid fa-file-export"></i> <span class="hide-mobile">Export</span>
+            </button>
+        </div>
+    </header>
 
-    <div id="ui-layer">
-        <div id="hud">
-            <div id="hud-title">⛏ INVENTORY</div>
-            <div id="inv-contents">Empty</div>
-        </div>
-        <div id="depth-meter">
-            <div>DEPTH</div>
-            <div id="depth-value">0m</div>
-        </div>
-        <div class="btn" id="btn-left">◀</div>
-        <div class="btn" id="btn-right">▶</div>
-        <div class="btn" id="btn-jump">JUMP</div>
-        <div id="btn-skill">🌟<div id="skill-notif">!</div>
-        </div>
-        <div id="xp-bar-container">
-            <div id="xp-bar-label">LVL 1 — 0 XP</div>
-            <div id="xp-bar-outer">
-                <div id="xp-bar-inner"></div>
+    <main>
+        <!-- Left Panel: Input Form -->
+        <aside class="input-panel">
+            <div class="input-group">
+                <label for="quoteInput">Quote Text</label>
+                <textarea id="quoteInput" placeholder="Enter the exact words..."></textarea>
             </div>
-        </div>
-        <div id="skill-overlay">
-            <div id="skill-header">
-                <div id="skill-title">⚡ SKILL TREE</div>
-                <div id="skill-pts-display">0 POINTS</div>
-                <div id="skill-close">✕ CLOSE</div>
+            <div class="input-group">
+                <label for="authorInput">Author</label>
+                <input type="text" id="authorInput" placeholder="e.g. Marcus Aurelius">
             </div>
-            <div id="skill-tree-scroll">
-                <canvas id="skill-tree-canvas"></canvas>
+            <div class="input-group">
+                <label for="tagInput">Category / Tag</label>
+                <input type="text" id="tagInput" placeholder="e.g. Philosophy, Motivation...">
             </div>
-            <div id="skill-tooltip"></div>
-        </div>
-    </div>
+            <button class="primary" onclick="addQuote()">
+                <i class="fa-solid fa-bookmark"></i> Save Quote
+            </button>
+        </aside>
+
+        <!-- Right Panel: Quotes & Search -->
+        <section class="quotes-section">
+            <div class="search-bar">
+                <i class="fa-solid fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search your vault by keyword or author..." oninput="filterQuotes()">
+            </div>
+
+            <div class="quotes-grid" id="quotesGrid">
+                <!-- Quotes render here -->
+            </div>
+        </section>
+    </main>
 
     <script>
-        /**
- * 1. CONFIGURATION & EXTENSIBILITY
- * This section makes it extremely easy to add content.
- */
-
-// 1a. Color Palette (Hex Codes)
-const PALETTE = {
-    ' ': null,
-    // Dirt
-    'D': '#7a4a32', 'd': '#5c3420', 'Q': '#9b6347', 'q': '#3d2012',
-    // Grass top
-    'G': '#5a8a2a', 'g': '#3d6318', 'R': '#7ab83a', 'r': '#2d4d10',
-    // Stone
-    'S': '#7a7e84', 's': '#5a5e66', 'T': '#9a9ea4', 't': '#3a3e46',
-    // Coal
-    'C': '#1a1a1a', 'c2': '#2d2d2d',
-    // Iron
-    'I': '#d4b896', 'i': '#b89870',
-    // Gold
-    'O': '#f0c030', 'o': '#c89010',
-    // Diamond
-    'A': '#40c8d8', 'a': '#20a0b0',
-    // Bedrock
-    'B': '#0d0d0d', 'Z': '#1a1a1a', 'z': '#262626',
-    // Grass/moss accent
-    'M': '#4a7a20', 'm': '#6aaa30',
-    // Player
-    'P': '#f0b882', 'p': '#3a4a8a',
-    'e': '#ffffff', 'E': '#1a1a2e',
-    'c': '#c0392b',
-    'h': '#8b5e3c',
-    'b': '#5c4033',
-    'H': '#f5d6a0',
-    'X': '#2c3e7a',
-    'C': '#1a1a1a',
-};
-
-// 1b. Textures (8x8 Pixel Grid Technique)
-// Just 'draw' your block using the letters from the palette!
-const TEXTURES = {
-    'grass': [
-        "RmGmRmGm",
-        "gGMgGMgG",
-        "gGgGgGgG",
-        "QDdQDdQD",
-        "dQDDdQDD",
-        "DDdDDdDD",
-        "dDQDdDQD",
-        "QDDdQDDd"
-    ],
-    'dirt': [
-        "QDdQDdQD",
-        "dDDQdDDQ",
-        "DDqdDDqd",
-        "qDDDqDDD",
-        "DdQDDdQD",
-        "QDDdQDDd",
-        "dDqDdDqD",
-        "DDDqDDDq"
-    ],
-    'stone': [
-        "TtSSTtSS",
-        "tSSSStsS",
-        "SSTtSSSt",
-        "sSSSsSsS",
-        "TtSSsSTS",
-        "tSSSStsS",
-        "SStTSSSt",
-        "sSSsSSss"
-    ],
-    'coal_ore': [
-        "TtSSTtSS",
-        "tSCCCtsS",
-        "SSTtCCSt",
-        "sSSCCsSS",
-        "TtSCCCTS",
-        "tSCCCtsS",
-        "SStTSSSt",
-        "sSSsSSss"
-    ],
-    'iron_ore': [
-        "TtSSTtSS",
-        "tSIiItsS",
-        "SSTtIiSt",
-        "sSiIIsSS",
-        "TtSIiITS",
-        "tSiIItsS",
-        "SStTSSSt",
-        "sSSsSSss"
-    ],
-    'gold_ore': [
-        "TtSSTtSS",
-        "tSOoOtsS",
-        "SSTtOoSt",
-        "sSoOOsSS",
-        "TtSOoOTS",
-        "tSoOOtsS",
-        "SStTSSSt",
-        "sSSsSSss"
-    ],
-    'diamond_ore': [
-        "TtSSTtSS",
-        "tSAaAtsS",
-        "SSTtAaSt",
-        "sSaAAsSS",
-        "TtSAaATS",
-        "tSaAAtsS",
-        "SStTSSSt",
-        "sSSsSSss"
-    ],
-    'bedrock': [
-        "BZzBZzBZ",
-        "ZBBzZBBz",
-        "zBZBzBZB",
-        "BzZBBzZB",
-        "ZBBzZBBz",
-        "zZBZzZBZ",
-        "BzBBZzBB",
-        "ZBzZBZzB"
-    ],
-    'player_idle': [
-        " hhhhh  ",
-        " hHPPh  ",
-        " PeEPP  ",
-        " PPPPP  ",
-        " ccccc  ",
-        " cXcXc  ",
-        " b   b  ",
-        " b   b  "
-    ],
-    'player_walk1': [
-        " hhhhh  ",
-        " hHPPh  ",
-        " PeEPP  ",
-        " PPPPP  ",
-        " ccccc  ",
-        " cXcXc  ",
-        " b b    ",
-        "    b   "
-    ],
-    'player_walk2': [
-        " hhhhh  ",
-        " hHPPh  ",
-        " PeEPP  ",
-        " PPPPP  ",
-        " ccccc  ",
-        " cXcXc  ",
-        "    b b ",
-        "   b    "
-    ],
-    'player_jump': [
-        " hhhhh  ",
-        " hHPPh  ",
-        " PeEPP  ",
-        " PPPPP  ",
-        " ccccc  ",
-        " cXcXc  ",
-        "b     b ",
-        "        "
-    ],
-    'player_mine': [
-        " hhhhh  ",
-        " hHPPh  ",
-        "PPeEPP  ",
-        " PPPPP  ",
-        "cccccc  ",
-        " cXcXc  ",
-        " b   b  ",
-        " b   b  "
-    ]
-};
-
-// 1c. Block Registry
-// Define physics and drops here.
-const BLOCKS = {
-    0: { name: 'Air', solid: false },
-    1: { name: 'Grass',       solid: true, texture: 'grass',       drop: 'Dirt',    hardness: 45  },
-    2: { name: 'Dirt',        solid: true, texture: 'dirt',        drop: 'Dirt',    hardness: 40  },
-    3: { name: 'Stone',       solid: true, texture: 'stone',       drop: 'Stone',   hardness: 90  },
-    4: { name: 'Coal Ore',    solid: true, texture: 'coal_ore',    drop: 'Coal',    hardness: 100 },
-    5: { name: 'Iron Ore',    solid: true, texture: 'iron_ore',    drop: 'Iron',    hardness: 120 },
-    6: { name: 'Gold Ore',    solid: true, texture: 'gold_ore',    drop: 'Gold',    hardness: 140 },
-    7: { name: 'Diamond Ore', solid: true, texture: 'diamond_ore', drop: 'Diamond', hardness: 180 },
-    8: { name: 'Bedrock',     solid: true, texture: 'bedrock',     drop: null,      unbreakable: true }
-};
-
-
-/**
- * 2. ENGINE SETUP & OPTIMIZATIONS
- */
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d', { alpha: false }); // alpha false optimizes performance
-const TILE_SIZE = 40; // Scale of blocks on screen
-const SPRITE_SIZE = 8; // Internal resolution of our pixel grids
-
-// Pre-render sprites onto hidden canvases (Huge performance boost)
-const preRenderedSprites = {};
-function compileSprites() {
-    for (let key in TEXTURES) {
-        const sprCanvas = document.createElement('canvas');
-        sprCanvas.width = SPRITE_SIZE;
-        sprCanvas.height = SPRITE_SIZE;
-        const sprCtx = sprCanvas.getContext('2d');
-        const grid = TEXTURES[key];
-        
-        for (let y = 0; y < SPRITE_SIZE; y++) {
-            for (let x = 0; x < SPRITE_SIZE; x++) {
-                const char = grid[y][x];
-                if (PALETTE[char]) {
-                    sprCtx.fillStyle = PALETTE[char];
-                    sprCtx.fillRect(x, y, 1, 1);
-                }
-            }
+        /* =========================================================================
+           SECURITY FEATURE: HTML Sanitizer
+           Prevents Cross-Site Scripting (XSS) if malicious code is pasted in.
+           ========================================================================= */
+        function sanitize(str) {
+            if (!str) return '';
+            const temp = document.createElement('div');
+            temp.textContent = str;
+            return temp.innerHTML;
         }
-        preRenderedSprites[key] = sprCanvas;
-    }
-}
-compileSprites();
 
-// Resize handling
-let width, height;
-function resize() {
-    width = window.innerWidth;
-    height = window.innerHeight;
-    canvas.width = width;
-    canvas.height = height;
-    ctx.imageSmoothingEnabled = false; // Keep pixels sharp
-}
-window.addEventListener('resize', resize);
-resize();
+        /* =========================================================================
+           DATA MANAGEMENT
+           Pulling from localStorage. Adding unique IDs and Timestamps.
+           ========================================================================= */
+        let quotes = JSON.parse(localStorage.getItem('VaultSecureQuotes')) || [];
 
-/**
- * 3. WORLD GENERATION
- */
-const WORLD_W = 100;
-const WORLD_H = 150;
-let world = [];
+        const quoteInput = document.getElementById('quoteInput');
+        const authorInput = document.getElementById('authorInput');
+        const tagInput = document.getElementById('tagInput');
+        const searchInput = document.getElementById('searchInput');
+        const quotesGrid = document.getElementById('quotesGrid');
 
-// Lightweight noise helpers
-function smoothNoise(x, scale, seed) {
-    const i = Math.floor(x / scale);
-    const f = (x / scale) - i;
-    const t = f * f * (3 - 2 * f); // smoothstep
-    const hash = (n) => {
-        let h = (n * 1664525 + seed * 22695477 + 1013904223) & 0xffffffff;
-        return (h >>> 0) / 0xffffffff;
-    };
-    return hash(i) * (1 - t) + hash(i + 1) * t;
-}
-function terrainHeight(x) {
-    let h = 0;
-    h += smoothNoise(x, 18, 42) * 5;
-    h += smoothNoise(x, 7, 137) * 2;
-    h += smoothNoise(x, 3, 99) * 1;
-    return Math.round(18 + h);
-}
-function caveNoise(x, y) {
-    const a = smoothNoise(x + y * 0.3, 5, 7777);
-    const b = smoothNoise(x * 0.4 + y, 4, 3333);
-    return a * b;
-}
+        // Render quotes to the UI
+        function renderQuotes(filterText = "") {
+            quotesGrid.innerHTML = ''; 
+            
+            // Filter logic for the search bar
+            const filteredQuotes = quotes.filter(q => 
+                q.text.toLowerCase().includes(filterText.toLowerCase()) || 
+                q.author.toLowerCase().includes(filterText.toLowerCase()) ||
+                q.tag.toLowerCase().includes(filterText.toLowerCase())
+            );
 
-function generateWorld() {
-    const surfaceY = [];
-    for (let x = 0; x < WORLD_W; x++) surfaceY[x] = terrainHeight(x);
-
-    for (let x = 0; x < WORLD_W; x++) {
-        world[x] = [];
-        const surf = surfaceY[x];
-        for (let y = 0; y < WORLD_H; y++) {
-            if (y < surf) {
-                world[x][y] = 0; // Air
-            } else if (y === surf) {
-                world[x][y] = 1; // Grass
-            } else if (y <= surf + 4) {
-                world[x][y] = 2; // Dirt layer
-            } else if (y >= WORLD_H - 1) {
-                world[x][y] = 8; // Bedrock
-            } else {
-                // Cave carving
-                if (y > surf + 6 && caveNoise(x, y) > 0.62) {
-                    world[x][y] = 0; // cave air
-                    continue;
-                }
-                let rand = Math.random();
-                let blockId = 3;
-                const depth = y - surf;
-                if (depth > 5) {
-                    if (rand < 0.055) blockId = 4;
-                    else if (rand < 0.085 && depth > 20) blockId = 5;
-                    else if (rand < 0.10 && depth > 50) blockId = 6;
-                    else if (rand < 0.105 && depth > 80) blockId = 7;
-                }
-                world[x][y] = blockId;
+            if (filteredQuotes.length === 0) {
+                quotesGrid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fa-solid fa-box-open"></i>
+                        <h2>No quotes found</h2>
+                        <p>Your vault is empty or no search results match.</p>
+                    </div>`;
+                return;
             }
-        }
-    }
-    // Store surface for reference
-    world._surfaceY = surfaceY;
-}
-generateWorld();
 
+            filteredQuotes.forEach(quote => {
+                const card = document.createElement('div');
+                card.className = 'quote-card';
+                
+                // Format the date to be human readable
+                const dateObj = new Date(quote.date);
+                const formattedDate = dateObj.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
 
-/**
- * 4. ENTITIES & PHYSICS
- */
-const player = {
-    x: WORLD_W * TILE_SIZE / 2,
-    y: (terrainHeight(Math.floor(WORLD_W / 2)) - 3) * TILE_SIZE,
-    vx: 0, vy: 0,
-    width: TILE_SIZE * 0.8,
-    height: TILE_SIZE * 0.9,
-    speed: 5,
-    jumpForce: 10,
-    grounded: false,
-    inventory: {},
-    frame: 'player_idle',
-    walkTimer: 0,
-    walkFrame: 0,
-    mineTimer: 0,
-    facing: 1,
-    xp: 0,
-    level: 1,
-    skillPoints: 0,
-};
-
-// ── SKILL DEFINITIONS ──────────────────────────────────────────────
-// Each skill has: id, name, desc, icon (5x5 pixel art), color, maxRank,
-// requires (skill id), col, row (layout in tree), effect per rank
-const SKILL_DEFS = [
-    // ── MINING BRANCH (left)
-    { id:'mine1',   name:'Iron Pick',      desc:'Mine 20% faster',          icon:'MMMM M M M MMMMM M M M M',   color:'#b0c0d0', maxRank:3, requires:null,    col:0, row:0, branch:'mine'   },
-    { id:'mine2',   name:'Steel Drill',    desc:'+25% mining speed each rank',icon:'MMMMM MM MM MMMMM   M   M', color:'#88aacc', maxRank:3, requires:'mine1', col:0, row:1, branch:'mine'   },
-    { id:'mine3',   name:'Vein Sense',     desc:'Double drops from ore',     icon:' MMM MMMMM MMMMM MMMMM MMM ', color:'#66ccff', maxRank:2, requires:'mine2', col:0, row:2, branch:'mine'   },
-    { id:'mine4',   name:'Blast Mine',     desc:'AOE crack on mine',         icon:'M M M MMM M M M MMM M M M',  color:'#ff9944', maxRank:1, requires:'mine3', col:0, row:3, branch:'mine'   },
-    // ── MOVE BRANCH (center-left)
-    { id:'move1',   name:'Fleet Foot',     desc:'+15% move speed per rank',  icon:' M M  MMM  M M  MM M  M  ', color:'#88ff88', maxRank:3, requires:null,    col:1, row:0, branch:'move'   },
-    { id:'move2',   name:'Sprint',         desc:'Speed burst on move',       icon:'M   M MM MM M M M MM MM M', color:'#44ff88', maxRank:2, requires:'move1', col:1, row:1, branch:'move'   },
-    { id:'move3',   name:'Parkour',        desc:'+1 extra jump per rank',    icon:' M   MMM  M M  M M   M  ', color:'#ffee44', maxRank:2, requires:'move2', col:1, row:2, branch:'move'   },
-    { id:'move4',   name:'Rocket Boots',   desc:'Triple jump height',        icon:'MMMMM M M M MMM MMMMM M M', color:'#ff6644', maxRank:1, requires:'move3', col:1, row:3, branch:'move'   },
-    // ── SURVIVAL BRANCH (center-right)
-    { id:'surv1',   name:'Tough Skin',     desc:'Unlock health system',      icon:'MMMMM MMMMM MM MM MMMMM M M', color:'#ff4444', maxRank:3, requires:null,   col:2, row:0, branch:'surv'   },
-    { id:'surv2',   name:'Regen',          desc:'Slow health regen',         icon:' MMM MMMMM MMMMM  MMM  M M', color:'#ff8888', maxRank:2, requires:'surv1', col:2, row:1, branch:'surv'   },
-    { id:'surv3',   name:'Deep Lungs',     desc:'Reduce fall damage',        icon:'MMMMM  M M  MMM  M M MMMMM', color:'#ffaaaa', maxRank:2, requires:'surv2', col:2, row:2, branch:'surv'   },
-    { id:'surv4',   name:'Immortal Core',  desc:'Survive one fatal hit',     icon:'MMMMM MMMMM MMMMM MMMMM MMM', color:'#ffdddd',maxRank:1, requires:'surv3', col:2, row:3, branch:'surv'   },
-    // ── FORTUNE BRANCH (right)
-    { id:'fort1',   name:'Lucky Find',     desc:'+10% rare ore chance/rank', icon:' M M  MMM  MMM  M M   M  ', color:'#f0c030', maxRank:3, requires:null,    col:3, row:0, branch:'fort'   },
-    { id:'fort2',   name:'Gold Nose',      desc:'Gold/Diamond drop +50%',   icon:'MMMMM MM MM MMMMM MM MM MM', color:'#ffdd44', maxRank:2, requires:'fort1', col:3, row:1, branch:'fort'   },
-    { id:'fort3',   name:'Gem Cutter',     desc:'Triple diamond yield',      icon:' MMM  M M MMMMM M M  MMM ', color:'#40c8d8', maxRank:2, requires:'fort2', col:3, row:2, branch:'fort'   },
-    { id:'fort4',   name:'El Dorado',      desc:'All drops x2 permanently', icon:'MMMMM MMMMM MMMMM MMMMM MMMMM', color:'#ffe800',maxRank:1, requires:'fort3', col:3, row:3, branch:'fort'  },
-];
-
-// Player skill ranks (id → rank)
-const playerSkills = {};
-SKILL_DEFS.forEach(s => { playerSkills[s.id] = 0; });
-
-// XP needed per level
-function xpForLevel(lvl) { return Math.floor(80 * Math.pow(lvl, 1.5)); }
-
-function gainXP(amount) {
-    player.xp += amount;
-    const needed = xpForLevel(player.level);
-    if (player.xp >= needed) {
-        player.xp -= needed;
-        player.level++;
-        player.skillPoints += 2;
-        document.getElementById('skill-notif').style.display = 'flex';
-        updateXPBar();
-        // Level-up flash particles
-        for (let i = 0; i < 20; i++) {
-            const angle = (i / 20) * Math.PI * 2;
-            particles.push({
-                x: player.x + player.width/2, y: player.y + player.height/2,
-                vx: Math.cos(angle)*4, vy: Math.sin(angle)*4-2,
-                size: 6, life: 1.0, decay: 0.03,
-                color: ['#ffe066','#ff88ff','#88ffcc','#ff6644'][i%4],
-                isStar: true, rotation: 0, spin: 0.15, gravity: 0.05,
-                bounceCount:0, maxBounces:0, floorY: player.y+200, landed:false
+                // Securely render content using our sanitize function
+                card.innerHTML = `
+                    <div class="quote-header">
+                        ${quote.tag ? `<span class="quote-tag"><i class="fa-solid fa-tag" style="font-size: 10px;"></i> ${sanitize(quote.tag)}</span>` : '<div></div>'}
+                        <span class="quote-date">${formattedDate}</span>
+                    </div>
+                    <div class="quote-body">"${sanitize(quote.text)}"</div>
+                    <div class="quote-footer">
+                        <div class="quote-author">— ${sanitize(quote.author) || 'Unknown'}</div>
+                        <button class="icon-btn" onclick="deleteQuote('${quote.id}')" title="Delete Quote">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
+                `;
+                
+                quotesGrid.appendChild(card);
             });
         }
-    }
-    updateXPBar();
-}
 
-function updateXPBar() {
-    const needed = xpForLevel(player.level);
-    const pct = Math.min(100, (player.xp / needed) * 100);
-    document.getElementById('xp-bar-inner').style.width = pct + '%';
-    document.getElementById('xp-bar-label').textContent = 'LVL ' + player.level + ' — ' + player.xp + '/' + needed + ' XP';
-    document.getElementById('skill-pts-display').textContent = player.skillPoints + ' POINT' + (player.skillPoints !== 1 ? 'S' : '');
-}
-updateXPBar();
+        // Add a new quote
+        function addQuote() {
+            const text = quoteInput.value.trim();
+            const author = authorInput.value.trim();
+            const tag = tagInput.value.trim();
 
-// Skill effect helpers — read these anywhere
-function getSkillEffect(id) { return playerSkills[id] || 0; }
-
-const gravity = 0.5;
-const maxFallSpeed = 12;
-
-const camera = { x: 0, y: 0, tx: 0, ty: 0, shake: 0, shakeX: 0, shakeY: 0 };
-
-// Controls State
-const keys = { left: false, right: false, up: false };
-
-// Mining state — holds the block currently being mined
-let miningTarget = null; // { tileX, tileY, progress, required }
-
-// Particle system
-const particles = [];
-function spawnParticles(tileX, tileY, blockId) {
-    const block = BLOCKS[blockId];
-    if (!block || !block.texture) return;
-
-
-
-
-    const blockColors = {
-        1: ['#5a8a2a','#3d6318','#7ab83a','#7a4a32'],
-        2: ['#7a4a32','#5c3420','#9b6347','#3d2012'],
-        3: ['#7a7e84','#5a5e66','#9a9ea4','#3a3e46'],
-        4: ['#1a1a1a','#2d2d2d','#5a5e66','#3a3e46'],
-        5: ['#d4b896','#b89870','#7a7e84','#9a9ea4'],
-        6: ['#f0c030','#c89010','#7a7e84','#f0d060'],
-        7: ['#40c8d8','#20a0b0','#5a5e66','#80e8f8'],
-        8: ['#333333','#1a1a1a','#444444','#222222']
-    };
-    const colors = blockColors[blockId] || ['#888888','#aaaaaa','#666666'];
-
-
-
-
-    const cx = tileX * TILE_SIZE + TILE_SIZE / 2;
-    const cy = tileY * TILE_SIZE + TILE_SIZE / 2;
-    const floorY = (tileY + 1) * TILE_SIZE;
-
-
-
-
-    // --- 1. CHUNKY SHARDS (wall-bouncing physics) ---
-    const NUM_SHARDS = 14;
-    for (let i = 0; i < NUM_SHARDS; i++) {
-        const spawnOffX = (Math.random() - 0.5) * TILE_SIZE * 0.8;
-        const spawnOffY = (Math.random() - 0.5) * TILE_SIZE * 0.6;
-        const angle = Math.random() * Math.PI * 2;
-        const speed = 2.5 + Math.random() * 5.5;
-        const vx = Math.cos(angle) * speed;
-        const vy = Math.sin(angle) * speed - 2 - Math.random() * 3;
-        const size = 3 + Math.random() * 5;
-        const color = colors[Math.floor(Math.random() * colors.length)];
-        const rotation = Math.random() * Math.PI * 2;
-        const spin = (Math.random() - 0.5) * 0.35;
-        particles.push({
-            x: cx + spawnOffX, y: cy + spawnOffY,
-            vx, vy, size,
-            life: 1.0, fadeRate: 0.018 + Math.random() * 0.015,
-            color, rotation, spin,
-            gravity: 0.42,
-            bounceCount: 0, maxBounces: 2 + Math.floor(Math.random() * 2),
-            floorY, landed: false,
-            wallLeft: 0, wallRight: WORLD_W * TILE_SIZE,
-            isShard: true
-        });
-    }
-
-
-
-
-    // --- 2. DUST PUFFS ---
-    for (let i = 0; i < 8; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const speed = 0.6 + Math.random() * 2.5;
-        particles.push({
-            x: cx + (Math.random() - 0.5) * TILE_SIZE * 0.5,
-            y: cy + (Math.random() - 0.5) * TILE_SIZE * 0.4,
-            vx: Math.cos(angle) * speed,
-            vy: Math.sin(angle) * speed - 1.8,
-            size: 2 + Math.random() * 3,
-            life: 1.0, decay: 0.025 + Math.random() * 0.02,
-            color: colors[Math.floor(Math.random() * colors.length)],
-            rotation: 0, spin: 0,
-            gravity: 0.08,
-            bounceCount: 0, maxBounces: 0,
-            floorY, landed: false,
-            isDust: true
-        });
-    }
-
-
-
-
-    // --- 3. SHRINKING BLOCK that flies to player, then spawns a STAR ---
-    const startX = cx;
-    const startY = cy;
-    // target = player center
-    particles.push({
-        x: startX, y: startY,
-        size: TILE_SIZE * 0.85,
-        life: 1.0,
-        color: colors[0], color2: colors[1] || colors[0],
-        colors: colors,
-        blockId: blockId,
-        isBlockFly: true,
-        rotation: 0, spin: (Math.random() - 0.5) * 0.08,
-        t: 0,          // lerp progress 0→1
-        speed: 0.045,
-        startX, startY,
-        floorY, landed: false, bounceCount: 0, maxBounces: 0
-    });
-}
-
-
-
-
-// Star pixel art (5x5 pixels, drawn at position)
-function drawPixelStar(ctx, x, y, size, color, alpha) {
-    // 5x5 star pattern
-    const star = [
-        "  X  ",
-        " XXX ",
-        "XXXXX",
-        " XXX ",
-        "  X  "
-    ];
-    ctx.globalAlpha = alpha;
-    ctx.fillStyle = color;
-    const ps = size / 5;
-    for (let row = 0; row < 5; row++) {
-        for (let col = 0; col < 5; col++) {
-            if (star[row][col] === 'X') {
-                ctx.fillRect(x + col * ps - size/2, y + row * ps - size/2, ps, ps);
-            }
-        }
-    }
-}
-
-function updateParticles() {
-    const playerCX = player.x + player.width / 2;
-    const playerCY = player.y + player.height / 2;
-
-    for (let i = particles.length - 1; i >= 0; i--) {
-        const p = particles[i];
-
-        // --- FLYING BLOCK (shrink + fly to player) ---
-        if (p.isBlockFly) {
-            p.t += p.speed;
-            if (p.t >= 1) {
-                // Arrived at player — burst into stars
-                for (let s = 0; s < 6; s++) {
-                    const angle = (s / 6) * Math.PI * 2;
-                    const spd = 3 + Math.random() * 3;
-                    particles.push({
-                        x: playerCX, y: playerCY,
-                        vx: Math.cos(angle) * spd,
-                        vy: Math.sin(angle) * spd - 1,
-                        size: 8 + Math.random() * 6,
-                        life: 1.0, decay: 0.04 + Math.random() * 0.025,
-                        color: p.colors[Math.floor(Math.random() * p.colors.length)],
-                        isStar: true,
-                        rotation: Math.random() * Math.PI * 2,
-                        spin: (Math.random() - 0.5) * 0.2,
-                        gravity: 0.07,
-                        bounceCount: 0, maxBounces: 0,
-                        floorY: p.floorY, landed: false
-                    });
-                }
-                particles.splice(i, 1);
-                continue;
-            }
-            // Ease-in-out lerp
-            const ease = p.t < 0.5 ? 2*p.t*p.t : -1+(4-2*p.t)*p.t;
-            p.x = p.startX + (playerCX - p.startX) * ease;
-            p.y = p.startY + (playerCY - p.startY) * ease;
-            // Shrink as it travels
-            p.size = (TILE_SIZE * 0.85) * (1 - p.t * 0.85);
-            p.rotation += p.spin;
-            continue;
-        }
-
-        // --- STAR PARTICLE ---
-        if (p.isStar) {
-            p.vy += p.gravity;
-            p.x += p.vx;
-            p.y += p.vy;
-            p.rotation += p.spin;
-            p.vx *= 0.97;
-            p.life -= p.decay;
-            if (p.life <= 0) { particles.splice(i, 1); }
-            continue;
-        }
-
-        if (!p.landed) {
-            p.vy += p.gravity;
-            p.x += p.vx;
-            p.y += p.vy;
-            if (p.spin !== undefined) p.rotation += p.spin;
-
-            // --- WALL BOUNCE (left/right world bounds + nearby solid tiles) ---
-            if (p.isShard) {
-                // Left/right world bounds
-                if (p.x < p.size / 2) {
-                    p.x = p.size / 2;
-                    p.vx = Math.abs(p.vx) * 0.6;
-                    p.spin *= 0.5;
-                }
-                if (p.x > WORLD_W * TILE_SIZE - p.size / 2) {
-                    p.x = WORLD_W * TILE_SIZE - p.size / 2;
-                    p.vx = -Math.abs(p.vx) * 0.6;
-                    p.spin *= 0.5;
-                }
-                // Check tile to left/right
-                const tileXL = Math.floor((p.x - p.size/2) / TILE_SIZE);
-                const tileXR = Math.floor((p.x + p.size/2) / TILE_SIZE);
-                const tileYM = Math.floor(p.y / TILE_SIZE);
-                if (tileXL >= 0 && tileYM >= 0 && tileYM < WORLD_H && BLOCKS[world[tileXL][tileYM]]?.solid && p.vx < 0) {
-                    p.vx = Math.abs(p.vx) * 0.55;
-                    p.x = (tileXL + 1) * TILE_SIZE + p.size / 2;
-                    p.spin *= 0.4;
-                }
-                if (tileXR < WORLD_W && tileYM >= 0 && tileYM < WORLD_H && BLOCKS[world[tileXR][tileYM]]?.solid && p.vx > 0) {
-                    p.vx = -Math.abs(p.vx) * 0.55;
-                    p.x = tileXR * TILE_SIZE - p.size / 2;
-                    p.spin *= 0.4;
-                }
-                // Ceiling bounce
-                const tileXM = Math.floor(p.x / TILE_SIZE);
-                const tileYT = Math.floor((p.y - p.size/2) / TILE_SIZE);
-                if (tileXM >= 0 && tileXM < WORLD_W && tileYT >= 0 && BLOCKS[world[tileXM][tileYT]]?.solid && p.vy < 0) {
-                    p.vy = Math.abs(p.vy) * 0.5;
-                    p.y = (tileYT + 1) * TILE_SIZE + p.size / 2;
-                }
+            if (text === '') {
+                alert("Please enter a quote before saving.");
+                return;
             }
 
-            // Floor collision
-            const tileXUnder = Math.floor(p.x / TILE_SIZE);
-            const tileYUnder = Math.floor((p.y + p.size/2) / TILE_SIZE);
-            const onSolidGround = (
-                tileXUnder >= 0 && tileXUnder < WORLD_W &&
-                tileYUnder >= 0 && tileYUnder < WORLD_H &&
-                BLOCKS[world[tileXUnder][tileYUnder]]?.solid
-            );
-            const hitFloor = p.y >= p.floorY || onSolidGround;
+            const newQuote = {
+                id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(), // Secure unique ID
+                text: text,
+                author: author,
+                tag: tag,
+                date: new Date().toISOString()
+            };
 
-            if (hitFloor) {
-                const floorSurface = onSolidGround ? tileYUnder * TILE_SIZE : p.floorY;
-                if (!p.isDust && p.bounceCount < p.maxBounces && Math.abs(p.vy) > 1.5) {
-                    p.y = floorSurface - p.size / 2;
-                    p.vy = -Math.abs(p.vy) * (0.32 - p.bounceCount * 0.08);
-                    p.vx *= 0.6;
-                    p.spin *= 0.35;
-                    p.bounceCount++;
-                } else {
-                    p.y = floorSurface - p.size / 2;
-                    p.vy = 0; p.vx = 0; p.spin = 0;
-                    p.landed = true;
+            quotes.unshift(newQuote);
+            saveData();
+
+            // Reset inputs
+            quoteInput.value = '';
+            authorInput.value = '';
+            tagInput.value = '';
+            searchInput.value = '';
+            
+            renderQuotes();
+        }
+
+        // Delete a quote by ID
+        function deleteQuote(id) {
+            if(confirm("Are you sure you want to permanently delete this quote?")) {
+                quotes = quotes.filter(q => q.id !== id);
+                saveData();
+                filterQuotes(); // Re-render with current search filter
+            }
+        }
+
+        // Search filter trigger
+        function filterQuotes() {
+            renderQuotes(searchInput.value);
+        }
+
+        // Core save function
+        function saveData() {
+            localStorage.setItem('VaultSecureQuotes', JSON.stringify(quotes));
+        }
+
+        /* =========================================================================
+           BACKUP & RESTORE (Extra Security against Data Loss)
+           ========================================================================= */
+        
+        // Export to JSON file
+        function exportData() {
+            if (quotes.length === 0) {
+                alert("There are no quotes to export.");
+                return;
+            }
+            const dataStr = JSON.stringify(quotes, null, 2);
+            const blob = new Blob([dataStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `QuoteVault_Backup_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Import from JSON file
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedQuotes = JSON.parse(e.target.result);
+                    if (Array.isArray(importedQuotes)) {
+                        // Merge imported quotes, avoiding duplicates by ID
+                        const existingIds = new Set(quotes.map(q => q.id));
+                        importedQuotes.forEach(q => {
+                            if (!existingIds.has(q.id)) {
+                                quotes.push(q);
+                            }
+                        });
+                        
+                        // Sort by date (newest first)
+                        quotes.sort((a, b) => new Date(b.date) - new Date(a.date));
+                        
+                        saveData();
+                        renderQuotes();
+                        alert("Vault successfully restored/updated!");
+                    } else {
+                        alert("Invalid file format. Please upload a valid Quote Vault backup.");
+                    }
+                } catch (err) {
+                    alert("Error reading file. Make sure it's a valid JSON backup.");
                 }
-            }
-        } else {
-            p.life -= p.fadeRate;
-            if (p.life <= 0) { particles.splice(i, 1); continue; }
+            };
+            reader.readAsText(file);
+            // Reset the input so the same file can be uploaded again if needed
+            event.target.value = '';
         }
 
-        if (p.isDust) {
-            p.life -= p.decay;
-            if (p.life <= 0) { particles.splice(i, 1); continue; }
-        }
-    }
-}
-
-function drawParticles() {
-    for (const p of particles) {
-
-        // --- FLYING BLOCK ---
-        if (p.isBlockFly) {
-            ctx.globalAlpha = Math.max(0, 1 - p.t * 0.5);
-            ctx.save();
-            ctx.translate(Math.round(p.x), Math.round(p.y));
-            ctx.rotate(p.rotation);
-            const bs = p.size;
-            const cols = p.colors;
-            const ps = Math.max(1, bs / 4);
-            // Draw a 4x4 mini block texture
-            const pat = [
-                [0,1,0,1],[1,0,1,0],[0,1,0,1],[1,0,1,0]
-            ];
-            for (let row = 0; row < 4; row++) {
-                for (let col = 0; col < 4; col++) {
-                    ctx.fillStyle = cols[pat[row][col] % cols.length];
-                    ctx.fillRect(-bs/2 + col*ps, -bs/2 + row*ps, ps, ps);
-                }
-            }
-            // Slight outline
-            ctx.strokeStyle = 'rgba(0,0,0,0.4)';
-            ctx.lineWidth = 1;
-            ctx.strokeRect(-bs/2, -bs/2, bs, bs);
-            ctx.restore();
-            ctx.globalAlpha = 1;
-            continue;
-        }
-
-        // --- STAR PARTICLE ---
-        if (p.isStar) {
-            drawPixelStar(ctx, p.x, p.y, p.size, p.color, Math.max(0, p.life));
-            ctx.globalAlpha = 1;
-            continue;
-        }
-
-        const alpha = p.isDust ? p.life * 0.7 : (p.landed ? p.life : Math.min(1, p.life + 0.1));
-        ctx.globalAlpha = Math.max(0, alpha);
-        ctx.fillStyle = p.color;
-
-        if (p.isDust) {
-            // Simple round dust puff
-            const s = p.size * (p.isDust ? p.life + 0.4 : 1);
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, Math.max(0.5, s), 0, Math.PI * 2);
-            ctx.fill();
-        } else {
-            // Chunky rotated shard
-            ctx.save();
-            ctx.translate(Math.round(p.x), Math.round(p.y));
-            ctx.rotate(p.rotation || 0);
-            const s = p.size;
-            // Draw as irregular chunk: rectangle with a small dark edge
-            ctx.fillStyle = p.color;
-            ctx.fillRect(-s/2, -s/2, s, s);
-            // Dark edge on two sides for a chipped-rock look
-            ctx.fillStyle = 'rgba(0,0,0,0.35)';
-            ctx.fillRect(-s/2, s/2 - 1.5, s, 1.5);
-            ctx.fillRect(s/2 - 1.5, -s/2, 1.5, s);
-            ctx.restore();
-        }
-    }
-    ctx.globalAlpha = 1;
-}
-
-// AABB Collision check against the world grid
-function checkCollision(px, py) {
-    let leftTile = Math.floor(px / TILE_SIZE);
-    let rightTile = Math.floor((px + player.width) / TILE_SIZE);
-    let topTile = Math.floor(py / TILE_SIZE);
-    let bottomTile = Math.floor((py + player.height) / TILE_SIZE);
-
-    for (let x = leftTile; x <= rightTile; x++) {
-        for (let y = topTile; y <= bottomTile; y++) {
-            if (x >= 0 && x < WORLD_W && y >= 0 && y < WORLD_H) {
-                if (BLOCKS[world[x][y]].solid) return true;
-            } else if (x < 0 || x >= WORLD_W || y >= WORLD_H) {
-                return true; // World boundaries are solid
-            }
-        }
-    }
-    return false;
-}
-
-function updatePhysics() {
-    // Horizontal
-    if (keys.left) player.vx = -player.speed;
-    else if (keys.right) player.vx = player.speed;
-    else player.vx = 0;
-
-    player.x += player.vx;
-    if (checkCollision(player.x, player.y)) {
-        // Resolve horizontal
-        if (player.vx > 0) player.x = Math.floor((player.x + player.width) / TILE_SIZE) * TILE_SIZE - player.width - 0.1;
-        if (player.vx < 0) player.x = Math.floor(player.x / TILE_SIZE) * TILE_SIZE + TILE_SIZE + 0.1;
-    }
-
-    // Vertical
-    player.vy += gravity;
-    if (player.vy > maxFallSpeed) player.vy = maxFallSpeed;
-    
-    player.y += player.vy;
-    player.grounded = false;
-
-    if (checkCollision(player.x, player.y)) {
-        // Resolve vertical
-        if (player.vy > 0) { // Landing
-            player.y = Math.floor((player.y + player.height) / TILE_SIZE) * TILE_SIZE - player.height - 0.1;
-            player.grounded = true;
-        }
-        if (player.vy < 0) { // Hitting ceiling
-            player.y = Math.floor(player.y / TILE_SIZE) * TILE_SIZE + TILE_SIZE + 0.1;
-        }
-        player.vy = 0;
-    }
-
-    // Jump
-    if (keys.up && player.grounded) {
-        player.vy = -player.jumpForce;
-    }
-
-    // Apply skill effects to base stats each frame
-    player.speed     = 5 * (1 + getSkillEffect('move1') * 0.15 + getSkillEffect('move2') * 0.1);
-    player.jumpForce = 10 + getSkillEffect('move3') * 1.8 + getSkillEffect('move4') * 4;
-
-    // Tick mining progress
-    if (miningTarget) {
-        const mineBonus = 1 + getSkillEffect('mine1') * 0.20 + getSkillEffect('mine2') * 0.25;
-        miningTarget.progress += mineBonus;
-        if (miningTarget.progress >= miningTarget.required) {
-            const { tileX, tileY } = miningTarget;
-            const blockId = world[tileX][tileY];
-            const block = BLOCKS[blockId];
-            world[tileX][tileY] = 0;
-            spawnParticles(tileX, tileY, blockId);
-            camera.shake = 5 + (block.hardness || 60) / 20;
-            // XP for mining
-            const xpGain = { 1:5, 2:6, 3:10, 4:18, 5:25, 6:40, 7:80 }[blockId] || 8;
-            gainXP(xpGain);
-            if (block.drop) {
-                if (!player.inventory[block.drop]) player.inventory[block.drop] = 0;
-                let dropCount = 1;
-                if (getSkillEffect('mine3') > 0) dropCount += getSkillEffect('mine3');
-                if (getSkillEffect('fort4') > 0) dropCount *= 2;
-                if (getSkillEffect('fort2') > 0 && (blockId === 6 || blockId === 7)) dropCount = Math.ceil(dropCount * 1.5);
-                if (getSkillEffect('fort3') > 0 && blockId === 7) dropCount += getSkillEffect('fort3') * 2;
-                player.inventory[block.drop] += dropCount;
-                updateUI();
-            }
-            miningTarget = null;
-        }
-        player.mineTimer = 12;
-    }
-
-    // Animation state machine
-    if (player.mineTimer > 0) {
-        player.mineTimer--;
-        player.frame = 'player_mine';
-    } else if (!player.grounded) {
-        player.frame = 'player_jump';
-    } else if (keys.left || keys.right) {
-        player.walkTimer++;
-        if (player.walkTimer > 8) {
-            player.walkTimer = 0;
-            player.walkFrame = 1 - player.walkFrame;
-        }
-        player.frame = player.walkFrame === 0 ? 'player_walk1' : 'player_walk2';
-    } else {
-        player.frame = 'player_idle';
-        player.walkTimer = 0;
-    }
-    if (keys.left) player.facing = -1;
-    if (keys.right) player.facing = 1;
-
-    // Smooth camera with lerp
-    camera.tx = player.x - width / 2 + player.width / 2;
-    camera.ty = player.y - height / 2 + player.height / 2;
-    camera.x += (camera.tx - camera.x) * 0.12;
-    camera.y += (camera.ty - camera.y) * 0.12;
-    // Screen shake decay
-    if (camera.shake > 0) {
-        camera.shake -= 0.8;
-        if (camera.shake < 0) camera.shake = 0;
-        camera.shakeX = (Math.random() - 0.5) * camera.shake;
-        camera.shakeY = (Math.random() - 0.5) * camera.shake;
-    } else { camera.shakeX = 0; camera.shakeY = 0; }
-}
-
-
-/**
- * 5. INTERACTION & INPUT (Touch & Mouse)
- */
-function bindBtn(id, key) {
-    const btn = document.getElementById(id);
-    btn.addEventListener('touchstart',  (e) => { e.preventDefault(); e.stopPropagation(); keys[key] = true;  }, { passive: false });
-    btn.addEventListener('touchend',    (e) => { e.preventDefault(); e.stopPropagation(); keys[key] = false; }, { passive: false });
-    btn.addEventListener('touchcancel', (e) => { e.preventDefault(); e.stopPropagation(); keys[key] = false; }, { passive: false });
-    btn.addEventListener('mousedown',   (e) => { e.preventDefault(); keys[key] = true;  });
-    btn.addEventListener('mouseup',     (e) => { e.preventDefault(); keys[key] = false; });
-    btn.addEventListener('mouseleave',  (e) => { e.preventDefault(); keys[key] = false; });
-}
-bindBtn('btn-left', 'left');
-bindBtn('btn-right', 'right');
-bindBtn('btn-jump', 'up');
-
-// Keyboard fallback for desktop testing
-window.addEventListener('keydown', (e) => {
-    if (e.key === 'a' || e.key === 'ArrowLeft') keys.left = true;
-    if (e.key === 'd' || e.key === 'ArrowRight') keys.right = true;
-    if (e.key === 'w' || e.key === 'ArrowUp' || e.key === ' ') keys.up = true;
-});
-window.addEventListener('keyup', (e) => {
-    if (e.key === 'a' || e.key === 'ArrowLeft') keys.left = false;
-    if (e.key === 'd' || e.key === 'ArrowRight') keys.right = false;
-    if (e.key === 'w' || e.key === 'ArrowUp' || e.key === ' ') keys.up = false;
-});
-
-// Mining Logic — hold/tap to mine with progress
-function getPointerTile(e) {
-    const clickX = e.clientX + camera.x;
-    const clickY = e.clientY + camera.y;
-    return { tileX: Math.floor(clickX / TILE_SIZE), tileY: Math.floor(clickY / TILE_SIZE) };
-}
-
-canvas.addEventListener('pointerdown', (e) => {
-    e.preventDefault();
-    const { tileX, tileY } = getPointerTile(e);
-    if (tileX >= 0 && tileX < WORLD_W && tileY >= 0 && tileY < WORLD_H) {
-        const blockId = world[tileX][tileY];
-        const block = BLOCKS[blockId];
-        const dx = (tileX * TILE_SIZE + TILE_SIZE/2) - (player.x + player.width/2);
-        const dy = (tileY * TILE_SIZE + TILE_SIZE/2) - (player.y + player.height/2);
-        const dist = Math.sqrt(dx*dx + dy*dy);
-        if (dist < TILE_SIZE * 4 && block.solid && !block.unbreakable) {
-            miningTarget = { tileX, tileY, progress: 0, required: block.hardness || 60 };
-        }
-    }
-});
-
-canvas.addEventListener('pointermove', (e) => {
-    if (!miningTarget) return;
-    const { tileX, tileY } = getPointerTile(e);
-    if (tileX !== miningTarget.tileX || tileY !== miningTarget.tileY) {
-        miningTarget = null; // Moved off block, cancel
-    }
-});
-
-canvas.addEventListener('pointerup',     () => { miningTarget = null; });
-canvas.addEventListener('pointercancel', () => { miningTarget = null; });
-
-// Crack overlay stages (drawn over block while mining)
-function drawCrackOverlay(tileX, tileY, progress, required) {
-    const stage = Math.floor((progress / required) * 8); // 0–7
-    const x = tileX * TILE_SIZE;
-    const y = tileY * TILE_SIZE;
-    const T = TILE_SIZE;
-    ctx.globalAlpha = 0.18 + stage * 0.07;
-    ctx.fillStyle = '#000000';
-    // Draw progressively more crack pixels based on stage
-    const crackPatterns = [
-        [[3,2],[4,2]],
-        [[3,2],[4,2],[3,3]],
-        [[2,2],[3,2],[4,2],[3,3],[4,3]],
-        [[2,2],[3,2],[4,2],[3,3],[4,3],[2,4]],
-        [[1,2],[2,2],[3,2],[4,2],[3,3],[4,3],[2,4],[5,4]],
-        [[1,2],[2,2],[3,2],[4,2],[3,3],[4,3],[2,4],[5,4],[1,5],[5,5]],
-        [[0,1],[1,2],[2,2],[3,2],[4,2],[5,2],[3,3],[4,3],[2,4],[5,4],[1,5],[5,5],[0,6]],
-        [[0,1],[1,2],[2,2],[3,2],[4,2],[5,2],[6,2],[3,3],[4,3],[2,4],[5,4],[1,5],[5,5],[0,6],[6,6],[3,7]]
-    ];
-    const px = Math.floor(T / 8);
-    const pattern = crackPatterns[Math.min(stage, 7)];
-    for (const [cx, cy] of pattern) {
-        ctx.fillRect(x + cx * px, y + cy * px, px, px);
-    }
-    ctx.globalAlpha = 1;
-}
-
-const ITEM_ICONS = { Dirt:'🟫', Stone:'🩶', Coal:'⬛', Iron:'🟤', Gold:'🟡', Diamond:'💎' };
-function updateUI() {
-    let html = '';
-    let empty = true;
-    for (let item in player.inventory) {
-        const icon = ITEM_ICONS[item] || '▪';
-        html += `<div>${icon} ${item}: <span style="color:#ffe066">${player.inventory[item]}</span></div>`;
-        empty = false;
-    }
-    if (empty) html = '<span style="color:#888">Empty</span>';
-    document.getElementById('inv-contents').innerHTML = html;
-}
-updateUI();
-
-
-/**
- * 6. RENDER LOOP
- */
-// Wind system
-let windStrength = 0.35;
-let windTarget   = 0.35;
-let windTimer    = 0;
-
-// Tree state
-const trees = [];
-(function generateTrees() {
-    for (let tx = 2; tx < WORLD_W - 2; tx++) {
-        if (Math.random() < 0.16) {
-            const surf = world._surfaceY[tx];
-            if (world[tx][surf] === 1) {
-                trees.push({
-                    tx, surf,
-                    trunkH:    3 + Math.floor(Math.random() * 3),
-                    canopyR:   22 + Math.random() * 14,
-                    leafPhases: Array.from({length: 16}, () => Math.random() * Math.PI * 2),
-                    swayAmp:   0.016 + Math.random() * 0.012
-                });
-            }
-        }
-    }
-})();
-
-function drawTrees(now) {
-    windTimer++;
-    if (windTimer > 200) {
-        windTarget = 0.1 + Math.random() * 0.8;
-        windTimer  = 0;
-    }
-    windStrength += (windTarget - windStrength) * 0.003;
-
-    const t = now / 1000;
-    const TRUNK_COL  = '#5c3a14';
-    const TRUNK_DARK = '#3a2008';
-    const LEAF_COLS  = ['#2d7a1f','#3a9428','#1e5c14','#4db830','#56c23a','#1a4d10'];
-
-    for (const tree of trees) {
-        const wx = tree.tx * TILE_SIZE;
-        const wy = tree.surf * TILE_SIZE;
-        const sx = wx - camera.x;
-        const sy = wy - camera.y;
-        if (sx < -200 || sx > width + 200) continue;
-
-        const sway = Math.sin(t * 1.1 + tree.tx * 0.7) * windStrength * tree.swayAmp * TILE_SIZE;
-        const TW   = 10;
-
-        // Trunk
-        for (let seg = 0; seg < tree.trunkH; seg++) {
-            const frac   = seg / tree.trunkH;
-            const segSway = sway * frac * frac;
-            const bx = sx + TILE_SIZE / 2 - TW / 2 + segSway;
-            const by = sy - seg * TILE_SIZE - TILE_SIZE;
-            ctx.fillStyle = TRUNK_COL;
-            ctx.fillRect(Math.round(bx),               Math.round(by), Math.round(TW * 0.65), TILE_SIZE + 1);
-            ctx.fillStyle = TRUNK_DARK;
-            ctx.fillRect(Math.round(bx + TW * 0.65),   Math.round(by), Math.round(TW * 0.35), TILE_SIZE + 1);
-        }
-
-        // Canopy blobs
-        const topSway = sway;
-        const cy2     = sy - tree.trunkH * TILE_SIZE;
-        const cr      = tree.canopyR;
-        const cx2     = sx + TILE_SIZE / 2 + topSway;
-        const windOff = Math.sin(t * 1.7 + tree.tx * 0.5) * windStrength * 3;
-
-        const layers = [
-            { rx: cr * 0.95, ry: cr * 0.72, dy: cr * 0.1,   ci: 1 },
-            { rx: cr * 0.72, ry: cr * 0.55, dy: -cr * 0.38, ci: 0 },
-            { rx: cr * 0.52, ry: cr * 0.40, dy: -cr * 0.68, ci: 2 },
-        ];
-        for (const l of layers) {
-            ctx.globalAlpha = 0.96;
-            ctx.fillStyle = LEAF_COLS[l.ci % LEAF_COLS.length];
-            ctx.beginPath();
-            ctx.ellipse(Math.round(cx2 + windOff * 0.25), Math.round(cy2 + l.dy), l.rx, l.ry, 0, 0, Math.PI * 2);
-            ctx.fill();
-            // dark underside
-            ctx.globalAlpha = 0.18;
-            ctx.fillStyle = '#0a2d06';
-            ctx.beginPath();
-            ctx.ellipse(Math.round(cx2 + windOff * 0.25), Math.round(cy2 + l.dy + l.ry * 0.5), l.rx * 0.85, l.ry * 0.28, 0, 0, Math.PI * 2);
-            ctx.fill();
-        }
-
-        // Individual drifting leaves
-        for (let li = 0; li < 10; li++) {
-            const ph   = tree.leafPhases[li % tree.leafPhases.length];
-            const dx   = Math.sin(t * (0.8 + li * 0.13) + ph) * windStrength * 8;
-            const dy2  = Math.cos(t * (0.5 + li * 0.09) + ph) * 4;
-            const lx   = cx2 + (li % 5 - 2) * (cr * 0.4) + dx;
-            const ly   = cy2 - cr * 0.25 + (li % 3) * (cr * 0.28) + dy2;
-            const ls   = 3 + (li % 3) * 1.5;
-            ctx.globalAlpha = 0.75;
-            ctx.fillStyle = LEAF_COLS[(li + 2) % LEAF_COLS.length];
-            ctx.beginPath();
-            ctx.ellipse(Math.round(lx), Math.round(ly), ls, ls * 0.6, dx * 0.04, 0, Math.PI * 2);
-            ctx.fill();
-        }
-        ctx.globalAlpha = 1;
-    }
-}
-
-// Cloud state
-const clouds = Array.from({length: 10}, () => ({
-    x: Math.random() * WORLD_W * TILE_SIZE,
-    y: 30 + Math.random() * 120,
-    w: 60 + Math.random() * 120,
-    h: 22 + Math.random() * 20,
-    speed: 0.12 + Math.random() * 0.18
-}));
-
-function drawSky() {
-    // Sky gradient based on camera depth
-    const groundY = 20 * TILE_SIZE - camera.y;
-    const skyGrad = ctx.createLinearGradient(0, 0, 0, Math.max(10, groundY));
-    skyGrad.addColorStop(0, '#4a90d9');
-    skyGrad.addColorStop(0.5, '#87CEEB');
-    skyGrad.addColorStop(1, '#b8e0f0');
-    ctx.fillStyle = skyGrad;
-    ctx.fillRect(0, 0, width, Math.max(0, groundY));
-    // Underground fill
-    if (groundY < height) {
-        ctx.fillStyle = '#0d0a06';
-        ctx.fillRect(0, Math.max(0, groundY), width, height);
-    }
-}
-
-function drawClouds() {
-    for (const c of clouds) {
-        c.x += c.speed;
-        if (c.x > WORLD_W * TILE_SIZE + 200) c.x = -200;
-        const sx = c.x - camera.x;
-        const sy = c.y - camera.y;
-        if (sx > width + 200 || sx + c.w < -200 || sy > height || sy + c.h < 0) continue;
-        ctx.globalAlpha = 0.82;
-        ctx.fillStyle = '#ffffff';
-        // 3-oval chunky pixel cloud
-        ctx.beginPath();
-        ctx.ellipse(sx + c.w * 0.3, sy + c.h * 0.6, c.w * 0.3, c.h * 0.45, 0, 0, Math.PI*2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.ellipse(sx + c.w * 0.6, sy + c.h * 0.5, c.w * 0.38, c.h * 0.5, 0, 0, Math.PI*2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.ellipse(sx + c.w * 0.82, sy + c.h * 0.65, c.w * 0.22, c.h * 0.38, 0, 0, Math.PI*2);
-        ctx.fill();
-        ctx.globalAlpha = 1;
-    }
-}
-
-function drawDepthFog() {
-    // Darkens underground areas to simulate depth
-    const fogStart = 22 * TILE_SIZE;
-    const fogEnd = WORLD_H * TILE_SIZE;
-    const playerDepthPx = player.y;
-    if (playerDepthPx < fogStart) return;
-
-    const t = Math.min(1, (playerDepthPx - fogStart) / (fogEnd - fogStart) * 1.4);
-    const fogAlpha = t * 0.55;
-    const fogY = fogStart - camera.y;
-    const grad = ctx.createLinearGradient(0, fogY, 0, fogY + 80);
-    grad.addColorStop(0, 'rgba(0,0,0,0)');
-    grad.addColorStop(1, `rgba(0,0,0,${fogAlpha})`);
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, fogY, width, 80);
-    if (fogAlpha > 0.05) {
-        ctx.fillStyle = `rgba(0,0,0,${fogAlpha * 0.7})`;
-        ctx.fillRect(0, fogY + 80, width, height);
-    }
-}
-
-function draw() {
-    const shX = Math.round(camera.shakeX);
-    const shY = Math.round(camera.shakeY);
-
-    // Sky
-    drawSky();
-
-    ctx.save();
-    ctx.translate(-camera.x + shX, -camera.y + shY);
-
-    // Clouds (drawn in world space so they scroll)
-    drawClouds();
-
-    // Trees with wind animation
-    drawTrees(performance.now());
-
-    // Frustum Culling
-    const startCol = Math.max(0, Math.floor(camera.x / TILE_SIZE));
-    const endCol = Math.min(WORLD_W, Math.ceil((camera.x + width) / TILE_SIZE));
-    const startRow = Math.max(0, Math.floor(camera.y / TILE_SIZE));
-    const endRow = Math.min(WORLD_H, Math.ceil((camera.y + height) / TILE_SIZE));
-
-    for (let x = startCol; x < endCol; x++) {
-        for (let y = startRow; y < endRow; y++) {
-            const blockId = world[x][y];
-            if (blockId !== 0) {
-                const textureName = BLOCKS[blockId].texture;
-                const sprite = preRenderedSprites[textureName];
-                if (sprite) {
-                    ctx.drawImage(sprite, x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-                }
-                // Subtle inner shadow on block edges for depth
-                ctx.globalAlpha = 0.12;
-                ctx.fillStyle = '#000';
-                ctx.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, 2);
-                ctx.fillRect(x * TILE_SIZE, y * TILE_SIZE, 2, TILE_SIZE);
-                ctx.globalAlpha = 1;
-            }
-        }
-    }
-
-    // Depth fog overlay
-    drawDepthFog();
-
-    // Draw crack overlay + mining progress bar
-    if (miningTarget) {
-        drawCrackOverlay(miningTarget.tileX, miningTarget.tileY, miningTarget.progress, miningTarget.required);
-        // Progress bar below block
-        const bx = miningTarget.tileX * TILE_SIZE;
-        const by = miningTarget.tileY * TILE_SIZE;
-        const prog = miningTarget.progress / miningTarget.required;
-        ctx.fillStyle = 'rgba(0,0,0,0.6)';
-        ctx.fillRect(bx + 2, by + TILE_SIZE + 4, TILE_SIZE - 4, 6);
-        ctx.fillStyle = prog > 0.66 ? '#ff4444' : prog > 0.33 ? '#ffaa00' : '#44ff88';
-        ctx.fillRect(bx + 2, by + TILE_SIZE + 4, (TILE_SIZE - 4) * prog, 6);
-    }
-
-    // Draw particles
-    drawParticles();
-
-    // Player shadow
-    ctx.globalAlpha = 0.22;
-    ctx.fillStyle = '#000';
-    ctx.beginPath();
-    ctx.ellipse(
-        player.x + player.width / 2, player.y + player.height + 2,
-        player.width * 0.45, 5, 0, 0, Math.PI * 2
-    );
-    ctx.fill();
-    ctx.globalAlpha = 1;
-
-    // Draw Player
-    const pSprite = preRenderedSprites[player.frame] || preRenderedSprites['player_idle'];
-    ctx.save();
-    const pcx = player.x + player.width / 2;
-    const pcy = player.y + player.height / 2;
-    ctx.translate(pcx, pcy);
-    ctx.scale(player.facing, 1);
-    ctx.translate(-player.width / 2, -player.height / 2);
-    ctx.drawImage(pSprite, 0, 0, player.width, player.height);
-    ctx.restore();
-
-    ctx.restore();
-}
-
-// ── SKILL TREE RENDERER ─────────────────────────────────────────────
-const ST_NODE_W = 90, ST_NODE_H = 74, ST_COL_GAP = 110, ST_ROW_GAP = 120;
-const ST_COLS = 4, ST_ROWS = 4;
-const ST_PAD = 40;
-const ST_W = ST_COLS * (ST_NODE_W + ST_COL_GAP) - ST_COL_GAP + ST_PAD * 2;
-const ST_H = ST_ROWS * (ST_NODE_H + ST_ROW_GAP) - ST_ROW_GAP + ST_PAD * 2 + 60;
-
-const BRANCH_COLORS = { mine:'#88bbdd', move:'#88ffaa', surv:'#ff8888', fort:'#ffdd44' };
-const BRANCH_NAMES  = { mine:'⛏ MINING', move:'👟 AGILITY', surv:'❤ SURVIVAL', fort:'💰 FORTUNE' };
-
-const skCanvas  = document.getElementById('skill-tree-canvas');
-const skCtx     = skCanvas.getContext('2d');
-skCanvas.width  = ST_W;
-skCanvas.height = ST_H;
-
-function nodePos(col, row) {
-    return {
-        x: ST_PAD + col * (ST_NODE_W + ST_COL_GAP),
-        y: ST_PAD + 60 + row * (ST_NODE_H + ST_ROW_GAP)
-    };
-}
-
-function canUnlock(skill) {
-    if (playerSkills[skill.id] >= skill.maxRank) return false;
-    if (player.skillPoints < 1) return false;
-    if (skill.requires && playerSkills[skill.requires] < 1) return false;
-    return true;
-}
-
-function drawPixelIcon(sCtx, str, cx, cy, size, color) {
-    // Draw a 5x5 pixel icon from a 25-char string
-    const px = Math.floor(size / 5);
-    for (let i = 0; i < 25; i++) {
-        if (str[i] === 'M') {
-            const gx = i % 5;
-            const gy = Math.floor(i / 5);
-            sCtx.fillStyle = color;
-            sCtx.fillRect(cx - Math.floor(size/2) + gx*px, cy - Math.floor(size/2) + gy*px, px, px);
-        }
-    }
-}
-
-function renderSkillTree() {
-    skCtx.clearRect(0, 0, ST_W, ST_H);
-
-    // Background
-    const bg = skCtx.createLinearGradient(0, 0, ST_W, ST_H);
-    bg.addColorStop(0, '#0a0418');
-    bg.addColorStop(1, '#0d0824');
-    skCtx.fillStyle = bg;
-    skCtx.fillRect(0, 0, ST_W, ST_H);
-
-    // Branch header labels
-    for (let col = 0; col < ST_COLS; col++) {
-        const bkey = ['mine','move','surv','fort'][col];
-        const bx = ST_PAD + col * (ST_NODE_W + ST_COL_GAP) + ST_NODE_W / 2;
-        skCtx.fillStyle = BRANCH_COLORS[bkey];
-        skCtx.font = '8px "Press Start 2P", monospace';
-        skCtx.textAlign = 'center';
-        skCtx.textBaseline = 'middle';
-        // glow
-        skCtx.shadowColor = BRANCH_COLORS[bkey];
-        skCtx.shadowBlur = 10;
-        skCtx.fillText(BRANCH_NAMES[bkey], bx, ST_PAD + 22);
-        skCtx.shadowBlur = 0;
-    }
-
-    // Draw connector lines first
-    for (const skill of SKILL_DEFS) {
-        if (!skill.requires) continue;
-        const parent = SKILL_DEFS.find(s => s.id === skill.requires);
-        const fromP  = nodePos(parent.col, parent.row);
-        const toP    = nodePos(skill.col, skill.row);
-        const unlocked = playerSkills[skill.id] > 0;
-        const parentUnlocked = playerSkills[parent.id] > 0;
-        skCtx.strokeStyle = (unlocked && parentUnlocked) ? BRANCH_COLORS[skill.branch] : 'rgba(100,80,140,0.4)';
-        skCtx.lineWidth = unlocked ? 3 : 1.5;
-        skCtx.setLineDash(unlocked ? [] : [6, 4]);
-        if (unlocked) {
-            skCtx.shadowColor = BRANCH_COLORS[skill.branch];
-            skCtx.shadowBlur = 8;
-        }
-        skCtx.beginPath();
-        skCtx.moveTo(fromP.x + ST_NODE_W/2, fromP.y + ST_NODE_H);
-        skCtx.lineTo(toP.x + ST_NODE_W/2, toP.y);
-        skCtx.stroke();
-        skCtx.setLineDash([]);
-        skCtx.shadowBlur = 0;
-    }
-
-    // Draw nodes
-    for (const skill of SKILL_DEFS) {
-        const { x, y } = nodePos(skill.col, skill.row);
-        const rank      = playerSkills[skill.id];
-        const unlocked  = rank > 0;
-        const available = canUnlock(skill);
-        const maxed     = rank >= skill.maxRank;
-        const col       = BRANCH_COLORS[skill.branch];
-
-        // Node border glow
-        if (unlocked) {
-            skCtx.shadowColor = col;
-            skCtx.shadowBlur = 18;
-        }
-
-        // Node background
-        const nodeBg = skCtx.createLinearGradient(x, y, x, y + ST_NODE_H);
-        if (maxed) {
-            nodeBg.addColorStop(0, 'rgba(40,20,80,0.98)');
-            nodeBg.addColorStop(1, 'rgba(20,10,40,0.98)');
-        } else if (unlocked) {
-            nodeBg.addColorStop(0, 'rgba(30,15,60,0.98)');
-            nodeBg.addColorStop(1, 'rgba(15,8,30,0.98)');
-        } else if (available) {
-            nodeBg.addColorStop(0, 'rgba(20,10,40,0.92)');
-            nodeBg.addColorStop(1, 'rgba(10,5,20,0.92)');
-        } else {
-            nodeBg.addColorStop(0, 'rgba(10,8,18,0.85)');
-            nodeBg.addColorStop(1, 'rgba(6,4,12,0.85)');
-        }
-        skCtx.fillStyle = nodeBg;
-        skCtx.beginPath();
-        skCtx.roundRect(x, y, ST_NODE_W, ST_NODE_H, 8);
-        skCtx.fill();
-
-        // Border
-        skCtx.strokeStyle = maxed ? col : unlocked ? col : available ? 'rgba(150,100,220,0.6)' : 'rgba(60,40,100,0.4)';
-        skCtx.lineWidth = maxed ? 2.5 : unlocked ? 2 : 1.5;
-        skCtx.beginPath();
-        skCtx.roundRect(x, y, ST_NODE_W, ST_NODE_H, 8);
-        skCtx.stroke();
-        skCtx.shadowBlur = 0;
-
-        // Pixel icon
-        const iconAlpha = unlocked ? 1 : available ? 0.7 : 0.28;
-        skCtx.globalAlpha = iconAlpha;
-        drawPixelIcon(skCtx, skill.icon.padEnd(25,' '), x + ST_NODE_W/2, y + 20, 22, maxed ? col : unlocked ? col : '#888888');
-        skCtx.globalAlpha = 1;
-
-        // Skill name
-        skCtx.fillStyle = unlocked ? col : available ? '#aaaacc' : '#555566';
-        skCtx.font = '6px "Press Start 2P", monospace';
-        skCtx.textAlign = 'center';
-        skCtx.textBaseline = 'middle';
-        // wrap long names
-        const words = skill.name.split(' ');
-        if (words.length > 2) {
-            skCtx.fillText(words.slice(0,2).join(' '), x + ST_NODE_W/2, y + 38);
-            skCtx.fillText(words.slice(2).join(' '),   x + ST_NODE_W/2, y + 47);
-        } else {
-            skCtx.fillText(skill.name, x + ST_NODE_W/2, y + 42);
-        }
-
-        // Rank pips
-        const pipW = 10, pipGap = 3;
-        const totalPipW = skill.maxRank * pipW + (skill.maxRank-1) * pipGap;
-        const pipStartX = x + ST_NODE_W/2 - totalPipW/2;
-        for (let r = 0; r < skill.maxRank; r++) {
-            const px2 = pipStartX + r * (pipW + pipGap);
-            skCtx.fillStyle = r < rank ? col : 'rgba(80,60,120,0.5)';
-            if (r < rank) { skCtx.shadowColor = col; skCtx.shadowBlur = 6; }
-            skCtx.fillRect(Math.round(px2), y + ST_NODE_H - 13, pipW, 6);
-            skCtx.shadowBlur = 0;
-        }
-
-        // Available pulse border overlay
-        if (available && !unlocked) {
-            const pulse = 0.4 + 0.3 * Math.sin(Date.now() * 0.004);
-            skCtx.strokeStyle = `rgba(180,120,255,${pulse})`;
-            skCtx.lineWidth = 2;
-            skCtx.beginPath();
-            skCtx.roundRect(x+1, y+1, ST_NODE_W-2, ST_NODE_H-2, 7);
-            skCtx.stroke();
-        }
-    }
-}
-
-// Skill tree touch/click
-let skillHoverTimeout = null;
-function getSkillAtPos(ex, ey) {
-    const rect = skCanvas.getBoundingClientRect();
-    const scaleX = skCanvas.width / rect.width;
-    const scaleY = skCanvas.height / rect.height;
-    const cx = (ex - rect.left) * scaleX;
-    const cy = (ey - rect.top)  * scaleY;
-    for (const skill of SKILL_DEFS) {
-        const { x, y } = nodePos(skill.col, skill.row);
-        if (cx >= x && cx <= x + ST_NODE_W && cy >= y && cy <= y + ST_NODE_H) return skill;
-    }
-    return null;
-}
-
-function showTooltip(skill) {
-    const tt = document.getElementById('skill-tooltip');
-    const rank = playerSkills[skill.id];
-    const maxed = rank >= skill.maxRank;
-    const avail = canUnlock(skill);
-    let statusLine = '';
-    if (maxed)       statusLine = '<span style="color:#ffdd44">✦ MAXED OUT</span>';
-    else if (avail)  statusLine = '<span style="color:#88ffaa">▶ TAP TO UNLOCK  (1 pt)</span>';
-    else if (!skill.requires || playerSkills[skill.requires] < 1)
-                     statusLine = '<span style="color:#ff8888">🔒 Requires ' + (SKILL_DEFS.find(s=>s.id===skill.requires)?.name||'?') + '</span>';
-    else             statusLine = '<span style="color:#ff8888">Not enough skill points</span>';
-    tt.innerHTML = `<b style="color:${BRANCH_COLORS[skill.branch]}">${skill.name}</b><br>${skill.desc}<br>Rank: ${rank}/${skill.maxRank}<br>${statusLine}`;
-    tt.style.display = 'block';
-}
-
-skCanvas.addEventListener('click', (e) => {
-    const skill = getSkillAtPos(e.clientX, e.clientY);
-    if (!skill) return;
-    if (canUnlock(skill)) {
-        playerSkills[skill.id]++;
-        player.skillPoints--;
-        document.getElementById('skill-notif').style.display = player.skillPoints > 0 ? 'flex' : 'none';
-        updateXPBar();
-        renderSkillTree();
-    }
-    showTooltip(skill);
-});
-
-skCanvas.addEventListener('touchend', (e) => {
-    e.preventDefault();
-    const t = e.changedTouches[0];
-    const skill = getSkillAtPos(t.clientX, t.clientY);
-    if (!skill) return;
-    if (canUnlock(skill)) {
-        playerSkills[skill.id]++;
-        player.skillPoints--;
-        document.getElementById('skill-notif').style.display = player.skillPoints > 0 ? 'flex' : 'none';
-        updateXPBar();
-        renderSkillTree();
-    }
-    showTooltip(skill);
-}, { passive: false });
-
-skCanvas.addEventListener('mousemove', (e) => {
-    const skill = getSkillAtPos(e.clientX, e.clientY);
-    if (skill) showTooltip(skill);
-    else document.getElementById('skill-tooltip').style.display = 'none';
-});
-
-// Skill tree open/close
-document.getElementById('btn-skill').addEventListener('click', () => {
-    document.getElementById('skill-overlay').classList.toggle('open');
-    document.getElementById('skill-notif').style.display = 'none';
-    renderSkillTree();
-});
-document.getElementById('btn-skill').addEventListener('touchend', (e) => {
-    e.preventDefault(); e.stopPropagation();
-    document.getElementById('skill-overlay').classList.toggle('open');
-    document.getElementById('skill-notif').style.display = 'none';
-    renderSkillTree();
-}, { passive: false });
-document.getElementById('skill-close').addEventListener('click', () => {
-    document.getElementById('skill-overlay').classList.remove('open');
-});
-document.getElementById('skill-close').addEventListener('touchend', (e) => {
-    e.preventDefault(); e.stopPropagation();
-    document.getElementById('skill-overlay').classList.remove('open');
-}, { passive: false });
-
-// Animate skill tree while open (for pulse effect)
-function skillTreeLoop() {
-    if (document.getElementById('skill-overlay').classList.contains('open')) {
-        renderSkillTree();
-    }
-    requestAnimationFrame(skillTreeLoop);
-}
-requestAnimationFrame(skillTreeLoop);
-
-// Main Game Loop
-let lastTime = 0;
-function loop(timestamp) {
-    updatePhysics();
-    updateParticles();
-    draw();
-    const surf = world._surfaceY ? world._surfaceY[Math.floor(player.x / TILE_SIZE + 0.5)] || 20 : 20;
-    const depthTiles = Math.max(0, Math.floor(player.y / TILE_SIZE) - surf);
-    document.getElementById('depth-value').textContent = depthTiles > 0 ? depthTiles * 2 + 'm' : 'surface';
-    requestAnimationFrame(loop);
-}
-
-// Start game
-requestAnimationFrame(loop);
-
+        // Initial render on page load
+        renderQuotes();
     </script>
 </body>
-
 </html>
