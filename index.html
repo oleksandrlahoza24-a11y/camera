@@ -1,537 +1,1793 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Quote Vault | Professional Edition</title>
-    
-    <!-- Professional Typography -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-    
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>LuminaQuote — by Oleksandr Lahoza</title>
 
-    <style>
-        :root {
-            /* Professional Dark Slate Color Palette */
-            --bg-color: #0f172a;
-            --surface-color: #1e293b;
-            --border-color: #334155;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --accent-color: #3b82f6;
-            --accent-hover: #2563eb;
-            --danger-color: #ef4444;
-            --danger-hover: #dc2626;
-            --border-radius: 12px;
-            --transition: all 0.2s ease-in-out;
-        }
+  <!-- Professional Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            -webkit-tap-highlight-color: transparent;
-        }
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            line-height: 1.6;
-            min-height: 100vh;
-            padding: 20px;
-        }
+  <style>
+    /* ============================================================
+       LUMINA QUOTE — BRAND DESIGN SYSTEM
+       Author: Oleksandr Lahoza
+    ============================================================ */
 
-        /* Top Navigation / Header */
-        header {
-            max-width: 1200px;
-            margin: 0 auto 30px auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border-color);
-            flex-wrap: wrap;
-            gap: 15px;
-        }
+    /* --- Theme Definitions --- */
+    :root,
+    [data-theme="midnight"] {
+      --bg-color: #090d1a;
+      --bg-pattern: radial-gradient(ellipse at 20% 10%, rgba(99, 102, 241, 0.08) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 80%, rgba(16, 185, 129, 0.06) 0%, transparent 55%);
+      --surface-color: #111827;
+      --surface-raised: #1a2336;
+      --border-color: #1f2d45;
+      --border-light: #263347;
+      --text-main: #f0f4ff;
+      --text-muted: #8899bb;
+      --text-faint: #445570;
+      --accent-color: #6366f1;
+      --accent-hover: #4f46e5;
+      --accent-glow: rgba(99, 102, 241, 0.25);
+      --accent-tag-bg: rgba(99, 102, 241, 0.12);
+      --accent-tag-text: #a5b4fc;
+      --danger-color: #f43f5e;
+      --danger-hover: #e11d48;
+      --success-color: #10b981;
+      --border-radius: 14px;
+      --transition: all 0.2s ease-in-out;
+      --logo-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      --card-hover-border: #2d4060;
+      --card-hover-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+      --font-body: 'Inter', sans-serif;
+      --font-display: 'Space Grotesk', sans-serif;
+      --font-quote: 'Lora', serif;
+    }
 
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+    [data-theme="obsidian"] {
+      --bg-color: #0a0a0a;
+      --bg-pattern: radial-gradient(ellipse at 50% 0%, rgba(245, 158, 11, 0.06) 0%, transparent 60%);
+      --surface-color: #141414;
+      --surface-raised: #1c1c1c;
+      --border-color: #242424;
+      --border-light: #2e2e2e;
+      --text-main: #f5f0e8;
+      --text-muted: #807060;
+      --text-faint: #3a3020;
+      --accent-color: #d97706;
+      --accent-hover: #b45309;
+      --accent-glow: rgba(217, 119, 6, 0.25);
+      --accent-tag-bg: rgba(217, 119, 6, 0.12);
+      --accent-tag-text: #fbbf24;
+      --danger-color: #ef4444;
+      --danger-hover: #dc2626;
+      --success-color: #10b981;
+      --logo-gradient: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+      --card-hover-border: #383020;
+      --card-hover-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+    }
 
-        .logo i {
-            color: var(--accent-color);
-        }
+    [data-theme="nord"] {
+      --bg-color: #1c2333;
+      --bg-pattern: radial-gradient(ellipse at 30% 20%, rgba(129, 161, 193, 0.08) 0%, transparent 55%);
+      --surface-color: #242f42;
+      --surface-raised: #2c3a50;
+      --border-color: #3b4a60;
+      --border-light: #445570;
+      --text-main: #d8dee9;
+      --text-muted: #81a1c1;
+      --text-faint: #4c5f7a;
+      --accent-color: #5e81ac;
+      --accent-hover: #4c6f98;
+      --accent-glow: rgba(94, 129, 172, 0.25);
+      --accent-tag-bg: rgba(94, 129, 172, 0.15);
+      --accent-tag-text: #88c0d0;
+      --danger-color: #bf616a;
+      --danger-hover: #a84f58;
+      --success-color: #a3be8c;
+      --logo-gradient: linear-gradient(135deg, #5e81ac 0%, #88c0d0 100%);
+      --card-hover-border: #506080;
+      --card-hover-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
 
-        .header-actions {
-            display: flex;
-            gap: 10px;
-        }
+    [data-theme="emerald"] {
+      --bg-color: #071410;
+      --bg-pattern: radial-gradient(ellipse at 70% 30%, rgba(16, 185, 129, 0.1) 0%, transparent 60%);
+      --surface-color: #0e1f18;
+      --surface-raised: #142a20;
+      --border-color: #1a3828;
+      --border-light: #224832;
+      --text-main: #e8f5ef;
+      --text-muted: #5a9a78;
+      --text-faint: #24503a;
+      --accent-color: #10b981;
+      --accent-hover: #059669;
+      --accent-glow: rgba(16, 185, 129, 0.25);
+      --accent-tag-bg: rgba(16, 185, 129, 0.12);
+      --accent-tag-text: #6ee7b7;
+      --danger-color: #f43f5e;
+      --danger-hover: #e11d48;
+      --success-color: #34d399;
+      --logo-gradient: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+      --card-hover-border: #2a6045;
+      --card-hover-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    }
 
-        /* Buttons & Inputs (iPad touch optimized to min 44px height) */
-        button, input, textarea {
-            font-family: 'Inter', sans-serif;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            background-color: var(--surface-color);
-            color: var(--text-main);
-            outline: none;
-            transition: var(--transition);
-            font-size: 1rem;
-        }
+    [data-theme="light"] {
+      --bg-color: #f4f6fb;
+      --bg-pattern: radial-gradient(ellipse at 20% 10%, rgba(99, 102, 241, 0.05) 0%, transparent 60%);
+      --surface-color: #ffffff;
+      --surface-raised: #f0f2f8;
+      --border-color: #dde3f0;
+      --border-light: #e8ecf5;
+      --text-main: #0f1629;
+      --text-muted: #5a6a88;
+      --text-faint: #b0bcd0;
+      --accent-color: #6366f1;
+      --accent-hover: #4f46e5;
+      --accent-glow: rgba(99, 102, 241, 0.15);
+      --accent-tag-bg: rgba(99, 102, 241, 0.08);
+      --accent-tag-text: #4f46e5;
+      --danger-color: #f43f5e;
+      --danger-hover: #e11d48;
+      --success-color: #10b981;
+      --logo-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      --card-hover-border: #c8d0e8;
+      --card-hover-shadow: 0 8px 32px rgba(100, 120, 200, 0.12);
+    }
 
-        button {
-            cursor: pointer;
-            padding: 12px 20px;
-            font-weight: 500;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            min-height: 48px; /* iPad Touch Target Standard */
-        }
+    /* --- Font size scale settings --- */
+    [data-fontsize="small"] {
+      font-size: 14px;
+    }
 
-        button.primary {
-            background-color: var(--accent-color);
-            border-color: var(--accent-color);
-        }
+    [data-fontsize="medium"] {
+      font-size: 16px;
+    }
 
-        button.primary:hover {
-            background-color: var(--accent-hover);
-        }
+    [data-fontsize="large"] {
+      font-size: 18px;
+    }
 
-        button.secondary {
-            background-color: transparent;
-        }
+    /* --- Card layout setting --- */
+    [data-cardlayout="list"] .quotes-grid {
+      grid-template-columns: 1fr !important;
+    }
 
-        button.secondary:hover {
-            background-color: var(--border-color);
-        }
+    [data-cardlayout="compact"] .quotes-grid {
+      gap: 10px !important;
+    }
 
-        button.icon-btn {
-            padding: 12px;
-            color: var(--text-muted);
-            background: transparent;
-            border: none;
-        }
+    [data-cardlayout="compact"] .quote-card {
+      padding: 16px !important;
+      gap: 10px !important;
+    }
 
-        button.icon-btn:hover {
-            color: var(--danger-color);
-            background: rgba(239, 68, 68, 0.1);
-        }
+    /* --- Serif toggle --- */
+    [data-quotefont="sans"] .quote-body {
+      font-family: var(--font-display) !important;
+      font-style: normal !important;
+    }
 
-        input, textarea {
-            width: 100%;
-            padding: 14px;
-        }
+    /* --- Reset --- */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-        input:focus, textarea:focus {
-            border-color: var(--accent-color);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-        }
+    html {
+      scroll-behavior: smooth;
+    }
 
-        textarea {
-            resize: vertical;
-            min-height: 120px;
-        }
+    body {
+      font-family: var(--font-body);
+      background-color: var(--bg-color);
+      background-image: var(--bg-pattern);
+      background-attachment: fixed;
+      color: var(--text-main);
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 24px 20px 60px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
 
-        /* Main Layout */
-        main {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 30px;
-        }
+    /* ============================================================
+       HEADER & BRAND
+    ============================================================ */
+    header {
+      max-width: 1220px;
+      margin: 0 auto 36px auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 22px;
+      border-bottom: 1px solid var(--border-color);
+      flex-wrap: wrap;
+      gap: 16px;
+    }
 
-        @media (min-width: 850px) {
-            main {
-                grid-template-columns: 350px 1fr; /* Two columns for iPad Landscape & Desktop */
-                align-items: start;
-            }
-        }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+    }
 
-        /* Input Section */
-        .input-panel {
-            background-color: var(--surface-color);
-            padding: 24px;
-            border-radius: var(--border-radius);
-            border: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            position: sticky;
-            top: 20px;
-        }
+    .brand-logo {
+      width: 40px;
+      height: 40px;
+      background: var(--logo-gradient);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: #fff;
+      flex-shrink: 0;
+      box-shadow: 0 4px 16px var(--accent-glow);
+    }
 
-        .input-group label {
-            display: block;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-            font-weight: 500;
-        }
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
 
-        /* Quotes Section */
-        .quotes-section {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
+    .brand-name {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.3rem;
+      color: var(--text-main);
+      letter-spacing: -0.3px;
+    }
 
-        .search-bar {
-            position: relative;
-        }
+    .brand-tagline {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
 
-        .search-bar i {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-        }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-        .search-bar input {
-            padding-left: 45px;
-        }
+    .header-divider {
+      width: 1px;
+      height: 24px;
+      background: var(--border-color);
+      margin: 0 4px;
+    }
 
-        .quotes-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
+    /* ============================================================
+       BUTTONS & FORM INPUTS
+    ============================================================ */
+    button,
+    input,
+    textarea,
+    select {
+      font-family: var(--font-body);
+      border-radius: 9px;
+      border: 1px solid var(--border-color);
+      background-color: var(--surface-color);
+      color: var(--text-main);
+      outline: none;
+      transition: var(--transition);
+      font-size: 0.95rem;
+    }
 
-        @media (min-width: 1100px) {
-            .quotes-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
+    button {
+      cursor: pointer;
+      padding: 11px 18px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 44px;
+      white-space: nowrap;
+    }
 
-        /* Individual Quote Card */
-        .quote-card {
-            background-color: var(--surface-color);
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius);
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            position: relative;
-            transition: var(--transition);
-        }
+    button.primary {
+      background: var(--logo-gradient);
+      border-color: transparent;
+      color: #fff;
+      font-weight: 600;
+      box-shadow: 0 2px 12px var(--accent-glow);
+    }
 
-        .quote-card:hover {
-            border-color: #475569;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-        }
+    button.primary:hover {
+      opacity: 0.9;
+      box-shadow: 0 4px 20px var(--accent-glow);
+      transform: translateY(-1px);
+    }
 
-        .quote-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-        }
+    button.secondary {
+      background-color: var(--surface-raised);
+      border-color: var(--border-color);
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
 
-        .quote-tag {
-            background-color: rgba(59, 130, 246, 0.15);
-            color: #60a5fa;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+    button.secondary:hover {
+      border-color: var(--accent-color);
+      color: var(--text-main);
+      background-color: var(--surface-raised);
+    }
 
-        .quote-date {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
+    button.icon-btn {
+      padding: 10px;
+      color: var(--text-faint);
+      background: transparent;
+      border: 1px solid transparent;
+      min-height: 40px;
+      border-radius: 8px;
+    }
 
-        .quote-body {
-            font-family: 'Lora', serif;
-            font-size: 1.25rem;
-            line-height: 1.6;
-            color: var(--text-main);
-            font-style: italic;
-        }
+    button.icon-btn:hover {
+      color: var(--danger-color);
+      background: rgba(244, 63, 94, 0.08);
+      border-color: rgba(244, 63, 94, 0.2);
+    }
 
-        .quote-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 10px;
-            border-top: 1px solid var(--border-color);
-            padding-top: 15px;
-        }
+    button.icon-btn.fav-btn:hover {
+      color: #f59e0b;
+      background: rgba(245, 158, 11, 0.1);
+      border-color: rgba(245, 158, 11, 0.25);
+    }
 
-        .quote-author {
-            font-weight: 600;
-            color: var(--text-muted);
-            font-size: 0.95rem;
-        }
+    button.icon-btn.fav-btn.active {
+      color: #f59e0b;
+    }
 
-        /* Hidden File Input for Import */
-        #importFile {
-            display: none;
-        }
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 13px 15px;
+      background-color: var(--surface-raised);
+      border-color: var(--border-color);
+    }
 
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 50px 20px;
-            color: var(--text-muted);
-            grid-column: 1 / -1;
-        }
-        
-        .empty-state i {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            opacity: 0.5;
-        }
-    </style>
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+      background-color: var(--surface-color);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 110px;
+      line-height: 1.6;
+    }
+
+    select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23667' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 36px;
+    }
+
+    /* ============================================================
+       LAYOUT
+    ============================================================ */
+    main {
+      max-width: 1220px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 30px;
+    }
+
+    @media (min-width: 850px) {
+      main {
+        grid-template-columns: 340px 1fr;
+        align-items: start;
+      }
+    }
+
+    /* ============================================================
+       INPUT PANEL
+    ============================================================ */
+    .input-panel {
+      background-color: var(--surface-color);
+      padding: 26px;
+      border-radius: var(--border-radius);
+      border: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: sticky;
+      top: 20px;
+    }
+
+    .panel-title {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 2px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .input-group label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .tag-suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .tag-pill {
+      font-size: 0.72rem;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: var(--surface-raised);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: var(--transition);
+      font-weight: 500;
+    }
+
+    .tag-pill:hover {
+      border-color: var(--accent-color);
+      color: var(--accent-tag-text);
+      background: var(--accent-tag-bg);
+    }
+
+    .char-count {
+      font-size: 0.72rem;
+      color: var(--text-faint);
+      text-align: right;
+      margin-top: 3px;
+    }
+
+    .char-count.warn {
+      color: #f59e0b;
+    }
+
+    /* ============================================================
+       STATS BAR
+    ============================================================ */
+    .stats-bar {
+      display: flex;
+      gap: 0;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+      margin-bottom: 4px;
+    }
+
+    .stat-item {
+      flex: 1;
+      text-align: center;
+      padding: 12px 8px;
+      background: var(--surface-color);
+      border-right: 1px solid var(--border-color);
+    }
+
+    .stat-item:last-child {
+      border-right: none;
+    }
+
+    .stat-number {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 0.65rem;
+      color: var(--text-faint);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-top: 3px;
+      font-weight: 600;
+    }
+
+    /* ============================================================
+       QUOTES SECTION
+    ============================================================ */
+    .quotes-section {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .search-bar {
+      position: relative;
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .search-bar i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-faint);
+      pointer-events: none;
+      font-size: 0.85rem;
+    }
+
+    .search-bar input {
+      padding-left: 42px;
+      padding-right: 42px;
+    }
+
+    .search-clear {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-faint);
+      cursor: pointer;
+      padding: 4px;
+      min-height: unset;
+      font-size: 0.8rem;
+      display: none;
+    }
+
+    .sort-select {
+      width: auto;
+      min-width: 130px;
+      flex-shrink: 0;
+    }
+
+    .filter-chips {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .filter-chip {
+      font-size: 0.75rem;
+      padding: 5px 12px;
+      border-radius: 20px;
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: var(--transition);
+      font-weight: 500;
+      min-height: unset;
+    }
+
+    .filter-chip:hover,
+    .filter-chip.active {
+      border-color: var(--accent-color);
+      color: var(--accent-tag-text);
+      background: var(--accent-tag-bg);
+    }
+
+    .quotes-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+
+    @media (min-width: 1100px) {
+      .quotes-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    /* ============================================================
+       QUOTE CARD
+    ============================================================ */
+    .quote-card {
+      background-color: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      position: relative;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+      animation: cardIn 0.25s ease both;
+    }
+
+    @keyframes cardIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .quote-card:hover {
+      border-color: var(--card-hover-border);
+      box-shadow: var(--card-hover-shadow);
+      transform: translateY(-2px);
+    }
+
+    .quote-card.favorited {
+      border-color: rgba(245, 158, 11, 0.3);
+    }
+
+    .quote-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .quote-tag {
+      background-color: var(--accent-tag-bg);
+      color: var(--accent-tag-text);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .quote-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .quote-date {
+      font-size: 0.72rem;
+      color: var(--text-faint);
+    }
+
+    .quote-body {
+      font-family: var(--font-quote);
+      font-size: 1.15rem;
+      line-height: 1.7;
+      color: var(--text-main);
+      font-style: italic;
+      flex: 1;
+    }
+
+    .quote-body::before {
+      content: '\201C';
+      color: var(--accent-color);
+      font-size: 2rem;
+      line-height: 0;
+      vertical-align: -0.6rem;
+      margin-right: 2px;
+      opacity: 0.6;
+    }
+
+    .quote-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-color);
+      gap: 8px;
+    }
+
+    .quote-author {
+      font-weight: 600;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      font-family: var(--font-display);
+    }
+
+    .quote-actions {
+      display: flex;
+      gap: 2px;
+    }
+
+    /* ============================================================
+       SETTINGS PANEL
+    ============================================================ */
+    .settings-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 900;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .settings-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .settings-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: min(420px, 100vw);
+      background: var(--surface-color);
+      border-left: 1px solid var(--border-color);
+      z-index: 950;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow-y: auto;
+    }
+
+    .settings-panel.open {
+      transform: translateX(0);
+    }
+
+    .settings-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 26px 20px;
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      background: var(--surface-color);
+      z-index: 1;
+    }
+
+    .settings-header h2 {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .settings-header h2 i {
+      color: var(--accent-color);
+    }
+
+    .settings-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1rem;
+      padding: 8px;
+      min-height: unset;
+      border-radius: 8px;
+    }
+
+    .settings-close:hover {
+      background: var(--surface-raised);
+      color: var(--text-main);
+    }
+
+    .settings-body {
+      padding: 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      flex: 1;
+    }
+
+    .settings-section h3 {
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-faint);
+      margin-bottom: 14px;
+    }
+
+    /* Theme swatches */
+    .theme-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+    }
+
+    .theme-swatch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 7px;
+      cursor: pointer;
+      padding: 2px;
+    }
+
+    .swatch-ring {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      padding: 3px;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .swatch-ring.active {
+      border-color: var(--accent-color);
+      transform: scale(1.1);
+    }
+
+    .swatch-circle {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+    }
+
+    .swatch-label {
+      font-size: 0.62rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      text-align: center;
+    }
+
+    /* Settings option rows */
+    .setting-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .setting-row:last-child {
+      border-bottom: none;
+    }
+
+    .setting-row-label {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .setting-row-label strong {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .setting-row-label span {
+      font-size: 0.75rem;
+      color: var(--text-faint);
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      background: var(--border-color);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      border: none;
+      width: 44px;
+      height: 24px;
+      min-height: unset;
+    }
+
+    .toggle-track::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: white;
+      transition: transform 0.2s ease;
+    }
+
+    .toggle-switch input:checked+.toggle-track {
+      background: var(--accent-color);
+    }
+
+    .toggle-switch input:checked+.toggle-track::after {
+      transform: translateX(20px);
+    }
+
+    .seg-control {
+      display: flex;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+
+    .seg-btn {
+      flex: 1;
+      padding: 7px 10px;
+      background: var(--surface-raised);
+      border: none;
+      border-right: 1px solid var(--border-color);
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      font-weight: 600;
+      min-height: unset;
+      border-radius: 0;
+      cursor: pointer;
+    }
+
+    .seg-btn:last-child {
+      border-right: none;
+    }
+
+    .seg-btn.active {
+      background: var(--accent-color);
+      color: #fff;
+    }
+
+    .settings-footer {
+      padding: 20px 26px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      gap: 10px;
+    }
+
+    .settings-footer button {
+      flex: 1;
+      font-size: 0.85rem;
+    }
+
+    /* ============================================================
+       TOAST NOTIFICATIONS
+    ============================================================ */
+    .toast-container {
+      position: fixed;
+      bottom: 30px;
+      right: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 9999;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: var(--surface-raised);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 0.875rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      animation: toastIn 0.25s ease both;
+      pointer-events: all;
+      max-width: 320px;
+    }
+
+    .toast.success i {
+      color: var(--success-color);
+    }
+
+    .toast.error i {
+      color: var(--danger-color);
+    }
+
+    .toast.info i {
+      color: var(--accent-color);
+    }
+
+    @keyframes toastIn {
+      from {
+        opacity: 0;
+        transform: translateX(20px) scale(0.95);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+      }
+    }
+
+    @keyframes toastOut {
+      to {
+        opacity: 0;
+        transform: translateX(20px) scale(0.95);
+      }
+    }
+
+    /* ============================================================
+       EMPTY STATE
+    ============================================================ */
+    #importFile {
+      display: none;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+      grid-column: 1 / -1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .empty-state .empty-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      background: var(--surface-raised);
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      color: var(--text-faint);
+      margin-bottom: 4px;
+    }
+
+    .empty-state h2 {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      color: var(--text-muted);
+    }
+
+    .empty-state p {
+      font-size: 0.875rem;
+      color: var(--text-faint);
+      max-width: 280px;
+    }
+
+    /* ============================================================
+       AUTHOR CREDIT
+    ============================================================ */
+    .site-footer {
+      text-align: center;
+      padding: 40px 20px 10px;
+      font-size: 0.75rem;
+      color: var(--text-faint);
+      max-width: 1220px;
+      margin: 0 auto;
+    }
+
+    .site-footer a {
+      color: var(--accent-color);
+      text-decoration: none;
+    }
+
+    /* ============================================================
+       UTILITY
+    ============================================================ */
+    .hide-mobile {
+      display: inline;
+    }
+
+    @media (max-width: 600px) {
+      .hide-mobile {
+        display: none;
+      }
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--border-light);
+    }
+  </style>
 </head>
-<body>
 
-    <header>
-        <div class="logo">
-            <i class="fa-solid fa-vault"></i> SecureVault
+<body data-theme="midnight" data-fontsize="medium" data-cardlayout="grid" data-quotefont="serif">
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Settings Overlay -->
+  <div class="settings-overlay" id="settingsOverlay" onclick="closeSettings()"></div>
+
+  <!-- Settings Panel -->
+  <aside class="settings-panel" id="settingsPanel" role="dialog" aria-label="Settings">
+    <div class="settings-header">
+      <h2><i class="fa-solid fa-sliders"></i> Preferences</h2>
+      <button class="settings-close" onclick="closeSettings()" title="Close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="settings-body">
+
+      <!-- Theme -->
+      <div class="settings-section">
+        <h3>Theme</h3>
+        <div class="theme-grid">
+          <div class="theme-swatch" onclick="setTheme('midnight')">
+            <div class="swatch-ring" id="swatch-midnight">
+              <div class="swatch-circle" style="background:linear-gradient(135deg,#090d1a,#6366f1)"></div>
+            </div>
+            <span class="swatch-label">Midnight</span>
+          </div>
+          <div class="theme-swatch" onclick="setTheme('obsidian')">
+            <div class="swatch-ring" id="swatch-obsidian">
+              <div class="swatch-circle" style="background:linear-gradient(135deg,#0a0a0a,#d97706)"></div>
+            </div>
+            <span class="swatch-label">Obsidian</span>
+          </div>
+          <div class="theme-swatch" onclick="setTheme('nord')">
+            <div class="swatch-ring" id="swatch-nord">
+              <div class="swatch-circle" style="background:linear-gradient(135deg,#1c2333,#5e81ac)"></div>
+            </div>
+            <span class="swatch-label">Nord</span>
+          </div>
+          <div class="theme-swatch" onclick="setTheme('emerald')">
+            <div class="swatch-ring" id="swatch-emerald">
+              <div class="swatch-circle" style="background:linear-gradient(135deg,#071410,#10b981)"></div>
+            </div>
+            <span class="swatch-label">Emerald</span>
+          </div>
+          <div class="theme-swatch" onclick="setTheme('light')">
+            <div class="swatch-ring" id="swatch-light">
+              <div class="swatch-circle" style="background:linear-gradient(135deg,#f4f6fb,#6366f1)"></div>
+            </div>
+            <span class="swatch-label">Light</span>
+          </div>
         </div>
-        <div class="header-actions">
-            <!-- Hidden file input for importing data -->
-            <input type="file" id="importFile" accept=".json" onchange="importData(event)">
-            
-            <button class="secondary" onclick="document.getElementById('importFile').click()" title="Restore from file">
-                <i class="fa-solid fa-file-import"></i> <span class="hide-mobile">Import</span>
-            </button>
-            <button class="secondary" onclick="exportData()" title="Backup to file">
-                <i class="fa-solid fa-file-export"></i> <span class="hide-mobile">Export</span>
-            </button>
+      </div>
+
+      <!-- Font Size -->
+      <div class="settings-section">
+        <h3>Font Size</h3>
+        <div class="setting-row">
+          <div class="setting-row-label">
+            <strong>Interface Size</strong>
+            <span>Adjust text scale across the app</span>
+          </div>
+          <div class="seg-control">
+            <button class="seg-btn" id="fs-small" onclick="setFontSize('small')">S</button>
+            <button class="seg-btn active" id="fs-medium" onclick="setFontSize('medium')">M</button>
+            <button class="seg-btn" id="fs-large" onclick="setFontSize('large')">L</button>
+          </div>
         </div>
-    </header>
+      </div>
 
-    <main>
-        <!-- Left Panel: Input Form -->
-        <aside class="input-panel">
-            <div class="input-group">
-                <label for="quoteInput">Quote Text</label>
-                <textarea id="quoteInput" placeholder="Enter the exact words..."></textarea>
+      <!-- Layout -->
+      <div class="settings-section">
+        <h3>Card Layout</h3>
+        <div class="setting-row">
+          <div class="setting-row-label">
+            <strong>Grid</strong>
+            <span>Two columns on wide screens</span>
+          </div>
+          <div class="seg-control">
+            <button class="seg-btn active" id="cl-grid" onclick="setCardLayout('grid')"><i class="fa-solid fa-grip"></i></button>
+            <button class="seg-btn" id="cl-list" onclick="setCardLayout('list')"><i class="fa-solid fa-list"></i></button>
+            <button class="seg-btn" id="cl-compact" onclick="setCardLayout('compact')"><i class="fa-solid fa-align-justify"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quote Font -->
+      <div class="settings-section">
+        <h3>Quote Typography</h3>
+        <div class="setting-row">
+          <div class="setting-row-label">
+            <strong>Serif font for quotes</strong>
+            <span>Classic, elegant Lora typeface</span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggleSerif" checked onchange="toggleQuoteFont()">
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Display -->
+      <div class="settings-section">
+        <h3>Display</h3>
+        <div class="setting-row">
+          <div class="setting-row-label">
+            <strong>Show dates on cards</strong>
+            <span>Display save date on each quote</span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggleDates" checked onchange="toggleDates()">
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div class="setting-row-label">
+            <strong>Animated card entrance</strong>
+            <span>Cards fade in when loaded</span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggleAnim" checked onchange="toggleAnimations()">
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Data -->
+      <div class="settings-section">
+        <h3>Data & Backup</h3>
+        <div class="setting-row">
+          <div class="setting-row-label">
+            <strong>Export vault</strong>
+            <span>Download a JSON backup file</span>
+          </div>
+          <button class="secondary" onclick="exportData()" style="width:auto;min-width:80px;"><i class="fa-solid fa-file-export"></i> Export</button>
+        </div>
+        <div class="setting-row">
+          <div class="setting-row-label">
+            <strong>Import vault</strong>
+            <span>Merge from a backup file</span>
+          </div>
+          <button class="secondary" onclick="document.getElementById('importFile').click()" style="width:auto;min-width:80px;"><i class="fa-solid fa-file-import"></i> Import</button>
+        </div>
+        <div class="setting-row">
+          <div class="setting-row-label">
+            <strong>Clear all quotes</strong>
+            <span>Permanently erase your vault</span>
+          </div>
+          <button class="secondary" onclick="clearAll()" style="width:auto;min-width:80px;color:var(--danger-color);border-color:var(--danger-color)"><i class="fa-solid fa-trash"></i> Clear</button>
+        </div>
+      </div>
+
+    </div>
+    <div class="settings-footer">
+      <p style="font-size:0.72rem;color:var(--text-faint);text-align:center;width:100%">LuminaQuote v2.0 · by
+        <strong style="color:var(--text-muted)">Oleksandr Lahoza</strong></p>
+    </div>
+  </aside>
+
+  <!-- Header -->
+  <header>
+    <a class="brand" href="#">
+      <div class="brand-logo">
+        <i class="fa-solid fa-quote-left"></i>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">LuminaQuote</span>
+        <span class="brand-tagline">by Oleksandr Lahoza</span>
+      </div>
+    </a>
+    <div class="header-actions">
+      <input type="file" id="importFile" accept=".json" onchange="importData(event)">
+      <button class="secondary" onclick="document.getElementById('importFile').click()" title="Import backup">
+        <i class="fa-solid fa-file-import"></i><span class="hide-mobile"> Import</span>
+      </button>
+      <button class="secondary" onclick="exportData()" title="Export backup">
+        <i class="fa-solid fa-file-export"></i><span class="hide-mobile"> Export</span>
+      </button>
+      <div class="header-divider"></div>
+      <button class="secondary" onclick="openSettings()" title="Settings">
+        <i class="fa-solid fa-sliders"></i><span class="hide-mobile"> Settings</span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Left Panel: Input Form -->
+    <aside class="input-panel">
+      <div class="panel-title"><i class="fa-solid fa-pen-nib" style="margin-right:8px;color:var(--accent-color)"></i>Add
+        a Quote</div>
+
+      <div class="input-group">
+        <label for="quoteInput">Quote Text</label>
+        <textarea id="quoteInput" placeholder="Enter the exact words…" oninput="updateCharCount()"></textarea>
+        <div class="char-count" id="charCount">0 / 500</div>
+      </div>
+
+      <div class="input-group">
+        <label for="authorInput">Author</label>
+        <input type="text" id="authorInput" placeholder="e.g. Marcus Aurelius">
+      </div>
+
+      <div class="input-group">
+        <label for="tagInput">Category</label>
+        <input type="text" id="tagInput" placeholder="e.g. Philosophy">
+        <div class="tag-suggestions">
+          <span class="tag-pill" onclick="setTag('Philosophy')">Philosophy</span>
+          <span class="tag-pill" onclick="setTag('Motivation')">Motivation</span>
+          <span class="tag-pill" onclick="setTag('Stoicism')">Stoicism</span>
+          <span class="tag-pill" onclick="setTag('Science')">Science</span>
+          <span class="tag-pill" onclick="setTag('Art')">Art</span>
+          <span class="tag-pill" onclick="setTag('Life')">Life</span>
+        </div>
+      </div>
+
+      <button class="primary" onclick="addQuote()">
+        <i class="fa-solid fa-bookmark"></i> Save Quote
+      </button>
+
+      <!-- Stats -->
+      <div class="stats-bar" id="statsBar">
+        <div class="stat-item">
+          <div class="stat-number" id="statTotal">0</div>
+          <div class="stat-label">Total</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" id="statFavs">0</div>
+          <div class="stat-label">Starred</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" id="statTags">0</div>
+          <div class="stat-label">Tags</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Right Panel -->
+    <section class="quotes-section">
+      <div class="toolbar">
+        <div class="search-bar">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="searchInput" placeholder="Search quotes, authors, tags…" oninput="onSearchInput()">
+          <button class="search-clear" id="searchClear" onclick="clearSearch()" title="Clear"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <select class="sort-select" id="sortSelect" onchange="renderQuotes()">
+          <option value="newest">Newest first</option>
+          <option value="oldest">Oldest first</option>
+          <option value="az">Author A–Z</option>
+          <option value="fav">Starred first</option>
+        </select>
+      </div>
+
+      <div class="filter-chips" id="filterChips"></div>
+
+      <div class="quotes-grid" id="quotesGrid"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    LuminaQuote &mdash; crafted by <strong>Oleksandr Lahoza</strong> &middot; Your quotes, your clarity.
+  </footer>
+
+  <script>
+    /* ================================================================
+       LUMINA QUOTE — Core Application
+       Author: Oleksandr Lahoza
+    ================================================================ */
+
+    // --- XSS Sanitizer ---
+    function sanitize(str) {
+      if (!str) return '';
+      const d = document.createElement('div');
+      d.textContent = str;
+      return d.innerHTML;
+    }
+
+    // --- State ---
+    let quotes = JSON.parse(localStorage.getItem('LuminaQuotes')) || [];
+    let settings = JSON.parse(localStorage.getItem('LuminaSettings')) || {
+      theme: 'midnight', fontsize: 'medium', cardlayout: 'grid',
+      quotefont: 'serif', showDates: true, animations: true
+    };
+    let activeTagFilter = null;
+
+    // --- DOM refs ---
+    const quoteInput  = document.getElementById('quoteInput');
+    const authorInput = document.getElementById('authorInput');
+    const tagInput    = document.getElementById('tagInput');
+    const searchInput = document.getElementById('searchInput');
+    const quotesGrid  = document.getElementById('quotesGrid');
+    const sortSelect  = document.getElementById('sortSelect');
+
+    // ================================================================
+    // SETTINGS
+    // ================================================================
+    function applySettings() {
+      const body = document.body;
+      body.setAttribute('data-theme', settings.theme);
+      body.setAttribute('data-fontsize', settings.fontsize);
+      body.setAttribute('data-cardlayout', settings.cardlayout);
+      body.setAttribute('data-quotefont', settings.quotefont);
+
+      // Sync swatch rings
+      document.querySelectorAll('.swatch-ring').forEach(el => el.classList.remove('active'));
+      const sw = document.getElementById('swatch-' + settings.theme);
+      if (sw) sw.classList.add('active');
+
+      // Sync font-size buttons
+      ['small','medium','large'].forEach(s => {
+        const b = document.getElementById('fs-'+s);
+        if (b) b.classList.toggle('active', s === settings.fontsize);
+      });
+
+      // Sync card layout buttons
+      ['grid','list','compact'].forEach(s => {
+        const b = document.getElementById('cl-'+s);
+        if (b) b.classList.toggle('active', s === settings.cardlayout);
+      });
+
+      // Sync toggles
+      const serifEl = document.getElementById('toggleSerif');
+      if (serifEl) serifEl.checked = settings.quotefont === 'serif';
+
+      const datesEl = document.getElementById('toggleDates');
+      if (datesEl) datesEl.checked = settings.showDates !== false;
+
+      const animEl = document.getElementById('toggleAnim');
+      if (animEl) animEl.checked = settings.animations !== false;
+
+      // Animations CSS toggle
+      if (!settings.animations) {
+        const style = document.getElementById('animStyle') || document.createElement('style');
+        style.id = 'animStyle';
+        style.textContent = '.quote-card { animation: none !important; }';
+        document.head.appendChild(style);
+      } else {
+        const s = document.getElementById('animStyle');
+        if (s) s.remove();
+      }
+    }
+
+    function saveSettings() {
+      localStorage.setItem('LuminaSettings', JSON.stringify(settings));
+      applySettings();
+    }
+
+    function setTheme(t) {
+      settings.theme = t;
+      saveSettings();
+    }
+
+    function setFontSize(s) {
+      settings.fontsize = s;
+      saveSettings();
+    }
+
+    function setCardLayout(l) {
+      settings.cardlayout = l;
+      saveSettings();
+    }
+
+    function toggleQuoteFont() {
+      const checked = document.getElementById('toggleSerif').checked;
+      settings.quotefont = checked ? 'serif' : 'sans';
+      saveSettings();
+    }
+
+    function toggleDates() {
+      settings.showDates = document.getElementById('toggleDates').checked;
+      saveSettings();
+      renderQuotes();
+    }
+
+    function toggleAnimations() {
+      settings.animations = document.getElementById('toggleAnim').checked;
+      saveSettings();
+    }
+
+    function openSettings() {
+      document.getElementById('settingsPanel').classList.add('open');
+      document.getElementById('settingsOverlay').classList.add('open');
+    }
+
+    function closeSettings() {
+      document.getElementById('settingsPanel').classList.remove('open');
+      document.getElementById('settingsOverlay').classList.remove('open');
+    }
+
+    // ================================================================
+    // TOAST
+    // ================================================================
+    function toast(msg, type = 'info') {
+      const icons = { success: 'fa-circle-check', error: 'fa-circle-xmark', info: 'fa-circle-info' };
+      const t = document.createElement('div');
+      t.className = `toast ${type}`;
+      t.innerHTML = `<i class="fa-solid ${icons[type]}"></i> ${sanitize(msg)}`;
+      document.getElementById('toastContainer').appendChild(t);
+      setTimeout(() => {
+        t.style.animation = 'toastOut 0.3s ease forwards';
+        setTimeout(() => t.remove(), 300);
+      }, 2800);
+    }
+
+    // ================================================================
+    // STATS
+    // ================================================================
+    function updateStats() {
+      document.getElementById('statTotal').textContent = quotes.length;
+      document.getElementById('statFavs').textContent = quotes.filter(q => q.fav).length;
+      const tags = new Set(quotes.map(q => q.tag).filter(Boolean));
+      document.getElementById('statTags').textContent = tags.size;
+    }
+
+    // ================================================================
+    // TAG FILTER CHIPS
+    // ================================================================
+    function renderFilterChips() {
+      const container = document.getElementById('filterChips');
+      const tags = [...new Set(quotes.map(q => q.tag).filter(Boolean))].sort();
+      if (tags.length === 0) { container.innerHTML = ''; return; }
+
+      container.innerHTML = '<button class="filter-chip' + (activeTagFilter === null ? ' active' : '') + '" onclick="setTagFilter(null)">All</button>' +
+        tags.map(t => `<button class="filter-chip${activeTagFilter === t ? ' active' : ''}" onclick="setTagFilter('${sanitize(t)}')">${sanitize(t)}</button>`).join('');
+    }
+
+    function setTagFilter(tag) {
+      activeTagFilter = tag;
+      renderFilterChips();
+      renderQuotes();
+    }
+
+    // ================================================================
+    // CHAR COUNT
+    // ================================================================
+    function updateCharCount() {
+      const len = quoteInput.value.length;
+      const el = document.getElementById('charCount');
+      el.textContent = `${len} / 500`;
+      el.classList.toggle('warn', len > 420);
+    }
+
+    function setTag(tag) {
+      tagInput.value = tag;
+      tagInput.focus();
+    }
+
+    // ================================================================
+    // SEARCH
+    // ================================================================
+    function onSearchInput() {
+      const val = searchInput.value;
+      document.getElementById('searchClear').style.display = val ? 'flex' : 'none';
+      renderQuotes();
+    }
+
+    function clearSearch() {
+      searchInput.value = '';
+      document.getElementById('searchClear').style.display = 'none';
+      renderQuotes();
+    }
+
+    // ================================================================
+    // RENDER
+    // ================================================================
+    function getSortedFiltered() {
+      const q = searchInput.value.toLowerCase();
+      let list = quotes.filter(item =>
+        (!activeTagFilter || item.tag === activeTagFilter) &&
+        (item.text.toLowerCase().includes(q) ||
+         item.author.toLowerCase().includes(q) ||
+         item.tag.toLowerCase().includes(q))
+      );
+
+      const sort = sortSelect.value;
+      if (sort === 'newest') list.sort((a,b) => new Date(b.date) - new Date(a.date));
+      else if (sort === 'oldest') list.sort((a,b) => new Date(a.date) - new Date(b.date));
+      else if (sort === 'az') list.sort((a,b) => (a.author||'').localeCompare(b.author||''));
+      else if (sort === 'fav') list.sort((a,b) => (b.fav ? 1 : 0) - (a.fav ? 1 : 0));
+
+      return list;
+    }
+
+    function renderQuotes() {
+      quotesGrid.innerHTML = '';
+      updateStats();
+      renderFilterChips();
+
+      const list = getSortedFiltered();
+
+      if (list.length === 0) {
+        quotesGrid.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon"><i class="fa-solid fa-feather"></i></div>
+            <h2>No quotes here yet</h2>
+            <p>Add your first quote using the panel on the left, or try adjusting your search.</p>
+          </div>`;
+        return;
+      }
+
+      list.forEach((quote, idx) => {
+        const card = document.createElement('div');
+        card.className = 'quote-card' + (quote.fav ? ' favorited' : '');
+        card.style.animationDelay = `${idx * 0.04}s`;
+
+        const dateObj = new Date(quote.date);
+        const fmtDate = dateObj.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+
+        card.innerHTML = `
+          <div class="quote-header">
+            ${quote.tag ? `<span class="quote-tag">${sanitize(quote.tag)}</span>` : '<span></span>'}
+            <div class="quote-meta">
+              ${settings.showDates !== false ? `<span class="quote-date">${fmtDate}</span>` : ''}
             </div>
-            <div class="input-group">
-                <label for="authorInput">Author</label>
-                <input type="text" id="authorInput" placeholder="e.g. Marcus Aurelius">
+          </div>
+          <div class="quote-body">${sanitize(quote.text)}</div>
+          <div class="quote-footer">
+            <div class="quote-author">&mdash; ${sanitize(quote.author) || 'Unknown'}</div>
+            <div class="quote-actions">
+              <button class="icon-btn fav-btn${quote.fav ? ' active' : ''}" onclick="toggleFav('${quote.id}')" title="${quote.fav ? 'Unstar' : 'Star'}">
+                <i class="fa-${quote.fav ? 'solid' : 'regular'} fa-star"></i>
+              </button>
+              <button class="icon-btn" onclick="copyQuote('${quote.id}')" title="Copy to clipboard">
+                <i class="fa-regular fa-copy"></i>
+              </button>
+              <button class="icon-btn" onclick="deleteQuote('${quote.id}')" title="Delete">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
             </div>
-            <div class="input-group">
-                <label for="tagInput">Category / Tag</label>
-                <input type="text" id="tagInput" placeholder="e.g. Philosophy, Motivation...">
-            </div>
-            <button class="primary" onclick="addQuote()">
-                <i class="fa-solid fa-bookmark"></i> Save Quote
-            </button>
-        </aside>
+          </div>`;
+        quotesGrid.appendChild(card);
+      });
+    }
 
-        <!-- Right Panel: Quotes & Search -->
-        <section class="quotes-section">
-            <div class="search-bar">
-                <i class="fa-solid fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Search your vault by keyword or author..." oninput="filterQuotes()">
-            </div>
+    // ================================================================
+    // ACTIONS
+    // ================================================================
+    function addQuote() {
+      const text = quoteInput.value.trim();
+      if (!text) { toast('Please enter a quote first.', 'error'); return; }
+      if (text.length > 500) { toast('Quote is too long (max 500 characters).', 'error'); return; }
 
-            <div class="quotes-grid" id="quotesGrid">
-                <!-- Quotes render here -->
-            </div>
-        </section>
-    </main>
+      const newQuote = {
+        id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
+        text,
+        author: authorInput.value.trim(),
+        tag: tagInput.value.trim(),
+        date: new Date().toISOString(),
+        fav: false
+      };
 
-    <script>
-        /* =========================================================================
-           SECURITY FEATURE: HTML Sanitizer
-           Prevents Cross-Site Scripting (XSS) if malicious code is pasted in.
-           ========================================================================= */
-        function sanitize(str) {
-            if (!str) return '';
-            const temp = document.createElement('div');
-            temp.textContent = str;
-            return temp.innerHTML;
-        }
+      quotes.unshift(newQuote);
+      saveData();
 
-        /* =========================================================================
-           DATA MANAGEMENT
-           Pulling from localStorage. Adding unique IDs and Timestamps.
-           ========================================================================= */
-        let quotes = JSON.parse(localStorage.getItem('VaultSecureQuotes')) || [];
+      quoteInput.value = '';
+      authorInput.value = '';
+      tagInput.value = '';
+      searchInput.value = '';
+      updateCharCount();
+      document.getElementById('searchClear').style.display = 'none';
 
-        const quoteInput = document.getElementById('quoteInput');
-        const authorInput = document.getElementById('authorInput');
-        const tagInput = document.getElementById('tagInput');
-        const searchInput = document.getElementById('searchInput');
-        const quotesGrid = document.getElementById('quotesGrid');
+      renderQuotes();
+      toast('Quote saved to your vault.', 'success');
+    }
 
-        // Render quotes to the UI
-        function renderQuotes(filterText = "") {
-            quotesGrid.innerHTML = ''; 
-            
-            // Filter logic for the search bar
-            const filteredQuotes = quotes.filter(q => 
-                q.text.toLowerCase().includes(filterText.toLowerCase()) || 
-                q.author.toLowerCase().includes(filterText.toLowerCase()) ||
-                q.tag.toLowerCase().includes(filterText.toLowerCase())
-            );
+    function deleteQuote(id) {
+      if (!confirm('Permanently delete this quote?')) return;
+      quotes = quotes.filter(q => q.id !== id);
+      saveData();
+      renderQuotes();
+      toast('Quote deleted.', 'info');
+    }
 
-            if (filteredQuotes.length === 0) {
-                quotesGrid.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fa-solid fa-box-open"></i>
-                        <h2>No quotes found</h2>
-                        <p>Your vault is empty or no search results match.</p>
-                    </div>`;
-                return;
-            }
+    function toggleFav(id) {
+      const q = quotes.find(q => q.id === id);
+      if (q) { q.fav = !q.fav; saveData(); renderQuotes(); }
+    }
 
-            filteredQuotes.forEach(quote => {
-                const card = document.createElement('div');
-                card.className = 'quote-card';
-                
-                // Format the date to be human readable
-                const dateObj = new Date(quote.date);
-                const formattedDate = dateObj.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+    function copyQuote(id) {
+      const q = quotes.find(q => q.id === id);
+      if (!q) return;
+      const text = `"${q.text}" — ${q.author || 'Unknown'}`;
+      navigator.clipboard.writeText(text).then(() => toast('Copied to clipboard.', 'success'));
+    }
 
-                // Securely render content using our sanitize function
-                card.innerHTML = `
-                    <div class="quote-header">
-                        ${quote.tag ? `<span class="quote-tag"><i class="fa-solid fa-tag" style="font-size: 10px;"></i> ${sanitize(quote.tag)}</span>` : '<div></div>'}
-                        <span class="quote-date">${formattedDate}</span>
-                    </div>
-                    <div class="quote-body">"${sanitize(quote.text)}"</div>
-                    <div class="quote-footer">
-                        <div class="quote-author">— ${sanitize(quote.author) || 'Unknown'}</div>
-                        <button class="icon-btn" onclick="deleteQuote('${quote.id}')" title="Delete Quote">
-                            <i class="fa-solid fa-trash-can"></i>
-                        </button>
-                    </div>
-                `;
-                
-                quotesGrid.appendChild(card);
-            });
-        }
+    function clearAll() {
+      if (!confirm('Delete ALL quotes from your vault? This cannot be undone.')) return;
+      quotes = [];
+      saveData();
+      renderQuotes();
+      toast('Vault cleared.', 'info');
+    }
 
-        // Add a new quote
-        function addQuote() {
-            const text = quoteInput.value.trim();
-            const author = authorInput.value.trim();
-            const tag = tagInput.value.trim();
+    // ================================================================
+    // DATA
+    // ================================================================
+    function saveData() {
+      localStorage.setItem('LuminaQuotes', JSON.stringify(quotes));
+    }
 
-            if (text === '') {
-                alert("Please enter a quote before saving.");
-                return;
-            }
+    function exportData() {
+      if (quotes.length === 0) { toast('Nothing to export yet.', 'error'); return; }
+      const blob = new Blob([JSON.stringify(quotes, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `LuminaQuote_Backup_${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast('Vault exported.', 'success');
+    }
 
-            const newQuote = {
-                id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(), // Secure unique ID
-                text: text,
-                author: author,
-                tag: tag,
-                date: new Date().toISOString()
-            };
-
-            quotes.unshift(newQuote);
+    function importData(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if (Array.isArray(imported)) {
+            const existing = new Set(quotes.map(q => q.id));
+            let added = 0;
+            imported.forEach(q => { if (!existing.has(q.id)) { quotes.push(q); added++; } });
+            quotes.sort((a, b) => new Date(b.date) - new Date(a.date));
             saveData();
-
-            // Reset inputs
-            quoteInput.value = '';
-            authorInput.value = '';
-            tagInput.value = '';
-            searchInput.value = '';
-            
             renderQuotes();
+            toast(`Imported ${added} new quote${added !== 1 ? 's' : ''}.`, 'success');
+          } else {
+            toast('Invalid backup file.', 'error');
+          }
+        } catch {
+          toast('Could not parse the file. Ensure it is a valid JSON backup.', 'error');
         }
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    }
 
-        // Delete a quote by ID
-        function deleteQuote(id) {
-            if(confirm("Are you sure you want to permanently delete this quote?")) {
-                quotes = quotes.filter(q => q.id !== id);
-                saveData();
-                filterQuotes(); // Re-render with current search filter
-            }
-        }
-
-        // Search filter trigger
-        function filterQuotes() {
-            renderQuotes(searchInput.value);
-        }
-
-        // Core save function
-        function saveData() {
-            localStorage.setItem('VaultSecureQuotes', JSON.stringify(quotes));
-        }
-
-        /* =========================================================================
-           BACKUP & RESTORE (Extra Security against Data Loss)
-           ========================================================================= */
-        
-        // Export to JSON file
-        function exportData() {
-            if (quotes.length === 0) {
-                alert("There are no quotes to export.");
-                return;
-            }
-            const dataStr = JSON.stringify(quotes, null, 2);
-            const blob = new Blob([dataStr], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `QuoteVault_Backup_${new Date().toISOString().split('T')[0]}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-
-        // Import from JSON file
-        function importData(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const importedQuotes = JSON.parse(e.target.result);
-                    if (Array.isArray(importedQuotes)) {
-                        // Merge imported quotes, avoiding duplicates by ID
-                        const existingIds = new Set(quotes.map(q => q.id));
-                        importedQuotes.forEach(q => {
-                            if (!existingIds.has(q.id)) {
-                                quotes.push(q);
-                            }
-                        });
-                        
-                        // Sort by date (newest first)
-                        quotes.sort((a, b) => new Date(b.date) - new Date(a.date));
-                        
-                        saveData();
-                        renderQuotes();
-                        alert("Vault successfully restored/updated!");
-                    } else {
-                        alert("Invalid file format. Please upload a valid Quote Vault backup.");
-                    }
-                } catch (err) {
-                    alert("Error reading file. Make sure it's a valid JSON backup.");
-                }
-            };
-            reader.readAsText(file);
-            // Reset the input so the same file can be uploaded again if needed
-            event.target.value = '';
-        }
-
-        // Initial render on page load
-        renderQuotes();
-    </script>
+    // ================================================================
+    // INIT
+    // ================================================================
+    applySettings();
+    renderQuotes();
+  </script>
 </body>
+
 </html>
