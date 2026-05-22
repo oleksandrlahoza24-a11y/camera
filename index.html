@@ -150,6 +150,12 @@
       filter: brightness(1.1);
     }
 
+    .tb-btn.active-mode {
+      background: var(--accent-glow);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
     .tb-sep {
       width: 1px;
       height: 20px;
@@ -1502,17 +1508,43 @@
       <div class="logo-icon"><i class="fa-solid fa-cubes-stacked"></i></div>
       RblxUI Studio
     </div>
-    <div class="tb-group">
-      <button class="tb-btn" onclick="newFile()"><i class="fa-solid fa-plus"></i> New</button>
-      <button class="tb-btn" onclick="openUploadModal()"><i class="fa-solid fa-upload"></i> Import</button>
+    <div class="tb-group" style="position:relative">
+            <button class="tb-btn" onclick="newFile()"><i class="fa-solid fa-plus"></i> New</button>
+            <button class="tb-btn" onclick="openUploadModal()"><i class="fa-solid fa-upload"></i> Import</button>
+           
       <button class="tb-btn" onclick="openExportModal()"><i class="fa-solid fa-terminal"></i> Export to Studio</button>
-    </div>
-    <div class="tb-sep"></div>
-    <div class="tb-group">
-      <button class="tb-btn" onclick="toggleSearch()"><i class="fa-solid fa-magnifying-glass"></i> Find</button>
-      <button class="tb-btn" onclick="formatCode()"><i class="fa-solid fa-align-left"></i> Format</button>
-      <button class="tb-btn" onclick="runAnimation()"><i class="fa-solid fa-play"></i> Run</button>
-    </div>
+           
+      <button class="tb-btn" onclick="toggleFilesMenu(event)" id="files-tb-btn"><i class="fa-solid fa-folder-open"></i> Files <i class="fa-solid fa-chevron-down" style="font-size:9px;margin-left:2px"></i></button>
+            <div id="files-dropdown"
+        style="display:none;position:absolute;top:36px;left:0;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:4px;box-shadow:0 8px 32px rgba(0,0,0,0.5);z-index:600;min-width:200px;">
+                <div class="ctx-item" onclick="filesAction('save')"><i class="fa-solid fa-floppy-disk"></i> Save
+          Project<span class="ctx-kbd">Ctrl+S</span></div>
+                <div class="ctx-item" onclick="filesAction('saveAs')">
+          <i class="fa-solid fa-floppy-disk" style="color:var(--accent2)"></i> Save As...</div>
+                <div class="ctx-item" onclick="filesAction('saveScript')"><i class="fa-solid fa-scroll"></i> Save
+          Current Script</div>
+                <div class="ctx-sep"></div>
+                <div class="ctx-item" onclick="filesAction('exportHTML')">
+          <i class="fa-solid fa-file-code" style="color:var(--accent)"></i> Export as HTML</div>
+                <div class="ctx-item" onclick="filesAction('exportJSON')">
+          <i class="fa-solid fa-file-export" style="color:var(--accent3)"></i> Export as JSON</div>
+                <div class="ctx-item" onclick="filesAction('exportLua')">
+          <i class="fa-solid fa-file-lines" style="color:var(--yellow)"></i> Export Lua Script</div>
+                <div class="ctx-sep"></div>
+                <div class="ctx-item" onclick="openUploadModal()">
+          <i class="fa-solid fa-cloud-arrow-up" style="color:var(--green)"></i> Load / Import File</div>
+                <div class="ctx-item" onclick="filesAction('clearAll')">
+          <i class="fa-solid fa-trash" style="color:var(--red)"></i> Clear All Scripts</div>
+              </div>
+          </div>
+        <div class="tb-sep"></div>
+        <div class="tb-group">
+            <button class="tb-btn" onclick="toggleSearch()"><i class="fa-solid fa-magnifying-glass"></i> Find</button>
+            <button class="tb-btn" onclick="formatCode()"><i class="fa-solid fa-align-left"></i> Format</button>
+            <button class="tb-btn" onclick="runAnimation()"><i class="fa-solid fa-play"></i> Run</button>
+           
+      <button class="tb-btn" id="interactive-btn" onclick="toggleInteractiveMode()" title="Toggle interactive preview — makes buttons clickable"><i class="fa-solid fa-computer-mouse"></i> Interactive</button>
+          </div>
     <div class="tb-sep"></div>
     <div class="tb-group">
       <button class="tb-btn" id="mobile-sidebar-btn" onclick="toggleMobileSidebar()" style="display:none"><i class="fa-solid fa-bars"></i></button>
@@ -1773,12 +1805,14 @@
                   <div
                     style="font-size:14px;font-weight:700;color:#e8eaf2;margin-bottom:10px;font-family:'Syne',sans-serif">
                     Game Menu</div>
-                  <div
-                    style="width:100%;height:36px;background:linear-gradient(135deg,#5b8def,#7c6af5);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;font-family:'Syne',sans-serif;font-weight:700;margin-bottom:8px">
-                    PLAY</div>
-                  <div
-                    style="width:100%;height:36px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#b8bdcc;font-family:'Syne',sans-serif;font-weight:600;margin-bottom:8px">
-                    SETTINGS</div>
+                  <button id="pv-play-btn"
+                    style="width:100%;height:36px;background:linear-gradient(135deg,#5b8def,#7c6af5);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;font-family:'Syne',sans-serif;font-weight:700;margin-bottom:8px;border:none;cursor:not-allowed;opacity:0.6;transition:all 0.15s"
+                    onclick="previewBtnClick(this,'PLAY')" title="Enable Interactive mode to click">
+                    PLAY</button>
+                  <button id="pv-settings-btn"
+                    style="width:100%;height:36px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#b8bdcc;font-family:'Syne',sans-serif;font-weight:600;margin-bottom:8px;cursor:not-allowed;opacity:0.6;transition:all 0.15s"
+                    onclick="previewBtnClick(this,'SETTINGS')" title="Enable Interactive mode to click">
+                    SETTINGS</button>
                   <div style="width:100%;height:8px;background:rgba(255,255,255,0.1);border-radius:4px;overflow:hidden">
                     <div
                       style="width:65%;height:100%;background:linear-gradient(90deg,#4dc97e,#3dd6b5);border-radius:4px">
@@ -1817,7 +1851,8 @@
           <!-- Properties panel -->
           <div id="properties-panel">
             <div class="prop-header"><i class="fa-solid fa-sliders"></i> Properties —
-              <span id="prop-name">MainFrame</span></div>
+              <span id="prop-name">MainFrame</span>
+            </div>
             <div class="prop-row"><span class="prop-key">Name</span><input class="prop-val" value="MainFrame" onchange="updatePropName(this)">
             </div>
             <div class="prop-row"><span class="prop-key">Size</span><input class="prop-val" value="{0.4,0},{0.35,0}">
@@ -1900,18 +1935,23 @@
   <!-- CONTEXT MENU -->
   <div id="ctx-menu">
     <div class="ctx-item" onclick="ctxAction('rename')"><i class="fa-solid fa-pencil"></i> Rename
-      <span class="ctx-kbd">F2</span></div>
+      <span class="ctx-kbd">F2</span>
+    </div>
     <div class="ctx-item" onclick="ctxAction('duplicate')"><i class="fa-solid fa-copy"></i> Duplicate
-      <span class="ctx-kbd">Ctrl+D</span></div>
+      <span class="ctx-kbd">Ctrl+D</span>
+    </div>
     <div class="ctx-item" onclick="ctxAction('addchild')"><i class="fa-solid fa-plus"></i> Add Child</div>
     <div class="ctx-sep"></div>
     <div class="ctx-item" onclick="ctxAction('copy')"><i class="fa-solid fa-clone"></i> Copy
-      <span class="ctx-kbd">Ctrl+C</span></div>
+      <span class="ctx-kbd">Ctrl+C</span>
+    </div>
     <div class="ctx-item" onclick="ctxAction('paste')"><i class="fa-solid fa-paste"></i> Paste
-      <span class="ctx-kbd">Ctrl+V</span></div>
+      <span class="ctx-kbd">Ctrl+V</span>
+    </div>
     <div class="ctx-sep"></div>
     <div class="ctx-item danger" onclick="ctxAction('delete')"><i class="fa-solid fa-trash"></i> Delete
-      <span class="ctx-kbd">Del</span></div>
+      <span class="ctx-kbd">Del</span>
+    </div>
   </div>
 
   <!-- UPLOAD MODAL -->
@@ -3381,13 +3421,18 @@ function showToast(msg, type = 'ok') {
 let pvFullscreen = false;
 function togglePreviewMode() {
   const panel = document.getElementById('preview-panel');
+  const btn = document.getElementById('preview-fs-btn');
   pvFullscreen = !pvFullscreen;
   if (pvFullscreen) {
-    panel.style.cssText = 'position:fixed;inset:0;width:100%;z-index:80;';
-    document.getElementById('preview-fs-btn').innerHTML = '<i class="fa-solid fa-compress"></i>';
+    panel.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;z-index:80;display:flex;flex-direction:column;';
+    btn.innerHTML = '<i class="fa-solid fa-compress"></i>';
+    btn.title = 'Exit fullscreen';
+    addLog('info', 'Preview fullscreen — click ⊠ to minimise');
   } else {
     panel.style.cssText = '';
-    document.getElementById('preview-fs-btn').innerHTML = '<i class="fa-solid fa-expand"></i>';
+    btn.innerHTML = '<i class="fa-solid fa-expand"></i>';
+    btn.title = 'Fullscreen';
+    addLog('info', 'Preview restored');
   }
 }
 
@@ -3407,6 +3452,114 @@ function checkMobile() {
   document.getElementById('mobile-preview-btn').style.display = isMobile ? '' : 'none';
 }
 window.addEventListener('resize', checkMobile);
+
+// ─────────────────────────────────────────────
+// INTERACTIVE PREVIEW MODE
+// ─────────────────────────────────────────────
+let interactiveMode = false;
+function toggleInteractiveMode() {
+  interactiveMode = !interactiveMode;
+  const btn = document.getElementById('interactive-btn');
+  const pvPlay = document.getElementById('pv-play-btn');
+  const pvSettings = document.getElementById('pv-settings-btn');
+  if (interactiveMode) {
+    btn.classList.add('active-mode');
+    btn.innerHTML = '<i class="fa-solid fa-computer-mouse"></i> Interactive <i class="fa-solid fa-circle" style="font-size:7px;color:var(--green);margin-left:2px"></i>';
+    if (pvPlay) { pvPlay.style.cursor = 'pointer'; pvPlay.style.opacity = '1'; pvPlay.title = 'Click to trigger'; }
+    if (pvSettings) { pvSettings.style.cursor = 'pointer'; pvSettings.style.opacity = '1'; pvSettings.title = 'Click to trigger'; }
+    // Make all preview UI elements non-draggable so clicks go through
+    document.querySelectorAll('.preview-ui-el').forEach(el => el.style.pointerEvents = 'auto');
+    addLog('success', 'Interactive mode ON — buttons are now clickable');
+    showToast('Interactive mode ON', 'ok');
+  } else {
+    btn.classList.remove('active-mode');
+    btn.innerHTML = '<i class="fa-solid fa-computer-mouse"></i> Interactive';
+    if (pvPlay) { pvPlay.style.cursor = 'not-allowed'; pvPlay.style.opacity = '0.6'; pvPlay.title = 'Enable Interactive mode to click'; }
+    if (pvSettings) { pvSettings.style.cursor = 'not-allowed'; pvSettings.style.opacity = '0.6'; pvSettings.title = 'Enable Interactive mode to click'; }
+    addLog('info', 'Interactive mode OFF — drag mode restored');
+    showToast('Interactive mode OFF', 'ok');
+  }
+}
+
+function previewBtnClick(el, name) {
+  if (!interactiveMode) { showToast('Enable Interactive mode first', 'warn'); return; }
+  el.style.transform = 'scale(0.94)';
+  setTimeout(() => { el.style.transform = ''; }, 120);
+  addLog('success', `Button clicked: ${name}`);
+  showToast(`${name} clicked!`, 'ok');
+}
+
+// ─────────────────────────────────────────────
+// FILES MENU
+// ─────────────────────────────────────────────
+function toggleFilesMenu(e) {
+  e.stopPropagation();
+  const dd = document.getElementById('files-dropdown');
+  dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+}
+document.addEventListener('click', () => {
+  const dd = document.getElementById('files-dropdown');
+  if (dd) dd.style.display = 'none';
+});
+
+function filesAction(action) {
+  document.getElementById('files-dropdown').style.display = 'none';
+  const editor = document.getElementById('code-editor');
+  if (action === 'save') {
+    const data = JSON.stringify({ scripts: SCRIPTS, timestamp: Date.now() });
+    const blob = new Blob([data], { type: 'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = 'rblxui-project.json'; a.click();
+    addLog('success', 'Project saved as rblxui-project.json');
+    showToast('Project saved!', 'ok');
+  } else if (action === 'saveAs') {
+    const name = prompt('Save project as:', 'my-project') || 'my-project';
+    const data = JSON.stringify({ scripts: SCRIPTS, timestamp: Date.now() });
+    const blob = new Blob([data], { type: 'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = name.replace(/[^a-z0-9_-]/gi,'_') + '.json'; a.click();
+    addLog('success', `Saved as ${name}.json`);
+    showToast('Saved!', 'ok');
+  } else if (action === 'saveScript') {
+    const activeTab = document.querySelector('.editor-tab.active');
+    const tabName = activeTab ? activeTab.id.replace('tab-','') : 'script';
+    const blob = new Blob([editor.value], { type: 'text/plain' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = tabName + '.lua'; a.click();
+    addLog('success', `Script exported: ${tabName}.lua`);
+    showToast(`${tabName}.lua downloaded`, 'ok');
+  } else if (action === 'exportHTML') {
+    const html = document.documentElement.outerHTML;
+    const blob = new Blob([html], { type: 'text/html' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = 'webforge-export.html'; a.click();
+    addLog('success', 'Exported as webforge-export.html');
+    showToast('HTML exported!', 'ok');
+  } else if (action === 'exportJSON') {
+    const payload = { scripts: SCRIPTS, version: '1.0', exported: new Date().toISOString() };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = 'ui-data.json'; a.click();
+    addLog('success', 'Exported as ui-data.json');
+    showToast('JSON exported!', 'ok');
+  } else if (action === 'exportLua') {
+    const activeTab = document.querySelector('.editor-tab.active');
+    const tabName = activeTab ? activeTab.id.replace('tab-','') : 'script';
+    const luaOut = `-- Exported from RblxUI Studio\n-- Script: ${tabName}\n\n` + editor.value;
+    const blob = new Blob([luaOut], { type: 'text/plain' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = tabName + '.lua'; a.click();
+    addLog('success', `Lua exported: ${tabName}.lua`);
+    showToast('Lua script downloaded!', 'ok');
+  } else if (action === 'clearAll') {
+    if (!confirm('Clear all scripts? This cannot be undone.')) return;
+    Object.keys(SCRIPTS).forEach(k => { SCRIPTS[k] = '-- cleared'; });
+    editor.value = '-- cleared';
+    onCodeChange();
+    addLog('warn', 'All scripts cleared');
+    showToast('Scripts cleared', 'warn');
+  }
+}
 
 // ─────────────────────────────────────────────
 // PROPS
