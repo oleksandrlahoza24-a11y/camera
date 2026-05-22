@@ -180,6 +180,7 @@
       display: flex;
       width: 100%;
       height: calc(100vh - var(--topbar-h));
+      height: calc(100dvh - var(--topbar-h));
     }
 
     /* ── SIDEBAR ── */
@@ -1034,7 +1035,9 @@
       border: 1px solid var(--border2);
       border-radius: 10px;
       padding: 24px;
-      width: min(480px, 90vw);
+      width: min(480px, 92vw);
+      max-height: 90vh;
+      overflow-y: auto;
       box-shadow: 0 8px 48px rgba(0, 0, 0, 0.5);
       animation: modal-in 0.2s ease;
     }
@@ -1344,8 +1347,8 @@
     /* iPad / touch optimizations */
     @media (pointer: coarse) {
       .tb-btn {
-        height: 36px;
-        padding: 0 14px;
+        height: 38px;
+        padding: 0 12px;
       }
 
       .tree-item {
@@ -1379,6 +1382,87 @@
         width: 38px;
         height: 38px;
         font-size: 14px;
+      }
+    }
+
+    /* ── iPad Layout (768px–1180px) ── */
+    @media (max-width: 1180px) and (min-width: 601px) {
+      :root {
+        --sidebar-w: 200px;
+        --topbar-h: 44px;
+      }
+
+      /* Topbar: wrap into two rows */
+      #topbar {
+        height: auto;
+        min-height: var(--topbar-h);
+        flex-wrap: wrap;
+        padding: 6px 10px;
+        gap: 6px;
+      }
+
+      #layout {
+        height: calc(100vh - var(--topbar-h) - 44px);
+      }
+
+      /* Hide text labels on most buttons, keep icons only */
+      .tb-btn-label {
+        display: none;
+      }
+
+      .tb-btn {
+        padding: 0 10px;
+        gap: 0;
+      }
+
+      /* Keep labels on key buttons */
+      #files-tb-btn .tb-btn-label,
+      #tools-tb-btn .tb-btn-label,
+      #toolbox-tb-btn .tb-btn-label {
+        display: inline;
+      }
+
+      /* Make the logo smaller */
+      #topbar .logo {
+        font-size: 13px;
+        padding-right: 10px;
+      }
+
+      /* Squeeze preview panel */
+      #preview-panel {
+        width: 280px;
+        min-width: 180px;
+      }
+    }
+
+    /* ── Tablet portrait / small iPad (601–768px) ── */
+    @media (max-width: 768px) and (min-width: 601px) {
+      :root {
+        --sidebar-w: 180px;
+      }
+
+      #topbar {
+        flex-wrap: wrap;
+        height: auto;
+        padding: 6px 8px;
+        gap: 4px;
+      }
+
+      #layout {
+        height: calc(100vh - 88px);
+      }
+
+      #preview-panel {
+        width: 240px;
+        min-width: 160px;
+      }
+
+      .tb-btn-label {
+        display: none;
+      }
+
+      .tb-btn {
+        padding: 0 9px;
       }
     }
 
@@ -1465,15 +1549,15 @@
     /* ── TOOLBOX PANEL ── */
     #toolbox-panel {
       position: fixed;
-      top: var(--topbar-h);
+      top: 0;
       right: 0;
-      width: 320px;
-      height: calc(100vh - var(--topbar-h));
+      width: min(320px, 90vw);
+      height: 100vh;
       background: var(--bg1);
       border-left: 1px solid var(--border);
       display: flex;
       flex-direction: column;
-      z-index: 90;
+      z-index: 150;
       transform: translateX(100%);
       transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       overflow: hidden;
@@ -1901,27 +1985,45 @@
     /* Responsive collapse */
     @media (max-width: 768px) {
       :root {
-        --sidebar-w: 220px;
+        --sidebar-w: 200px;
       }
 
       #preview-panel {
-        width: 300px;
+        width: 260px;
       }
     }
 
-    @media (max-width: 600px) {
+    /* iPad: sidebar slides in/out via toggle */
+    @media (max-width: 900px) {
       #sidebar {
         position: absolute;
         z-index: 50;
         left: -100%;
-        transition: left 0.25s;
+        height: 100%;
+        transition: left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
       #sidebar.mobile-open {
         left: 0;
-        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
+        box-shadow: 4px 0 32px rgba(0, 0, 0, 0.55);
       }
 
+      /* Dim overlay when sidebar open */
+      #sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 49;
+      }
+
+      #sidebar.mobile-open~#sidebar-overlay,
+      body.sidebar-open #sidebar-overlay {
+        display: block;
+      }
+    }
+
+    @media (max-width: 600px) {
       #preview-panel {
         display: none;
       }
@@ -2394,6 +2496,8 @@
 
     <!-- Sidebar Resizer -->
     <div id="sidebar-resizer"></div>
+    <!-- Sidebar overlay for iPad tap-to-close -->
+    <div id="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
 
     <!-- MAIN -->
     <div id="main">
@@ -4122,16 +4226,27 @@ function togglePreviewMode() {
 // MOBILE
 // ─────────────────────────────────────────────
 function toggleMobileSidebar() {
-  document.getElementById('sidebar').classList.toggle('mobile-open');
+  const sidebar = document.getElementById('sidebar');
+  sidebar.classList.toggle('mobile-open');
+  document.body.classList.toggle('sidebar-open', sidebar.classList.contains('mobile-open'));
 }
 function toggleMobilePreview() {
   document.getElementById('preview-panel').classList.toggle('mobile-show');
 }
 
 function checkMobile() {
+  const isNarrow = window.innerWidth <= 900;
   const isMobile = window.innerWidth <= 600;
-  document.getElementById('mobile-sidebar-btn').style.display = isMobile ? '' : 'none';
-  document.getElementById('mobile-preview-btn').style.display = isMobile ? '' : 'none';
+  document.getElementById('mobile-sidebar-btn').style.display = isNarrow ? '' : 'none';
+  document.getElementById('mobile-preview-btn').style.display = isNarrow ? '' : 'none';
+  // On narrow screens collapse sidebar by default
+  if (isMobile) {
+    document.getElementById('sidebar').classList.remove('mobile-open');
+  }
+  // Fix layout height when topbar wraps
+  const topbar = document.getElementById('topbar');
+  const layout = document.getElementById('layout');
+  if (layout) layout.style.height = 'calc(100vh - ' + topbar.offsetHeight + 'px)';
 }
 window.addEventListener('resize', checkMobile);
 
