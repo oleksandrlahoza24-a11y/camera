@@ -1462,6 +1462,442 @@
       transition: width 0.1s;
     }
 
+    /* ── TOOLBOX PANEL ── */
+    #toolbox-panel {
+      position: fixed;
+      top: var(--topbar-h);
+      right: 0;
+      width: 320px;
+      height: calc(100vh - var(--topbar-h));
+      background: var(--bg1);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      z-index: 90;
+      transform: translateX(100%);
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+    }
+
+    #toolbox-panel.open {
+      transform: translateX(0);
+      box-shadow: -8px 0 32px rgba(0, 0, 0, 0.45);
+    }
+
+    .tbx-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      height: 42px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .tbx-header-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text0);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tbx-header-title i {
+      color: var(--accent);
+    }
+
+    .tbx-close {
+      width: 26px;
+      height: 26px;
+      background: transparent;
+      border: none;
+      border-radius: 5px;
+      color: var(--text2);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      transition: all 0.12s;
+    }
+
+    .tbx-close:hover {
+      background: var(--bg4);
+      color: var(--text0);
+    }
+
+    .tbx-tabs {
+      display: flex;
+      padding: 6px 8px 0;
+      gap: 2px;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tbx-tab {
+      padding: 5px 10px;
+      border-radius: 5px 5px 0 0;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'Syne', sans-serif;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: var(--text2);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.12s;
+    }
+
+    .tbx-tab.active {
+      background: var(--bg3);
+      color: var(--text0);
+      border-top: 2px solid var(--accent);
+    }
+
+    .tbx-tab:hover:not(.active) {
+      color: var(--text1);
+    }
+
+    .tbx-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+    }
+
+    .tbx-body::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .tbx-body::-webkit-scrollbar-thumb {
+      background: var(--border2);
+      border-radius: 2px;
+    }
+
+    .tbx-section-title {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin: 12px 0 6px;
+    }
+
+    .tbx-section-title:first-child {
+      margin-top: 0;
+    }
+
+    /* Gradient Maker */
+    .grad-preview {
+      height: 56px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      border: 1px solid var(--border);
+      transition: all 0.2s;
+    }
+
+    .grad-stops {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 8px;
+      align-items: center;
+    }
+
+    .grad-stop-swatch {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      border: 2px solid var(--border2);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .tbx-input {
+      width: 100%;
+      height: 30px;
+      padding: 0 8px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text0);
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      outline: none;
+      margin-bottom: 6px;
+    }
+
+    .tbx-input:focus {
+      border-color: var(--accent);
+    }
+
+    .tbx-select {
+      width: 100%;
+      height: 30px;
+      padding: 0 8px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text0);
+      font-size: 12px;
+      font-family: 'Syne', sans-serif;
+      outline: none;
+      margin-bottom: 6px;
+      cursor: pointer;
+    }
+
+    .tbx-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 6px;
+      align-items: center;
+    }
+
+    .tbx-label {
+      font-size: 11px;
+      color: var(--text2);
+      width: 64px;
+      flex-shrink: 0;
+    }
+
+    .tbx-btn {
+      width: 100%;
+      height: 30px;
+      background: var(--bg4);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text1);
+      font-size: 12px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.12s;
+      margin-bottom: 6px;
+    }
+
+    .tbx-btn:hover {
+      background: var(--accent-glow);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .tbx-btn.primary {
+      background: var(--accent);
+      border-color: transparent;
+      color: #fff;
+    }
+
+    .tbx-btn.primary:hover {
+      background: #4a7de0;
+      color: #fff;
+    }
+
+    .tbx-output {
+      background: var(--bg0);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 8px 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--accent3);
+      min-height: 36px;
+      word-break: break-all;
+      line-height: 1.6;
+      margin-bottom: 6px;
+      cursor: pointer;
+    }
+
+    .tbx-output:hover {
+      border-color: var(--accent);
+    }
+
+    .tbx-color-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+
+    .tbx-color-swatch {
+      height: 26px;
+      border-radius: 4px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.1s;
+    }
+
+    .tbx-color-swatch:hover {
+      transform: scale(1.15);
+      border-color: var(--text0);
+    }
+
+    .tbx-shadow-preview {
+      height: 44px;
+      background: var(--bg3);
+      border-radius: 8px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: var(--text2);
+      border: 1px solid var(--border);
+    }
+
+    .tbx-snippet-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 9px;
+      border-radius: 5px;
+      background: var(--bg4);
+      border: 1px solid var(--border);
+      font-size: 11px;
+      color: var(--text1);
+      cursor: pointer;
+      margin: 2px;
+      transition: all 0.12s;
+    }
+
+    .tbx-snippet-chip:hover {
+      background: var(--accent-glow);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ── SETTINGS MODAL ── */
+    #settings-modal .modal {
+      width: min(520px, 95vw);
+    }
+
+    .settings-tabs {
+      display: flex;
+      gap: 2px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+
+    .settings-tab {
+      padding: 6px 14px;
+      border-radius: 5px 5px 0 0;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: 'Syne', sans-serif;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: var(--text2);
+      transition: all 0.12s;
+    }
+
+    .settings-tab.active {
+      background: var(--bg3);
+      color: var(--text0);
+      border-top: 2px solid var(--accent);
+    }
+
+    .settings-tab:hover:not(.active) {
+      color: var(--text1);
+    }
+
+    .settings-section {
+      display: none;
+    }
+
+    .settings-section.active {
+      display: block;
+    }
+
+    .theme-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .theme-card {
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: center;
+    }
+
+    .theme-card:hover {
+      border-color: var(--accent2);
+    }
+
+    .theme-card.active-theme {
+      border-color: var(--accent);
+      background: var(--accent-glow);
+    }
+
+    .theme-card-preview {
+      height: 36px;
+      border-radius: 5px;
+      margin-bottom: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .theme-card-name {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text1);
+    }
+
+    .settings-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--text1);
+    }
+
+    .settings-row:last-child {
+      border-bottom: none;
+    }
+
+    .settings-toggle {
+      width: 36px;
+      height: 20px;
+      background: var(--bg5);
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      cursor: pointer;
+      position: relative;
+      transition: background 0.2s;
+    }
+
+    .settings-toggle.on {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .settings-toggle::after {
+      content: '';
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      background: #fff;
+      border-radius: 50%;
+      top: 2px;
+      left: 2px;
+      transition: left 0.2s;
+    }
+
+    .settings-toggle.on::after {
+      left: 18px;
+    }
+
     /* Responsive collapse */
     @media (max-width: 768px) {
       :root {
@@ -1515,28 +1951,50 @@
       <button class="tb-btn" onclick="openExportModal()"><i class="fa-solid fa-terminal"></i> Export to Studio</button>
            
       <button class="tb-btn" onclick="toggleFilesMenu(event)" id="files-tb-btn"><i class="fa-solid fa-folder-open"></i> Files <i class="fa-solid fa-chevron-down" style="font-size:9px;margin-left:2px"></i></button>
+      <button class="tb-btn" onclick="toggleToolsMenu(event)" id="tools-tb-btn"><i class="fa-solid fa-wrench"></i> Tools <i class="fa-solid fa-chevron-down" style="font-size:9px;margin-left:2px"></i></button>
+      <div id="tools-dropdown"
+        style="display:none;position:absolute;top:36px;left:0;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:4px;box-shadow:0 8px 32px rgba(0,0,0,0.5);z-index:600;min-width:200px;">
+        <div class="ctx-item" id="tools-activemode-item" onclick="toggleActiveModeFromMenu()">
+          <i class="fa-solid fa-bolt" style="color:var(--accent)"></i> Active Mode
+          <span id="tools-activemode-badge" style="display:none;background:var(--green);color:#0a1a10;border-radius:3px;padding:1px 5px;font-size:10px;margin-left:auto">ON</span>
+        </div>
+        <div class="ctx-sep"></div>
+        <div class="ctx-item" onclick="toolsAction('gridSnap')">
+          <i class="fa-solid fa-border-all" style="color:var(--accent3)"></i> Grid Snap
+        </div>
+        <div class="ctx-item" onclick="toolsAction('rulers')">
+          <i class="fa-solid fa-ruler-combined" style="color:var(--accent2)"></i> Rulers
+        </div>
+      </div>
             <div id="files-dropdown"
         style="display:none;position:absolute;top:36px;left:0;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:4px;box-shadow:0 8px 32px rgba(0,0,0,0.5);z-index:600;min-width:200px;">
                 <div class="ctx-item" onclick="filesAction('save')"><i class="fa-solid fa-floppy-disk"></i> Save
           Project<span class="ctx-kbd">Ctrl+S</span></div>
                 <div class="ctx-item" onclick="filesAction('saveAs')">
-          <i class="fa-solid fa-floppy-disk" style="color:var(--accent2)"></i> Save As...</div>
+          <i class="fa-solid fa-floppy-disk" style="color:var(--accent2)"></i> Save As...
+        </div>
                 <div class="ctx-item" onclick="filesAction('saveScript')"><i class="fa-solid fa-scroll"></i> Save
           Current Script</div>
                 <div class="ctx-sep"></div>
                 <div class="ctx-item" onclick="filesAction('exportHTML')">
-          <i class="fa-solid fa-file-code" style="color:var(--accent)"></i> Export as HTML</div>
+          <i class="fa-solid fa-file-code" style="color:var(--accent)"></i> Export as HTML
+        </div>
                 <div class="ctx-item" onclick="filesAction('exportJSON')">
-          <i class="fa-solid fa-file-export" style="color:var(--accent3)"></i> Export as JSON</div>
+          <i class="fa-solid fa-file-export" style="color:var(--accent3)"></i> Export as JSON
+        </div>
                 <div class="ctx-item" onclick="filesAction('exportLua')">
-          <i class="fa-solid fa-file-lines" style="color:var(--yellow)"></i> Export Lua Script</div>
+          <i class="fa-solid fa-file-lines" style="color:var(--yellow)"></i> Export Lua Script
+        </div>
                 <div class="ctx-sep"></div>
                 <div class="ctx-item" onclick="openUploadModal()">
-          <i class="fa-solid fa-cloud-arrow-up" style="color:var(--green)"></i> Load / Import File</div>
+          <i class="fa-solid fa-cloud-arrow-up" style="color:var(--green)"></i> Load / Import File
+        </div>
                 <div class="ctx-item" onclick="filesAction('clearAll')">
-          <i class="fa-solid fa-trash" style="color:var(--red)"></i> Clear All Scripts</div>
+          <i class="fa-solid fa-trash" style="color:var(--red)"></i> Clear All Scripts
+        </div>
               </div>
-          </div>
+         
+    </div>
         <div class="tb-sep"></div>
         <div class="tb-group">
             <button class="tb-btn" onclick="toggleSearch()"><i class="fa-solid fa-magnifying-glass"></i> Find</button>
@@ -1544,7 +2002,8 @@
             <button class="tb-btn" onclick="runAnimation()"><i class="fa-solid fa-play"></i> Run</button>
            
       <button class="tb-btn" id="interactive-btn" onclick="toggleInteractiveMode()" title="Toggle interactive preview — makes buttons clickable"><i class="fa-solid fa-computer-mouse"></i> Interactive</button>
-          </div>
+         
+    </div>
     <div class="tb-sep"></div>
     <div class="tb-group">
       <button class="tb-btn" id="mobile-sidebar-btn" onclick="toggleMobileSidebar()" style="display:none"><i class="fa-solid fa-bars"></i></button>
@@ -1552,7 +2011,230 @@
     </div>
     <div class="tb-spacer"></div>
     <div class="tb-group">
+      <button class="tb-btn" onclick="openToolbox()" id="toolbox-tb-btn" title="Toolbox"><i class="fa-solid fa-toolbox"></i> Toolbox</button>
+      <button class="tb-btn" onclick="openModal('settings-modal')" title="Settings"><i class="fa-solid fa-gear"></i></button>
       <button class="tb-btn success" onclick="openExportModal()"><i class="fa-solid fa-rocket"></i> Deploy</button>
+    </div>
+  </div>
+
+  <!-- TOOLBOX PANEL -->
+  <div id="toolbox-panel">
+    <div class="tbx-header">
+      <span class="tbx-header-title"><i class="fa-solid fa-toolbox"></i> Toolbox</span>
+      <button class="tbx-close" onclick="closeToolbox()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="tbx-tabs">
+      <button class="tbx-tab active" onclick="switchTbxTab('gradient',this)"><i class="fa-solid fa-fill-drip"></i> Gradient</button>
+      <button class="tbx-tab" onclick="switchTbxTab('color',this)"><i class="fa-solid fa-palette"></i> Color</button>
+      <button class="tbx-tab" onclick="switchTbxTab('shadow',this)"><i class="fa-solid fa-layer-group"></i> Shadow</button>
+      <button class="tbx-tab" onclick="switchTbxTab('snippets',this)"><i class="fa-solid fa-code"></i> Snippets</button>
+      <button class="tbx-tab" onclick="switchTbxTab('layout',this)"><i class="fa-solid fa-table-cells"></i> Layout</button>
+    </div>
+    <div class="tbx-body">
+
+      <!-- GRADIENT TAB -->
+      <div id="tbx-gradient" class="tbx-pane">
+        <div class="tbx-section-title">Gradient Preview</div>
+        <div class="grad-preview" id="grad-preview-box"></div>
+        <div class="grad-stops">
+          <input type="color" id="grad-color1" value="#5b8def" class="grad-stop-swatch" oninput="updateGradient()">
+          <input type="color" id="grad-color2" value="#7c6af5" class="grad-stop-swatch" oninput="updateGradient()">
+          <input type="color" id="grad-color3" value="#3dd6b5" class="grad-stop-swatch" oninput="updateGradient()">
+        </div>
+        <div class="tbx-row">
+          <span class="tbx-label">Direction</span>
+          <select class="tbx-select" id="grad-dir" onchange="updateGradient()" style="flex:1;margin-bottom:0">
+            <option value="135deg">↘ Diagonal</option>
+            <option value="90deg">↓ Vertical</option>
+            <option value="0deg">→ Horizontal</option>
+            <option value="45deg">↗ Anti-diag</option>
+            <option value="180deg">↑ Bottom-up</option>
+          </select>
+        </div>
+        <div class="tbx-row">
+          <span class="tbx-label">Type</span>
+          <select class="tbx-select" id="grad-type" onchange="updateGradient()" style="flex:1;margin-bottom:0">
+            <option value="linear">Linear</option>
+            <option value="radial">Radial</option>
+          </select>
+        </div>
+        <div class="tbx-section-title">CSS Output</div>
+        <div class="tbx-output" id="grad-output" onclick="copyTbxOutput('grad-output')" title="Click to copy">Click to
+          copy…</div>
+        <button class="tbx-btn primary" onclick="copyTbxOutput('grad-output')"><i class="fa-solid fa-copy"></i> Copy CSS</button>
+        <div class="tbx-section-title">Roblox UIGradient</div>
+        <div class="tbx-output" id="grad-roblox-output" onclick="copyTbxOutput('grad-roblox-output')"
+          title="Click to copy">Click to copy…</div>
+        <button class="tbx-btn" onclick="copyTbxOutput('grad-roblox-output')"><i class="fa-solid fa-copy"></i> Copy Roblox</button>
+      </div>
+
+      <!-- COLOR TAB -->
+      <div id="tbx-color" class="tbx-pane" style="display:none">
+        <div class="tbx-section-title">Pick Color</div>
+        <input type="color" id="color-picker-main" value="#5b8def" oninput="updateColorTool()" style="width:100%;height:44px;border-radius:8px;border:1px solid var(--border);cursor:pointer;background:none;margin-bottom:8px;">
+        <div class="tbx-row">
+          <span class="tbx-label">HEX</span>
+          <div class="tbx-output" id="color-hex-out" onclick="copyTbxOutput('color-hex-out')" style="margin:0;flex:1">
+            #5b8def</div>
+        </div>
+        <div class="tbx-row">
+          <span class="tbx-label">RGB</span>
+          <div class="tbx-output" id="color-rgb-out" onclick="copyTbxOutput('color-rgb-out')" style="margin:0;flex:1">
+            91, 141, 239</div>
+        </div>
+        <div class="tbx-row">
+          <span class="tbx-label">Roblox</span>
+          <div class="tbx-output" id="color-rblx-out" onclick="copyTbxOutput('color-rblx-out')" style="margin:0;flex:1">
+            Color3.fromRGB(91,141,239)</div>
+        </div>
+        <div class="tbx-section-title">Roblox UI Palette</div>
+        <div class="tbx-color-grid" id="tbx-palette"></div>
+        <div class="tbx-section-title">Tints &amp; Shades</div>
+        <div class="tbx-color-grid" id="tbx-tints"></div>
+      </div>
+
+      <!-- SHADOW TAB -->
+      <div id="tbx-shadow" class="tbx-pane" style="display:none">
+        <div class="tbx-section-title">Shadow Preview</div>
+        <div class="tbx-shadow-preview" id="shadow-preview-box">
+          <div style="width:80px;height:28px;background:var(--bg5);border-radius:6px;" id="shadow-demo-el"></div>
+        </div>
+        <div class="tbx-row">
+          <span class="tbx-label">X Offset</span><input class="tbx-input" id="sh-x" type="range" min="-20" max="20" value="0" oninput="updateShadow()" style="flex:1;margin:0"><span id="sh-x-val" style="font-size:11px;color:var(--text2);width:28px;text-align:right">0</span>
+        </div>
+        <div class="tbx-row">
+          <span class="tbx-label">Y Offset</span><input class="tbx-input" id="sh-y" type="range" min="-20" max="20" value="4" oninput="updateShadow()" style="flex:1;margin:0"><span id="sh-y-val" style="font-size:11px;color:var(--text2);width:28px;text-align:right">4</span>
+        </div>
+        <div class="tbx-row">
+          <span class="tbx-label">Blur</span><input class="tbx-input" id="sh-blur" type="range" min="0" max="40" value="16" oninput="updateShadow()" style="flex:1;margin:0"><span id="sh-blur-val" style="font-size:11px;color:var(--text2);width:28px;text-align:right">16</span>
+        </div>
+        <div class="tbx-row">
+          <span class="tbx-label">Spread</span><input class="tbx-input" id="sh-spread" type="range" min="-10" max="20" value="0" oninput="updateShadow()" style="flex:1;margin:0"><span id="sh-spread-val" style="font-size:11px;color:var(--text2);width:28px;text-align:right">0</span>
+        </div>
+        <div class="tbx-row">
+          <span class="tbx-label">Color</span><input type="color" id="sh-color" value="#000000" oninput="updateShadow()" style="width:36px;height:28px;border-radius:5px;border:1px solid var(--border);cursor:pointer;background:none"><input class="tbx-input" id="sh-alpha" type="range" min="0" max="100" value="40" oninput="updateShadow()" style="flex:1;margin:0"><span id="sh-alpha-val" style="font-size:11px;color:var(--text2);width:28px;text-align:right">40%</span>
+        </div>
+        <div class="tbx-row">
+          <span class="tbx-label">Inset</span><button class="settings-toggle" id="sh-inset-toggle" onclick="this.classList.toggle('on');updateShadow()"></button>
+        </div>
+        <div class="tbx-section-title">CSS Output</div>
+        <div class="tbx-output" id="shadow-output" onclick="copyTbxOutput('shadow-output')" title="Click to copy">
+          box-shadow: …</div>
+        <button class="tbx-btn primary" onclick="copyTbxOutput('shadow-output')"><i class="fa-solid fa-copy"></i> Copy CSS</button>
+      </div>
+
+      <!-- SNIPPETS TAB -->
+      <div id="tbx-snippets" class="tbx-pane" style="display:none">
+        <div class="tbx-section-title">UI Components</div>
+        <div style="display:flex;flex-wrap:wrap;">
+          <span class="tbx-snippet-chip" onclick="tbxInsertSnippet('screengui')"><i class="fa-solid fa-display"></i> ScreenGui</span>
+          <span class="tbx-snippet-chip" onclick="tbxInsertSnippet('frame')"><i class="fa-solid fa-square"></i> Frame</span>
+          <span class="tbx-snippet-chip" onclick="tbxInsertSnippet('textlabel')"><i class="fa-solid fa-font"></i> TextLabel</span>
+          <span class="tbx-snippet-chip" onclick="tbxInsertSnippet('textbutton')"><i class="fa-solid fa-hand-pointer"></i> TextButton</span>
+          <span class="tbx-snippet-chip" onclick="tbxInsertSnippet('imagelabel')"><i class="fa-solid fa-image"></i> ImageLabel</span>
+          <span class="tbx-snippet-chip" onclick="tbxInsertSnippet('scrollframe')"><i class="fa-solid fa-scroll"></i> ScrollFrame</span>
+          <span class="tbx-snippet-chip" onclick="tbxInsertSnippet('uicorner')"><i class="fa-solid fa-circle-nodes"></i> UICorner</span>
+          <span class="tbx-snippet-chip" onclick="tbxInsertSnippet('uistroke')"><i class="fa-solid fa-pen"></i> UIStroke</span>
+          <span class="tbx-snippet-chip" onclick="tbxInsertSnippet('uigradient')"><i class="fa-solid fa-fill-drip"></i> UIGradient</span>
+          <span class="tbx-snippet-chip" onclick="tbxInsertSnippet('uilistlayout')"><i class="fa-solid fa-list"></i> UIListLayout</span>
+          <span class="tbx-snippet-chip" onclick="tbxInsertSnippet('uipadding')"><i class="fa-solid fa-border-none"></i> UIPadding</span>
+          <span class="tbx-snippet-chip" onclick="tbxInsertSnippet('uiscale')"><i class="fa-solid fa-expand"></i> UIScale</span>
+        </div>
+        <div class="tbx-section-title">Script Patterns</div>
+        <div style="display:flex;flex-wrap:wrap;">
+          <span class="tbx-snippet-chip" onclick="tbxInsertSnippet('tween')"><i class="fa-solid fa-wand-magic-sparkles"></i> Tween</span>
+          <span class="tbx-snippet-chip" onclick="tbxInsertSnippet('remoteevent')"><i class="fa-solid fa-tower-broadcast"></i> RemoteEvent</span>
+          <span class="tbx-snippet-chip" onclick="tbxInsertSnippet('mouseenter')"><i class="fa-solid fa-computer-mouse"></i> MouseEnter</span>
+          <span class="tbx-snippet-chip" onclick="tbxInsertSnippet('clickdetect')"><i class="fa-solid fa-hand-pointer"></i> ClickDetect</span>
+          <span class="tbx-snippet-chip" onclick="tbxInsertSnippet('tocstring')"><i class="fa-solid fa-clock"></i> ToC String</span>
+          <span class="tbx-snippet-chip" onclick="tbxInsertSnippet('debounce')"><i class="fa-solid fa-stopwatch"></i> Debounce</span>
+          <span class="tbx-snippet-chip" onclick="tbxInsertSnippet('getservice')"><i class="fa-solid fa-server"></i> GetService</span>
+          <span class="tbx-snippet-chip" onclick="tbxInsertSnippet('datastore')"><i class="fa-solid fa-database"></i> DataStore</span>
+        </div>
+      </div>
+
+      <!-- LAYOUT TAB -->
+      <div id="tbx-layout" class="tbx-pane" style="display:none">
+        <div class="tbx-section-title">UDim2 Calculator</div>
+        <div class="tbx-row"><span class="tbx-label">Scale X</span><input class="tbx-input" id="udim-sx" type="number" step="0.01" min="0" max="1" value="0.5" oninput="updateUDim2()" style="flex:1;margin:0">
+        </div>
+        <div class="tbx-row"><span class="tbx-label">Offset X</span><input class="tbx-input" id="udim-ox" type="number" value="0" oninput="updateUDim2()" style="flex:1;margin:0">
+        </div>
+        <div class="tbx-row"><span class="tbx-label">Scale Y</span><input class="tbx-input" id="udim-sy" type="number" step="0.01" min="0" max="1" value="0.5" oninput="updateUDim2()" style="flex:1;margin:0">
+        </div>
+        <div class="tbx-row"><span class="tbx-label">Offset Y</span><input class="tbx-input" id="udim-oy" type="number" value="0" oninput="updateUDim2()" style="flex:1;margin:0">
+        </div>
+        <div class="tbx-output" id="udim-output" onclick="copyTbxOutput('udim-output')">UDim2.new(0.5, 0, 0.5, 0)</div>
+        <button class="tbx-btn primary" onclick="copyTbxOutput('udim-output')"><i class="fa-solid fa-copy"></i> Copy UDim2</button>
+        <div class="tbx-section-title">Anchor Point Helper</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:8px" id="anchor-grid"></div>
+        <div class="tbx-output" id="anchor-output" onclick="copyTbxOutput('anchor-output')">Vector2.new(0.5, 0.5)</div>
+        <div class="tbx-section-title">Size Presets</div>
+        <div style="display:flex;flex-wrap:wrap;">
+          <span class="tbx-snippet-chip" onclick="tbxCopyText('UDim2.new(1,0,1,0)')">Full Screen</span>
+          <span class="tbx-snippet-chip" onclick="tbxCopyText('UDim2.new(0.5,0,0.5,0)')">Half Screen</span>
+          <span class="tbx-snippet-chip" onclick="tbxCopyText('UDim2.new(0,200,0,50)')">Button 200×50</span>
+          <span class="tbx-snippet-chip" onclick="tbxCopyText('UDim2.new(0,300,0,200)')">Panel 300×200</span>
+          <span class="tbx-snippet-chip" onclick="tbxCopyText('UDim2.new(0,32,0,32)')">Icon 32×32</span>
+          <span class="tbx-snippet-chip" onclick="tbxCopyText('UDim2.new(0,64,0,64)')">Icon 64×64</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SETTINGS MODAL -->
+  <div class="modal-backdrop" id="settings-modal">
+    <div class="modal" style="width:min(520px,95vw)">
+      <div class="modal-title"><i class="fa-solid fa-gear"></i> Settings</div>
+      <div class="settings-tabs">
+        <button class="settings-tab active" onclick="switchSettingsTab('themes',this)">Themes</button>
+        <button class="settings-tab" onclick="switchSettingsTab('editor',this)">Editor</button>
+        <button class="settings-tab" onclick="switchSettingsTab('general',this)">General</button>
+      </div>
+      <!-- Themes -->
+      <div class="settings-section active" id="stab-themes">
+        <div class="theme-grid" id="theme-grid"></div>
+      </div>
+      <!-- Editor -->
+      <div class="settings-section" id="stab-editor">
+        <div class="settings-row">Font
+          Size<select class="tbx-select" id="set-fontsize" onchange="applyEditorSettings()" style="width:100px;margin:0"><option value="12">12px</option><option value="13" selected>13px</option><option value="14">14px</option><option value="16">16px</option><option value="18">18px</option></select>
+        </div>
+        <div class="settings-row">Line
+          Height<select class="tbx-select" id="set-lineheight" onchange="applyEditorSettings()" style="width:100px;margin:0"><option value="18">18</option><option value="20">20</option><option value="22" selected>22</option><option value="24">24</option><option value="26">26</option></select>
+        </div>
+        <div class="settings-row">Tab
+          Size<select class="tbx-select" id="set-tabsize" onchange="applyEditorSettings()" style="width:100px;margin:0"><option value="2">2</option><option value="4" selected>4</option><option value="8">8</option></select>
+        </div>
+        <div class="settings-row">
+          Minimap<button class="settings-toggle on" id="set-minimap" onclick="this.classList.toggle('on');applyEditorSettings()"></button>
+        </div>
+        <div class="settings-row">Line
+          Numbers<button class="settings-toggle on" id="set-linenums" onclick="this.classList.toggle('on');applyEditorSettings()"></button>
+        </div>
+        <div class="settings-row">Word
+          Wrap<button class="settings-toggle" id="set-wordwrap" onclick="this.classList.toggle('on');applyEditorSettings()"></button>
+        </div>
+      </div>
+      <!-- General -->
+      <div class="settings-section" id="stab-general">
+        <div class="settings-row">
+          Auto-save<button class="settings-toggle on" id="set-autosave" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="settings-row">
+          Animations<button class="settings-toggle on" id="set-anims" onclick="this.classList.toggle('on');applyAnimSetting()"></button>
+        </div>
+        <div class="settings-row">Compact
+          Topbar<button class="settings-toggle" id="set-compact" onclick="this.classList.toggle('on');applyCompactTopbar()"></button>
+        </div>
+        <div class="settings-row">iPad
+          Mode<button class="settings-toggle" id="set-ipad" onclick="this.classList.toggle('on');applyIPadMode()"></button>
+        </div>
+      </div>
+      <div class="modal-btns">
+        <button class="modal-btn" onclick="closeModal('settings-modal')">Close</button>
+      </div>
     </div>
   </div>
 
@@ -1761,7 +2443,7 @@
 
           <!-- Editor -->
           <div id="editor-wrapper">
-            <div id="line-numbers" id="line-numbers"></div>
+            <div id="line-numbers"></div>
             <textarea id="code-editor" spellcheck="false" autocorrect="off" autocapitalize="off"
             oninput="onCodeChange()" onkeydown="onKeyDown(event)" onscroll="syncScroll()"
             onclick="hideAutocomplete()" onfocus="onEditorFocus()"></textarea>
@@ -1794,7 +2476,7 @@
             <button class="ph-btn" onclick="togglePreviewMode()" title="Fullscreen" id="preview-fs-btn"><i class="fa-solid fa-expand"></i></button>
           </div>
 
-          <div id="preview-viewport" id="preview-viewport">
+          <div id="preview-viewport">
             <div id="preview-bg"></div>
             <div id="preview-canvas">
               <!-- MainFrame -->
@@ -3490,6 +4172,53 @@ function previewBtnClick(el, name) {
 }
 
 // ─────────────────────────────────────────────
+// TOOLS MENU
+// ─────────────────────────────────────────────
+function toggleToolsMenu(e) {
+  e.stopPropagation();
+  const dd = document.getElementById('tools-dropdown');
+  const filesDD = document.getElementById('files-dropdown');
+  if (filesDD) filesDD.style.display = 'none';
+  dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+}
+document.addEventListener('click', () => {
+  const dd = document.getElementById('tools-dropdown');
+  if (dd) dd.style.display = 'none';
+  const fd = document.getElementById('files-dropdown');
+  if (fd) fd.style.display = 'none';
+});
+
+let activeModeOn = false;
+function toggleActiveModeFromMenu() {
+  activeModeOn = !activeModeOn;
+  const badge = document.getElementById('tools-activemode-badge');
+  const item = document.getElementById('tools-activemode-item');
+  const btn = document.getElementById('interactive-btn');
+  if (activeModeOn) {
+    badge.style.display = '';
+    item.style.color = 'var(--accent)';
+    if (btn) { btn.classList.add('active-mode'); btn.innerHTML = '<i class="fa-solid fa-computer-mouse"></i> Interactive <i class="fa-solid fa-circle" style="font-size:7px;color:var(--green);margin-left:2px"></i>'; }
+    document.querySelectorAll('.preview-ui-el').forEach(el => el.style.pointerEvents = 'auto');
+    interactiveMode = true;
+    addLog('success', 'Active Mode ON via Tools menu');
+    showToast('Active Mode ON', 'ok');
+  } else {
+    badge.style.display = 'none';
+    item.style.color = '';
+    if (btn) { btn.classList.remove('active-mode'); btn.innerHTML = '<i class="fa-solid fa-computer-mouse"></i> Interactive'; }
+    interactiveMode = false;
+    addLog('info', 'Active Mode OFF via Tools menu');
+    showToast('Active Mode OFF', 'ok');
+  }
+  document.getElementById('tools-dropdown').style.display = 'none';
+}
+function toolsAction(action) {
+  document.getElementById('tools-dropdown').style.display = 'none';
+  addLog('info', `Tool toggled: ${action}`);
+  showToast(`${action} toggled`, 'ok');
+}
+
+// ─────────────────────────────────────────────
 // FILES MENU
 // ─────────────────────────────────────────────
 function toggleFilesMenu(e) {
@@ -3497,10 +4226,7 @@ function toggleFilesMenu(e) {
   const dd = document.getElementById('files-dropdown');
   dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
 }
-document.addEventListener('click', () => {
-  const dd = document.getElementById('files-dropdown');
-  if (dd) dd.style.display = 'none';
-});
+
 
 function filesAction(action) {
   document.getElementById('files-dropdown').style.display = 'none';
@@ -3584,6 +4310,270 @@ document.addEventListener('keydown', e => {
 });
 
 addLog('info', 'Workspace loaded — 3 scripts, 2 UI elements');
+
+// ─────────────────────────────────────────────
+// TOOLBOX
+// ─────────────────────────────────────────────
+function openToolbox() {
+  document.getElementById('toolbox-panel').classList.add('open');
+  document.getElementById('toolbox-tb-btn').classList.add('active-mode');
+  updateGradient(); updateColorTool(); updateShadow(); updateUDim2(); buildAnchorGrid(); buildPalette();
+}
+function closeToolbox() {
+  document.getElementById('toolbox-panel').classList.remove('open');
+  document.getElementById('toolbox-tb-btn').classList.remove('active-mode');
+}
+function switchTbxTab(name, btn) {
+  document.querySelectorAll('.tbx-pane').forEach(p => p.style.display = 'none');
+  document.querySelectorAll('.tbx-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tbx-' + name).style.display = '';
+  btn.classList.add('active');
+}
+function copyTbxOutput(id) {
+  const el = document.getElementById(id);
+  const text = el.textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('Copied!', 'ok')).catch(() => showToast('Copy failed', 'warn'));
+}
+function tbxCopyText(text) {
+  navigator.clipboard.writeText(text).then(() => showToast('Copied: ' + text, 'ok')).catch(() => showToast('Copy failed', 'warn'));
+}
+// Gradient maker
+function updateGradient() {
+  const c1 = document.getElementById('grad-color1').value;
+  const c2 = document.getElementById('grad-color2').value;
+  const c3 = document.getElementById('grad-color3').value;
+  const dir = document.getElementById('grad-dir').value;
+  const type = document.getElementById('grad-type').value;
+  let css, preview;
+  if (type === 'linear') {
+    css = `background: linear-gradient(${dir}, ${c1}, ${c2}, ${c3});`;
+    preview = `linear-gradient(${dir}, ${c1}, ${c2}, ${c3})`;
+  } else {
+    css = `background: radial-gradient(circle, ${c1}, ${c2}, ${c3});`;
+    preview = `radial-gradient(circle, ${c1}, ${c2}, ${c3})`;
+  }
+  document.getElementById('grad-preview-box').style.background = preview;
+  document.getElementById('grad-output').textContent = css;
+  const toRblx = hex => { const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16); return `Color3.fromRGB(${r},${g},${b})`; };
+  document.getElementById('grad-roblox-output').textContent =
+    `local grad = Instance.new("UIGradient")\ngrad.Color = ColorSequence.new({ColorSequenceKeypoint.new(0,${toRblx(c1)}),ColorSequenceKeypoint.new(0.5,${toRblx(c2)}),ColorSequenceKeypoint.new(1,${toRblx(c3)})})\ngrad.Rotation = 90\ngrad.Parent = frame`;
+}
+// Color tool
+function updateColorTool() {
+  const hex = document.getElementById('color-picker-main').value;
+  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  document.getElementById('color-hex-out').textContent = hex.toUpperCase();
+  document.getElementById('color-rgb-out').textContent = `${r}, ${g}, ${b}`;
+  document.getElementById('color-rblx-out').textContent = `Color3.fromRGB(${r},${g},${b})`;
+  buildTints(hex);
+}
+function buildPalette() {
+  const colors = ['#5b8def','#7c6af5','#3dd6b5','#4dc97e','#f05d6a','#f0924d','#f0c94d','#a97ef5','#e8eaf2','#b8bdcc','#7c839a','#4a5068','#0d0f14','#1f2433','#252b3b','#2c3449','#ffffff','#ff6b6b'];
+  const grid = document.getElementById('tbx-palette');
+  if (!grid || grid.childElementCount > 0) return;
+  colors.forEach(c => {
+    const s = document.createElement('div');
+    s.className = 'tbx-color-swatch';
+    s.style.background = c;
+    s.title = c;
+    s.onclick = () => { document.getElementById('color-picker-main').value = c; updateColorTool(); };
+    grid.appendChild(s);
+  });
+}
+function buildTints(hex) {
+  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  const grid = document.getElementById('tbx-tints');
+  grid.innerHTML = '';
+  const toH = (v) => v.toString(16).padStart(2,'0');
+  [-0.4,-0.25,-0.1,0,0.15,0.3].forEach(t => {
+    const nr=Math.min(255,Math.max(0,Math.round(r+(255-r)*Math.max(0,t)+r*Math.min(0,t))));
+    const ng=Math.min(255,Math.max(0,Math.round(g+(255-g)*Math.max(0,t)+g*Math.min(0,t))));
+    const nb=Math.min(255,Math.max(0,Math.round(b+(255-b)*Math.max(0,t)+b*Math.min(0,t))));
+    const col='#'+toH(nr)+toH(ng)+toH(nb);
+    const s=document.createElement('div');
+    s.className='tbx-color-swatch';
+    s.style.background=col; s.title=col;
+    s.onclick=()=>{document.getElementById('color-picker-main').value=col;updateColorTool();};
+    grid.appendChild(s);
+  });
+}
+// Shadow tool
+function updateShadow() {
+  const x=document.getElementById('sh-x').value;
+  const y=document.getElementById('sh-y').value;
+  const blur=document.getElementById('sh-blur').value;
+  const spread=document.getElementById('sh-spread').value;
+  const color=document.getElementById('sh-color').value;
+  const alpha=document.getElementById('sh-alpha').value;
+  const inset=document.getElementById('sh-inset-toggle').classList.contains('on');
+  document.getElementById('sh-x-val').textContent=x;
+  document.getElementById('sh-y-val').textContent=y;
+  document.getElementById('sh-blur-val').textContent=blur;
+  document.getElementById('sh-spread-val').textContent=spread;
+  document.getElementById('sh-alpha-val').textContent=alpha+'%';
+  const r=parseInt(color.slice(1,3),16),g=parseInt(color.slice(3,5),16),b=parseInt(color.slice(5,7),16);
+  const a=(alpha/100).toFixed(2);
+  const shadow=`${inset?'inset ':''}${x}px ${y}px ${blur}px ${spread}px rgba(${r},${g},${b},${a})`;
+  document.getElementById('shadow-demo-el').style.boxShadow=shadow;
+  document.getElementById('shadow-output').textContent=`box-shadow: ${shadow};`;
+}
+// UDim2 calculator
+function updateUDim2() {
+  const sx=parseFloat(document.getElementById('udim-sx').value)||0;
+  const ox=parseFloat(document.getElementById('udim-ox').value)||0;
+  const sy=parseFloat(document.getElementById('udim-sy').value)||0;
+  const oy=parseFloat(document.getElementById('udim-oy').value)||0;
+  document.getElementById('udim-output').textContent=`UDim2.new(${sx}, ${ox}, ${sy}, ${oy})`;
+}
+function buildAnchorGrid() {
+  const grid=document.getElementById('anchor-grid');
+  if (grid.childElementCount>0) return;
+  const points=[[0,0],[0.5,0],[1,0],[0,0.5],[0.5,0.5],[1,0.5],[0,1],[0.5,1],[1,1]];
+  points.forEach(([x,y]) => {
+    const btn=document.createElement('button');
+    btn.style.cssText='height:28px;background:var(--bg4);border:1px solid var(--border);border-radius:4px;color:var(--text1);font-size:10px;cursor:pointer;font-family:Syne,sans-serif';
+    btn.textContent=`${x},${y}`;
+    btn.onclick=()=>{document.getElementById('anchor-output').textContent=`Vector2.new(${x}, ${y})`;showToast('Copied!','ok');navigator.clipboard.writeText(`Vector2.new(${x}, ${y})`).catch(()=>{});};
+    grid.appendChild(btn);
+  });
+}
+// Toolbox snippets
+const TBX_SNIPPETS = {
+  screengui: `local sg = Instance.new("ScreenGui")\nsg.Name = "MyGui"\nsg.ResetOnSpawn = false\nsg.Parent = game.Players.LocalPlayer.PlayerGui`,
+  frame: `local frame = Instance.new("Frame")\nframe.Size = UDim2.new(0.4, 0, 0.35, 0)\nframe.Position = UDim2.new(0.3, 0, 0.3, 0)\nframe.BackgroundColor3 = Color3.fromRGB(15, 20, 35)\nframe.BorderSizePixel = 0\nframe.Parent = screenGui`,
+  textlabel: `local lbl = Instance.new("TextLabel")\nlbl.Size = UDim2.new(1, 0, 0, 32)\nlbl.BackgroundTransparency = 1\nlbl.Text = "Hello World"\nlbl.TextColor3 = Color3.fromRGB(232, 234, 242)\nlbl.Font = Enum.Font.GothamBold\nlbl.TextSize = 14\nlbl.Parent = frame`,
+  textbutton: `local btn = Instance.new("TextButton")\nbtn.Size = UDim2.new(1, -16, 0, 36)\nbtn.Position = UDim2.new(0, 8, 0, 8)\nbtn.BackgroundColor3 = Color3.fromRGB(91, 141, 239)\nbtn.Text = "Click Me"\nbtn.TextColor3 = Color3.new(1,1,1)\nbtn.Font = Enum.Font.GothamBold\nbtn.TextSize = 14\nbtn.BorderSizePixel = 0\nbtn.Parent = frame\nbtn.MouseButton1Click:Connect(function()\n    print("Button clicked!")\nend)`,
+  imagelabel: `local img = Instance.new("ImageLabel")\nimg.Size = UDim2.new(0, 64, 0, 64)\nimg.BackgroundTransparency = 1\nimg.Image = "rbxassetid://YOUR_ASSET_ID"\nimg.ScaleType = Enum.ScaleType.Fit\nimg.Parent = frame`,
+  scrollframe: `local scroll = Instance.new("ScrollingFrame")\nscroll.Size = UDim2.new(1, 0, 1, 0)\nscroll.BackgroundTransparency = 1\nscroll.ScrollBarThickness = 4\nscroll.ScrollBarImageColor3 = Color3.fromRGB(91,141,239)\nscroll.CanvasSize = UDim2.new(0,0,2,0)\nscroll.Parent = frame`,
+  uicorner: `local corner = Instance.new("UICorner")\ncorner.CornerRadius = UDim.new(0, 8)\ncorner.Parent = frame`,
+  uistroke: `local stroke = Instance.new("UIStroke")\nstroke.Color = Color3.fromRGB(91,141,239)\nstroke.Thickness = 1.5\nstroke.Transparency = 0.5\nstroke.Parent = frame`,
+  uigradient: `local grad = Instance.new("UIGradient")\ngrad.Color = ColorSequence.new({\n    ColorSequenceKeypoint.new(0, Color3.fromRGB(91,141,239)),\n    ColorSequenceKeypoint.new(1, Color3.fromRGB(124,106,245))\n})\ngrad.Rotation = 135\ngrad.Parent = frame`,
+  uilistlayout: `local layout = Instance.new("UIListLayout")\nlayout.FillDirection = Enum.FillDirection.Vertical\nlayout.HorizontalAlignment = Enum.HorizontalAlignment.Center\nlayout.Padding = UDim.new(0, 6)\nlayout.SortOrder = Enum.SortOrder.LayoutOrder\nlayout.Parent = frame`,
+  uipadding: `local pad = Instance.new("UIPadding")\npad.PaddingTop = UDim.new(0, 8)\npad.PaddingBottom = UDim.new(0, 8)\npad.PaddingLeft = UDim.new(0, 12)\npad.PaddingRight = UDim.new(0, 12)\npad.Parent = frame`,
+  uiscale: `local scale = Instance.new("UIScale")\nscale.Scale = 1.0\nscale.Parent = frame`,
+  tween: `local TweenService = game:GetService("TweenService")\nlocal info = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)\nlocal tween = TweenService:Create(frame, info, {\n    BackgroundTransparency = 0,\n    Position = UDim2.new(0.3, 0, 0.3, 0)\n})\ntween:Play()`,
+  remoteevent: `local ReplicatedStorage = game:GetService("ReplicatedStorage")\nlocal event = ReplicatedStorage:WaitForChild("MyEvent")\n-- Fire from client:\nevent:FireServer(data)\n-- Listen on server:\nevent.OnServerEvent:Connect(function(player, data)\n    print(player.Name, data)\nend)`,
+  mouseenter: `frame.MouseEnter:Connect(function()\n    TweenService:Create(frame, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(100,160,255)}):Play()\nend)\nframe.MouseLeave:Connect(function()\n    TweenService:Create(frame, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(91,141,239)}):Play()\nend)`,
+  clickdetect: `local detector = Instance.new("ClickDetector")\ndetector.MaxActivationDistance = 20\ndetector.Parent = part\ndetector.MouseClick:Connect(function(player)\n    print(player.Name .. " clicked!")\nend)`,
+  tocstring: `local function formatTime(seconds)\n    local m = math.floor(seconds / 60)\n    local s = seconds % 60\n    return string.format("%02d:%02d", m, s)\nend`,
+  debounce: `local debounce = false\nbtn.MouseButton1Click:Connect(function()\n    if debounce then return end\n    debounce = true\n    -- your code here\n    task.wait(0.5)\n    debounce = false\nend)`,
+  getservice: `local Players = game:GetService("Players")\nlocal TweenService = game:GetService("TweenService")\nlocal RunService = game:GetService("RunService")\nlocal ReplicatedStorage = game:GetService("ReplicatedStorage")\nlocal UserInputService = game:GetService("UserInputService")`,
+  datastore: `local DataStoreService = game:GetService("DataStoreService")\nlocal store = DataStoreService:GetDataStore("PlayerData")\n\ngame.Players.PlayerAdded:Connect(function(player)\n    local success, data = pcall(function()\n        return store:GetAsync(player.UserId)\n    end)\n    if success and data then\n        print("Loaded:", data)\n    end\nend)`,
+};
+function tbxInsertSnippet(key) {
+  const code = TBX_SNIPPETS[key];
+  if (!code) return;
+  const editor = document.getElementById('code-editor');
+  const start = editor.selectionStart;
+  const before = editor.value.substring(0, start);
+  const after = editor.value.substring(editor.selectionEnd);
+  editor.value = before + '\n' + code + '\n' + after;
+  onCodeChange();
+  showToast('Snippet inserted!', 'ok');
+  addLog('success', `Toolbox: inserted snippet "${key}"`);
+}
+
+// ─────────────────────────────────────────────
+// SETTINGS
+// ─────────────────────────────────────────────
+function switchSettingsTab(name, btn) {
+  document.querySelectorAll('.settings-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('stab-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+function applyEditorSettings() {
+  const editor = document.getElementById('code-editor');
+  const lnums = document.getElementById('line-numbers');
+  const minimap = document.getElementById('minimap');
+  const fs = document.getElementById('set-fontsize').value;
+  const lh = document.getElementById('set-lineheight').value;
+  const ts = document.getElementById('set-tabsize').value;
+  editor.style.fontSize = fs + 'px';
+  editor.style.lineHeight = lh + 'px';
+  editor.setAttribute('tabSize', ts);
+  if (lnums) { lnums.style.fontSize = fs + 'px'; lnums.style.lineHeight = lh + 'px'; }
+  const showMini = document.getElementById('set-minimap').classList.contains('on');
+  const showNums = document.getElementById('set-linenums').classList.contains('on');
+  const wrap = document.getElementById('set-wordwrap').classList.contains('on');
+  if (minimap) minimap.style.display = showMini ? '' : 'none';
+  if (lnums) lnums.style.display = showNums ? '' : 'none';
+  editor.style.whiteSpace = wrap ? 'pre-wrap' : 'pre';
+}
+function applyAnimSetting() {
+  const on = document.getElementById('set-anims').classList.contains('on');
+  document.documentElement.style.setProperty('--anim-speed', on ? '0.15s' : '0s');
+}
+function applyCompactTopbar() {
+  const on = document.getElementById('set-compact').classList.contains('on');
+  document.getElementById('topbar').style.height = on ? '34px' : '';
+}
+function applyIPadMode() {
+  const on = document.getElementById('set-ipad').classList.contains('on');
+  document.body.classList.toggle('ipad-forced', on);
+}
+
+// ── THEMES ──
+const THEMES = [
+  { id: 'dark', name: 'Dark', colors: ['#0d0f14','#5b8def','#7c6af5'] },
+  { id: 'midnight', name: 'Midnight', colors: ['#070a10','#4fc3f7','#7986cb'] },
+  { id: 'forest', name: 'Forest', colors: ['#0a110d','#4dc97e','#3dd6b5'] },
+  { id: 'crimson', name: 'Crimson', colors: ['#110a0d','#f05d6a','#f0924d'] },
+  { id: 'violet', name: 'Violet', colors: ['#0e0a18','#a97ef5','#7c6af5'] },
+  { id: 'slate', name: 'Slate', colors: ['#10131a','#8eaed4','#a8bbd4'] },
+];
+const THEME_VARS = {
+  dark:     { '--bg0':'#0d0f14','--bg1':'#12151c','--bg2':'#181c26','--bg3':'#1f2433','--bg4':'#252b3b','--bg5':'#2c3449','--border':'#2e3650','--border2':'#3a4460','--accent':'#5b8def','--accent2':'#7c6af5','--accent3':'#3dd6b5','--accent-glow':'rgba(91,141,239,0.18)' },
+  midnight: { '--bg0':'#070a10','--bg1':'#0d1018','--bg2':'#111520','--bg3':'#161b28','--bg4':'#1c2233','--bg5':'#22293d','--border':'#243050','--border2':'#304068','--accent':'#4fc3f7','--accent2':'#7986cb','--accent3':'#80cbc4','--accent-glow':'rgba(79,195,247,0.16)' },
+  forest:   { '--bg0':'#0a110d','--bg1':'#0f1812','--bg2':'#141f18','--bg3':'#1a281e','--bg4':'#203024','--bg5':'#27392b','--border':'#2a4030','--border2':'#355040','--accent':'#4dc97e','--accent2':'#3dd6b5','--accent3':'#a5d6a7','--accent-glow':'rgba(77,201,126,0.16)' },
+  crimson:  { '--bg0':'#110a0d','--bg1':'#180f12','--bg2':'#1f1418','--bg3':'#281a1e','--bg4':'#321f24','--bg5':'#3d252b','--border':'#50242c','--border2':'#682f38','--accent':'#f05d6a','--accent2':'#f0924d','--accent3':'#f0c94d','--accent-glow':'rgba(240,93,106,0.16)' },
+  violet:   { '--bg0':'#0e0a18','--bg1':'#120e20','--bg2':'#171228','--bg3':'#1d1832','--bg4':'#231e3c','--bg5':'#2a2448','--border':'#352e60','--border2':'#443c78','--accent':'#a97ef5','--accent2':'#7c6af5','--accent3':'#c084fc','--accent-glow':'rgba(169,126,245,0.18)' },
+  slate:    { '--bg0':'#10131a','--bg1':'#151922','--bg2':'#1a1f2c','--bg3':'#202636','--bg4':'#272e40','--bg5':'#2e364c','--border':'#3a4460','--border2':'#4a5678','--accent':'#8eaed4','--accent2':'#a8bbd4','--accent3':'#90caf9','--accent-glow':'rgba(142,174,212,0.16)' },
+};
+let currentTheme = 'dark';
+function buildThemeGrid() {
+  const grid = document.getElementById('theme-grid');
+  if (!grid || grid.childElementCount > 0) return;
+  THEMES.forEach(t => {
+    const card = document.createElement('div');
+    card.className = 'theme-card' + (t.id === currentTheme ? ' active-theme' : '');
+    card.id = 'theme-card-' + t.id;
+    card.onclick = () => applyTheme(t.id);
+    const prev = document.createElement('div');
+    prev.className = 'theme-card-preview';
+    prev.style.background = `linear-gradient(135deg, ${t.colors[0]} 0%, ${t.colors[1]} 50%, ${t.colors[2]} 100%)`;
+    const name = document.createElement('div');
+    name.className = 'theme-card-name';
+    name.textContent = t.name;
+    card.appendChild(prev); card.appendChild(name);
+    grid.appendChild(card);
+  });
+}
+function applyTheme(id) {
+  const vars = THEME_VARS[id];
+  if (!vars) return;
+  const root = document.documentElement;
+  Object.entries(vars).forEach(([k, v]) => root.style.setProperty(k, v));
+  currentTheme = id;
+  document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active-theme'));
+  const card = document.getElementById('theme-card-' + id);
+  if (card) card.classList.add('active-theme');
+  showToast('Theme: ' + THEMES.find(t=>t.id===id).name, 'ok');
+  addLog('info', 'Theme changed to ' + id);
+}
+// Build theme grid when settings open
+const _origOpenModal = window.openModal;
+window.openModal = function(id) {
+  if (id === 'settings-modal') buildThemeGrid();
+  if (_origOpenModal) _origOpenModal(id);
+  else document.getElementById(id).classList.add('open');
+};
+
+// iPad forced mode CSS
+const ipadStyle = document.createElement('style');
+ipadStyle.textContent = `body.ipad-forced .tb-btn{height:36px;padding:0 14px} body.ipad-forced .tree-item{padding:8px 10px} body.ipad-forced .editor-tab{height:34px} body.ipad-forced #code-editor{font-size:14px;line-height:24px} body.ipad-forced .ac-item{padding:10px 12px} body.ipad-forced .ph-btn{width:34px;height:34px} body.ipad-forced .pv-ctrl{width:38px;height:38px;font-size:14px} body.ipad-forced .ctx-item{padding:10px 12px;font-size:13px} body.ipad-forced .modal-btn{height:40px;font-size:14px} body.ipad-forced .tbx-btn{height:36px;font-size:13px} body.ipad-forced .tbx-input{height:36px;font-size:13px} body.ipad-forced .tbx-select{height:36px;font-size:13px}`;
+document.head.appendChild(ipadStyle);
+
   </script>
 </body>
 
