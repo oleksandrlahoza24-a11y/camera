@@ -558,19 +558,21 @@
 
     #code-editor {
       flex: 1;
-      background: var(--bg1);
+      background: transparent;
       border: none;
       outline: none;
       resize: none;
       font-family: 'JetBrains Mono', monospace;
       font-size: 13px;
       line-height: 22px;
-      color: var(--text0);
+      color: transparent;
+      caret-color: var(--text0);
       padding: 10px 12px;
       tab-size: 4;
       white-space: pre;
       overflow: auto;
-      caret-color: var(--accent);
+      position: relative;
+      z-index: 1;
     }
 
     #code-editor::-webkit-scrollbar {
@@ -601,7 +603,38 @@
       padding: 10px 12px;
       white-space: pre;
       overflow: hidden;
-      color: transparent;
+      color: var(--text0);
+    }
+
+    /* Syntax token colors */
+    .hl-comment {
+      color: #5c6a88;
+      font-style: italic;
+    }
+
+    .hl-string {
+      color: #98c379;
+    }
+
+    .hl-number {
+      color: #d19a66;
+    }
+
+    .hl-keyword {
+      color: #c678dd;
+      font-weight: 600;
+    }
+
+    .hl-builtin {
+      color: #e06c75;
+    }
+
+    .hl-global {
+      color: #61afef;
+    }
+
+    .hl-func {
+      color: #e5c07b;
     }
 
     .hl-match {
@@ -1900,7 +1933,7 @@
 
     .theme-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 8px;
       margin-bottom: 16px;
     }
@@ -1908,32 +1941,34 @@
     .theme-card {
       border: 2px solid var(--border);
       border-radius: 8px;
-      padding: 10px 8px;
       cursor: pointer;
       transition: all 0.15s;
-      text-align: center;
+      overflow: hidden;
+      background: var(--bg3);
     }
 
     .theme-card:hover {
-      border-color: var(--accent2);
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
     }
 
     .theme-card.active-theme {
       border-color: var(--accent);
-      background: var(--accent-glow);
+      box-shadow: 0 0 0 1px var(--accent);
     }
 
     .theme-card-preview {
-      height: 36px;
-      border-radius: 5px;
-      margin-bottom: 6px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      height: 52px;
+      width: 100%;
     }
 
     .theme-card-name {
       font-size: 11px;
       font-weight: 700;
-      color: var(--text1);
+      color: var(--text0);
+      text-align: center;
+      padding: 5px 4px 2px;
     }
 
     .settings-row {
@@ -2055,17 +2090,48 @@
       <button class="tb-btn" onclick="toggleFilesMenu(event)" id="files-tb-btn"><i class="fa-solid fa-folder-open"></i> Files <i class="fa-solid fa-chevron-down" style="font-size:9px;margin-left:2px"></i></button>
       <button class="tb-btn" onclick="toggleToolsMenu(event)" id="tools-tb-btn"><i class="fa-solid fa-wrench"></i> Tools <i class="fa-solid fa-chevron-down" style="font-size:9px;margin-left:2px"></i></button>
       <div id="tools-dropdown"
-        style="display:none;position:absolute;top:36px;left:0;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:4px;box-shadow:0 8px 32px rgba(0,0,0,0.5);z-index:600;min-width:200px;">
+        style="display:none;position:absolute;top:36px;left:0;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:4px;box-shadow:0 8px 32px rgba(0,0,0,0.5);z-index:600;min-width:220px;">
         <div class="ctx-item" id="tools-activemode-item" onclick="toggleActiveModeFromMenu()">
           <i class="fa-solid fa-bolt" style="color:var(--accent)"></i> Active Mode
           <span id="tools-activemode-badge" style="display:none;background:var(--green);color:#0a1a10;border-radius:3px;padding:1px 5px;font-size:10px;margin-left:auto">ON</span>
         </div>
         <div class="ctx-sep"></div>
-        <div class="ctx-item" onclick="toolsAction('gridSnap')">
+        <div class="ctx-item" id="tools-gridsnap-item" onclick="openGridSnapEditor()">
           <i class="fa-solid fa-border-all" style="color:var(--accent3)"></i> Grid Snap
+          <span id="tools-gridsnap-badge" style="display:none;background:var(--accent3);color:#0a1a10;border-radius:3px;padding:1px 5px;font-size:10px;margin-left:auto">ON</span>
         </div>
-        <div class="ctx-item" onclick="toolsAction('rulers')">
+        <div class="ctx-item" id="tools-rulers-item" onclick="toolsToggle('rulers')">
           <i class="fa-solid fa-ruler-combined" style="color:var(--accent2)"></i> Rulers
+          <span id="tools-rulers-badge" style="display:none;background:var(--accent2);color:#fff;border-radius:3px;padding:1px 5px;font-size:10px;margin-left:auto">ON</span>
+        </div>
+        <div class="ctx-item" id="tools-guides-item" onclick="toolsToggle('guides')">
+          <i class="fa-solid fa-crosshairs" style="color:var(--yellow)"></i> Smart Guides
+          <span id="tools-guides-badge" style="display:none;background:var(--yellow);color:#0a1a10;border-radius:3px;padding:1px 5px;font-size:10px;margin-left:auto">ON</span>
+        </div>
+        <div class="ctx-sep"></div>
+        <div class="ctx-item" onclick="openLayerManager()">
+          <i class="fa-solid fa-layer-group" style="color:var(--purple)"></i> Layer Manager
+        </div>
+        <div class="ctx-item" onclick="openAlignTool()">
+          <i class="fa-solid fa-align-center" style="color:var(--accent)"></i> Align &amp; Distribute
+        </div>
+        <div class="ctx-item" onclick="openTransformTool()">
+          <i class="fa-solid fa-up-down-left-right" style="color:var(--orange)"></i> Transform Panel
+        </div>
+        <div class="ctx-sep"></div>
+        <div class="ctx-item" id="tools-darkbg-item" onclick="toolsToggle('darkbg')">
+          <i class="fa-solid fa-moon" style="color:var(--text2)"></i> Dark Preview BG
+          <span id="tools-darkbg-badge" style="display:none;background:var(--bg5);color:var(--text0);border-radius:3px;padding:1px 5px;font-size:10px;margin-left:auto">ON</span>
+        </div>
+        <div class="ctx-item" id="tools-outlines-item" onclick="toolsToggle('outlines')">
+          <i class="fa-solid fa-vector-square" style="color:var(--accent3)"></i> Show Outlines
+          <span id="tools-outlines-badge" style="display:none;background:var(--accent3);color:#0a1a10;border-radius:3px;padding:1px 5px;font-size:10px;margin-left:auto">ON</span>
+        </div>
+        <div class="ctx-item" onclick="copyCanvasScreenshot()">
+          <i class="fa-solid fa-camera" style="color:var(--green)"></i> Screenshot Canvas
+        </div>
+        <div class="ctx-item" onclick="openMeasureTool()">
+          <i class="fa-solid fa-ruler" style="color:var(--red)"></i> Measure Tool
         </div>
       </div>
             <div id="files-dropdown"
@@ -2287,7 +2353,7 @@
 
   <!-- SETTINGS MODAL -->
   <div class="modal-backdrop" id="settings-modal">
-    <div class="modal" style="width:min(520px,95vw)">
+    <div class="modal" style="width:min(620px,96vw)">
       <div class="modal-title"><i class="fa-solid fa-gear"></i> Settings</div>
       <div class="settings-tabs">
         <button class="settings-tab active" onclick="switchSettingsTab('themes',this)">Themes</button>
@@ -3106,9 +3172,72 @@ const editor = document.getElementById('code-editor');
 const lineNumbers = document.getElementById('line-numbers');
 const autocomplete = document.getElementById('autocomplete');
 
+// ── LUA SYNTAX HIGHLIGHTING ──
+function luaHighlight(code) {
+  // Escape HTML first
+  let s = code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  // We process token by token using replace chains on safe HTML
+
+  // 1. Comments (-- and --[[ ]])
+  s = s.replace(/(--\[\[[\s\S]*?\]\])/g, '<span class="hl-comment">$1</span>');
+  s = s.replace(/(--[^\n]*)/g, '<span class="hl-comment">$1</span>');
+
+  // 2. Strings (double and single quoted, and multiline [[ ]])
+  s = s.replace(/(\[\[[\s\S]*?\]\])/g, (m) => m.startsWith('<span') ? m : '<span class="hl-string">'+m+'</span>');
+  s = s.replace(/("(?:[^"\\]|\\.)*")/g, (m) => m.startsWith('<span') ? m : '<span class="hl-string">'+m+'</span>');
+  s = s.replace(/('(?:[^'\\]|\\.)*')/g, (m) => m.startsWith('<span') ? m : '<span class="hl-string">'+m+'</span>');
+
+  // 3. Numbers
+  s = s.replace(/\b(\d+\.?\d*)\b/g, (m, p1, offset, str) => {
+    const before = str.slice(Math.max(0, offset-6), offset);
+    if (before.includes('class=') || before.includes('span')) return m;
+    return '<span class="hl-number">'+m+'</span>';
+  });
+
+  // 4. Keywords
+  const keywords = ['local','function','return','if','then','else','elseif','end','for','while','do','repeat','until','not','and','or','in','break','continue'];
+  keywords.forEach(kw => {
+    s = s.replace(new RegExp('\\b(' + kw + ')\\b', 'g'), (m, p1, offset, str) => {
+      const before = str.slice(Math.max(0, offset-20), offset);
+      if (before.lastIndexOf('<span') > before.lastIndexOf('</span')) return m;
+      return '<span class="hl-keyword">'+p1+'</span>';
+    });
+  });
+
+  // 5. Built-in values
+  ['true','false','nil','self'].forEach(v => {
+    s = s.replace(new RegExp('\\b('+v+')\\b', 'g'), (m, p1, offset, str) => {
+      const before = str.slice(Math.max(0, offset-20), offset);
+      if (before.lastIndexOf('<span') > before.lastIndexOf('</span')) return m;
+      return '<span class="hl-builtin">'+p1+'</span>';
+    });
+  });
+
+  // 6. Roblox services / globals
+  ['game','workspace','script','print','warn','error','require','wait','task','math','string','table','coroutine','os','io','type','tostring','tonumber','pairs','ipairs','next','select','unpack','rawget','rawset','setmetatable','getmetatable','pcall','xpcall','assert','Instance','UDim2','UDim','Color3','Vector2','Vector3','CFrame','TweenInfo','Enum','RunService','TweenService','Players','UserInputService','ReplicatedStorage','DataStoreService'].forEach(v => {
+    s = s.replace(new RegExp('\\b('+v+')\\b', 'g'), (m, p1, offset, str) => {
+      const before = str.slice(Math.max(0, offset-20), offset);
+      if (before.lastIndexOf('<span') > before.lastIndexOf('</span')) return m;
+      return '<span class="hl-global">'+p1+'</span>';
+    });
+  });
+
+  // 7. Function calls (word followed by open paren, not a keyword)
+  s = s.replace(/\b([a-zA-Z_]\w*)(\s*[\(:])/g, (m, name, after, offset, str) => {
+    const before = str.slice(Math.max(0, offset-20), offset);
+    if (before.lastIndexOf('<span') > before.lastIndexOf('</span')) return m;
+    if (['local','function','return','if','then','else','end','for','while','do','repeat','until'].includes(name)) return m;
+    if (str.charAt(offset + name.length) === ':' && str.charAt(offset + name.length + 1) !== ':') return m;
+    return '<span class="hl-func">'+name+'</span>'+after;
+  });
+
+  return s;
+}
+
 function initEditor() {
   editor.value = SCRIPTS[currentFile];
   updateLineNumbers();
+  updateHighlight();
   updateStatus();
 }
 
@@ -3121,12 +3250,20 @@ function updateLineNumbers() {
 
 function syncScroll() {
   lineNumbers.scrollTop = editor.scrollTop;
-  document.getElementById('highlight-overlay').scrollTop = editor.scrollTop;
-  document.getElementById('highlight-overlay').scrollLeft = editor.scrollLeft;
+  const ov = document.getElementById('highlight-overlay');
+  ov.scrollTop = editor.scrollTop;
+  ov.scrollLeft = editor.scrollLeft;
+}
+
+function updateHighlight() {
+  const ov = document.getElementById('highlight-overlay');
+  if (!ov) return;
+  ov.innerHTML = luaHighlight(editor.value);
 }
 
 function onCodeChange() {
   updateLineNumbers();
+  updateHighlight();
   updateStatus();
   triggerAutocomplete();
   if (searchState.matches.length) doSearch();
@@ -3537,6 +3674,7 @@ function switchEditorTab(name) {
   const tab = document.getElementById('tab-' + name);
   if (tab) tab.classList.add('active');
   updateLineNumbers();
+  updateHighlight();
   updateStatus();
   clearHighlights();
 }
@@ -3566,17 +3704,151 @@ function newFile() {
   div.onclick = () => switchEditorTab(name);
   tabs.appendChild(div);
   switchEditorTab(name);
-  addWorkspaceItem(name, 'Script');
+  addWorkspaceItemAt(name, 'LocalScript', null);
 }
 
 function addWorkspaceItem(name, type) {
+  return addWorkspaceItemAt(name, type, null);
+}
+
+function addWorkspaceItemAt(name, type, afterEl) {
   const tree = document.getElementById('workspace-tree');
   const div = document.createElement('div');
   div.className = 'tree-item';
   div.setAttribute('data-name', name);
-  div.innerHTML = `<span class="ti-icon"><i class="fa-solid fa-scroll" style="color:#f0c94d"></i></span><span class="ti-label">${name}</span><span class="ti-badge">${type}</span>`;
+  const typeColors = { Frame:'#f0924d', TextLabel:'#4dc97e', TextButton:'#a97ef5', ImageLabel:'#5b8def', ScrollingFrame:'#3dd6b5', Script:'#f0c94d', LocalScript:'#f0c94d', ModuleScript:'#3dd6b5', UICorner:'#b8bdcc', UIStroke:'#b8bdcc', UIGradient:'#b8bdcc', UIListLayout:'#b8bdcc', Folder:'#a97ef5' };
+  const typeIcons = { Frame:'fa-regular fa-square', TextLabel:'fa-solid fa-font', TextButton:'fa-solid fa-hand-pointer', ImageLabel:'fa-solid fa-image', ScrollingFrame:'fa-solid fa-scroll', Script:'fa-solid fa-scroll', LocalScript:'fa-solid fa-scroll', ModuleScript:'fa-solid fa-scroll', UICorner:'fa-solid fa-circle-nodes', UIStroke:'fa-solid fa-pen', UIGradient:'fa-solid fa-fill-drip', UIListLayout:'fa-solid fa-list', Folder:'fa-solid fa-folder' };
+  const col = typeColors[type] || '#b8bdcc';
+  const ico = typeIcons[type] || 'fa-solid fa-square';
+  div.innerHTML = `<span class="ti-icon"><i class="${ico}" style="color:${col}"></i></span><span class="ti-label">${name}</span><span class="ti-badge">${type}</span>`;
   div.onclick = () => selectItem(div, name);
-  tree.appendChild(div);
+  if (afterEl) {
+    // Insert as a child (indented) after the selected element
+    const indentDiv = document.createElement('div');
+    indentDiv.className = 'tree-indent';
+    indentDiv.appendChild(div);
+    afterEl.insertAdjacentElement('afterend', indentDiv);
+  } else {
+    tree.appendChild(div);
+  }
+  return div;
+}
+
+// Add Child Modal
+function openAddChildModal(parentName) {
+  // Remove any existing modal
+  const existing = document.getElementById('addchild-modal');
+  if (existing) existing.remove();
+
+  const backdrop = document.createElement('div');
+  backdrop.className = 'modal-backdrop open';
+  backdrop.id = 'addchild-modal';
+
+  const childTypes = [
+    { type: 'Frame', icon: 'fa-regular fa-square', col: '#f0924d' },
+    { type: 'TextLabel', icon: 'fa-solid fa-font', col: '#4dc97e' },
+    { type: 'TextButton', icon: 'fa-solid fa-hand-pointer', col: '#a97ef5' },
+    { type: 'ImageLabel', icon: 'fa-solid fa-image', col: '#5b8def' },
+    { type: 'ScrollingFrame', icon: 'fa-solid fa-scroll', col: '#3dd6b5' },
+    { type: 'ImageButton', icon: 'fa-solid fa-image', col: '#a97ef5' },
+    { type: 'TextBox', icon: 'fa-solid fa-keyboard', col: '#f0c94d' },
+    { type: 'ViewportFrame', icon: 'fa-solid fa-cube', col: '#f0924d' },
+    { type: 'UICorner', icon: 'fa-solid fa-circle-nodes', col: '#b8bdcc' },
+    { type: 'UIStroke', icon: 'fa-solid fa-pen', col: '#b8bdcc' },
+    { type: 'UIGradient', icon: 'fa-solid fa-fill-drip', col: '#b8bdcc' },
+    { type: 'UIListLayout', icon: 'fa-solid fa-list', col: '#b8bdcc' },
+    { type: 'UIGridLayout', icon: 'fa-solid fa-table-cells', col: '#b8bdcc' },
+    { type: 'UIPadding', icon: 'fa-solid fa-border-none', col: '#b8bdcc' },
+    { type: 'UIScale', icon: 'fa-solid fa-expand', col: '#b8bdcc' },
+    { type: 'UIAspectRatioConstraint', icon: 'fa-solid fa-lock', col: '#b8bdcc' },
+    { type: 'UITextSizeConstraint', icon: 'fa-solid fa-text-height', col: '#b8bdcc' },
+    { type: 'LocalScript', icon: 'fa-solid fa-scroll', col: '#f0c94d' },
+    { type: 'ModuleScript', icon: 'fa-solid fa-scroll', col: '#3dd6b5' },
+    { type: 'RemoteEvent', icon: 'fa-solid fa-tower-broadcast', col: '#f05d6a' },
+    { type: 'BillboardGui', icon: 'fa-solid fa-sign-hanging', col: '#5b8def' },
+    { type: 'SurfaceGui', icon: 'fa-solid fa-cube', col: '#5b8def' },
+  ];
+
+  backdrop.innerHTML = `
+    <div class="modal" style="width:min(560px,95vw);max-height:80vh;overflow-y:auto">
+      <div class="modal-title"><i class="fa-solid fa-plus" style="color:var(--accent3)"></i> Add Child to <span style="color:var(--accent)">${parentName || 'element'}</span></div>
+      <div style="margin-bottom:10px">
+        <input class="modal-input" id="addchild-search" placeholder="Search element types..." oninput="filterAddChild(this.value)" style="width:100%;margin-bottom:8px">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:8px">Or enter a custom name:</div>
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <input class="modal-input" id="addchild-name" placeholder="Element name (e.g. MyFrame)" style="flex:1">
+          <select class="modal-input" id="addchild-type" style="width:140px;cursor:pointer">
+            ${childTypes.map(t => `<option value="${t.type}">${t.type}</option>`).join('')}
+          </select>
+        </div>
+        <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">Quick Add</div>
+        <div id="addchild-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
+          ${childTypes.map(t => `
+            <div class="addchild-chip" data-type="${t.type}" onclick="quickAddChild('${t.type}', '${parentName}')"
+              style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;background:var(--bg3);border:1px solid var(--border);cursor:pointer;transition:all .12s;font-size:12px;color:var(--text1)">
+              <i class="${t.icon}" style="color:${t.col};font-size:12px;width:14px;text-align:center"></i>
+              <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.type}</span>
+            </div>`).join('')}
+        </div>
+      </div>
+      <div class="modal-btns">
+        <button class="modal-btn" onclick="document.getElementById('addchild-modal').remove()">Cancel</button>
+        <button class="modal-btn primary" onclick="confirmAddChild('${parentName}')"><i class="fa-solid fa-plus"></i> Add Child</button>
+      </div>
+    </div>`;
+
+  // Hover effects
+  backdrop.addEventListener('mouseover', e => {
+    const chip = e.target.closest('.addchild-chip');
+    if (chip) { chip.style.borderColor = 'var(--accent)'; chip.style.background = 'var(--accent-glow)'; chip.style.color = 'var(--text0)'; }
+  });
+  backdrop.addEventListener('mouseout', e => {
+    const chip = e.target.closest('.addchild-chip');
+    if (chip) { chip.style.borderColor = 'var(--border)'; chip.style.background = 'var(--bg3)'; chip.style.color = 'var(--text1)'; }
+  });
+  backdrop.addEventListener('click', e => { if (e.target === backdrop) backdrop.remove(); });
+  document.body.appendChild(backdrop);
+}
+
+function filterAddChild(q) {
+  const chips = document.querySelectorAll('.addchild-chip');
+  q = q.toLowerCase();
+  chips.forEach(chip => {
+    const type = chip.getAttribute('data-type') || '';
+    chip.style.display = !q || type.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+function quickAddChild(type, parentName) {
+  const name = type + '_' + Math.floor(Math.random() * 100 + 1);
+  _doAddChild(name, type, parentName);
+  document.getElementById('addchild-modal').remove();
+}
+
+function confirmAddChild(parentName) {
+  const nameInput = document.getElementById('addchild-name');
+  const typeSelect = document.getElementById('addchild-type');
+  const name = nameInput.value.trim() || typeSelect.value + '_' + Math.floor(Math.random() * 100 + 1);
+  const type = typeSelect.value;
+  _doAddChild(name, type, parentName);
+  document.getElementById('addchild-modal').remove();
+}
+
+function _doAddChild(name, type, parentName) {
+  const tree = document.getElementById('workspace-tree');
+  let parentEl = null;
+  if (parentName) {
+    const items = tree.querySelectorAll('.tree-item');
+    items.forEach(item => { if (item.getAttribute('data-name') === parentName) parentEl = item; });
+  }
+  addWorkspaceItemAt(name, type, parentEl);
+  showToast(`Added ${type}: ${name}`, 'ok');
+  addLog('success', `Added child: ${name} (${type}) → ${parentName || 'root'}`);
+  // Open in editor if it's a script type
+  if (['LocalScript', 'ModuleScript', 'Script'].includes(type)) {
+    SCRIPTS[name] = `-- ${name} (${type})\n\n`;
+    newFileTab(name, type);
+  }
 }
 
 // ─────────────────────────────────────────────
@@ -4176,16 +4448,71 @@ document.querySelectorAll('.modal-backdrop').forEach(m => {
 // CONTEXT MENU
 // ─────────────────────────────────────────────
 const ctxMenu = document.getElementById('ctx-menu');
+let ctxTargetItem = null;
 document.getElementById('workspace-tree').addEventListener('contextmenu', e => {
   e.preventDefault();
-  ctxMenu.style.left = e.clientX + 'px';
-  ctxMenu.style.top = e.clientY + 'px';
+  ctxTargetItem = e.target.closest('.tree-item');
+  if (ctxTargetItem) {
+    document.querySelectorAll('.tree-item').forEach(t => t.classList.remove('active'));
+    ctxTargetItem.classList.add('active');
+    const name = ctxTargetItem.getAttribute('data-name');
+    document.getElementById('prop-name').textContent = name;
+  }
+  // Clamp to viewport
+  const x = Math.min(e.clientX, window.innerWidth - 200);
+  const y = Math.min(e.clientY, window.innerHeight - 280);
+  ctxMenu.style.left = x + 'px';
+  ctxMenu.style.top = y + 'px';
   ctxMenu.classList.add('open');
 });
 document.addEventListener('click', () => ctxMenu.classList.remove('open'));
 function ctxAction(action) {
   ctxMenu.classList.remove('open');
-  addLog('info', `Action: ${action}`);
+  const selectedTreeItem = document.querySelector('.tree-item.active');
+  const selectedName = selectedTreeItem ? selectedTreeItem.getAttribute('data-name') : null;
+
+  if (action === 'addchild') {
+    openAddChildModal(selectedName);
+  } else if (action === 'rename') {
+    if (!selectedName) { showToast('Select an element first', 'warn'); return; }
+    const newName = prompt('Rename element:', selectedName);
+    if (newName && newName !== selectedName) {
+      if (selectedTreeItem) {
+        selectedTreeItem.setAttribute('data-name', newName);
+        const label = selectedTreeItem.querySelector('.ti-label');
+        if (label) label.textContent = newName;
+        document.getElementById('prop-name').textContent = newName;
+      }
+      addLog('info', `Renamed: ${selectedName} → ${newName}`);
+      showToast(`Renamed to ${newName}`, 'ok');
+    }
+  } else if (action === 'duplicate') {
+    if (!selectedName) { showToast('Select an element first', 'warn'); return; }
+    const copyName = selectedName + '_Copy';
+    addWorkspaceItemAt(copyName, selectedTreeItem ? (selectedTreeItem.querySelector('.ti-badge') || { textContent: 'Frame' }).textContent : 'Frame', selectedTreeItem);
+    addLog('info', `Duplicated: ${selectedName}`);
+    showToast(`Duplicated ${selectedName}`, 'ok');
+  } else if (action === 'copy') {
+    if (!selectedName) { showToast('Select an element first', 'warn'); return; }
+    window._clipboard = { name: selectedName };
+    addLog('info', `Copied: ${selectedName}`);
+    showToast(`Copied ${selectedName}`, 'ok');
+  } else if (action === 'paste') {
+    if (!window._clipboard) { showToast('Nothing to paste', 'warn'); return; }
+    const pastedName = window._clipboard.name + '_Paste';
+    addWorkspaceItemAt(pastedName, 'Frame', selectedTreeItem);
+    addLog('info', `Pasted: ${pastedName}`);
+    showToast(`Pasted ${pastedName}`, 'ok');
+  } else if (action === 'delete') {
+    if (!selectedName) { showToast('Select an element first', 'warn'); return; }
+    if (!confirm(`Delete "${selectedName}"?`)) return;
+    if (selectedTreeItem) selectedTreeItem.remove();
+    document.getElementById('prop-name').textContent = '—';
+    addLog('warn', `Deleted: ${selectedName}`);
+    showToast(`Deleted ${selectedName}`, 'ok');
+  } else {
+    addLog('info', `Action: ${action}`);
+  }
 }
 
 // ─────────────────────────────────────────────
@@ -4235,18 +4562,35 @@ function toggleMobilePreview() {
 }
 
 function checkMobile() {
-  const isNarrow = window.innerWidth <= 900;
-  const isMobile = window.innerWidth <= 600;
-  document.getElementById('mobile-sidebar-btn').style.display = isNarrow ? '' : 'none';
-  document.getElementById('mobile-preview-btn').style.display = isNarrow ? '' : 'none';
-  // On narrow screens collapse sidebar by default
+  const w = window.innerWidth;
+  const isNarrow = w <= 900;
+  const isMobile = w <= 600;
+  const isIpad = w > 600 && w <= 1180;
+  const mobileBtn = document.getElementById('mobile-sidebar-btn');
+  const mobilePvBtn = document.getElementById('mobile-preview-btn');
+  if (mobileBtn) mobileBtn.style.display = isNarrow ? '' : 'none';
+  if (mobilePvBtn) mobilePvBtn.style.display = isNarrow ? '' : 'none';
   if (isMobile) {
     document.getElementById('sidebar').classList.remove('mobile-open');
   }
-  // Fix layout height when topbar wraps
+  // Fix layout height precisely for all screen types
   const topbar = document.getElementById('topbar');
   const layout = document.getElementById('layout');
-  if (layout) layout.style.height = 'calc(100vh - ' + topbar.offsetHeight + 'px)';
+  if (layout && topbar) {
+    // Use dvh for modern browsers, fallback to vh
+    const th = topbar.getBoundingClientRect().height;
+    layout.style.height = `calc(100dvh - ${th}px)`;
+    // Fallback for older browsers
+    if (!CSS.supports('height', '1dvh')) {
+      layout.style.height = `calc(100vh - ${th}px)`;
+    }
+  }
+  // iPad mode: add class for better touch targets
+  if (isIpad) {
+    document.body.classList.add('is-ipad');
+  } else {
+    document.body.classList.remove('is-ipad');
+  }
 }
 window.addEventListener('resize', checkMobile);
 
@@ -4326,6 +4670,31 @@ function toggleActiveModeFromMenu() {
     showToast('Active Mode OFF', 'ok');
   }
   document.getElementById('tools-dropdown').style.display = 'none';
+}
+function openGridSnapEditor() {
+  document.getElementById('tools-dropdown').style.display = 'none';
+  if (typeof gseSnapOn === 'undefined') {
+    showToast('Grid Snap editor loading...', 'ok');
+    return;
+  }
+  const modal = document.getElementById('gridsnap-modal');
+  if (!modal) { showToast('Grid editor not found', 'warn'); return; }
+  gseOriginalStyles = {};
+  ['el-MainFrame','el-HealthBar','el-Hotbar','el-MiniMap'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) gseOriginalStyles[id] = { left: el.style.left, top: el.style.top, width: el.style.width||el.offsetWidth+'px', height: el.style.height||el.offsetHeight+'px', background: el.style.background, borderRadius: el.style.borderRadius, border: el.style.border };
+  });
+  gseHistory = []; gseHistoryIdx = -1;
+  gseBuildCanvas();
+  gseSelectElement('el-MainFrame');
+  gseBuildAnchorGrid();
+  document.getElementById('gse-grid-size').value = gseGridSize;
+  document.getElementById('gse-grid-size-val').textContent = gseGridSize;
+  document.getElementById('gse-snap-toggle').textContent = gseSnapOn ? 'ON' : 'OFF';
+  document.getElementById('gse-snap-toggle').style.background = gseSnapOn ? 'var(--accent3)' : 'var(--bg5)';
+  document.getElementById('gse-snap-toggle').style.color = gseSnapOn ? '#0a1a10' : 'var(--text2)';
+  openModal('gridsnap-modal');
+  setTimeout(gseDrawGrid, 60);
 }
 function toolsAction(action) {
   document.getElementById('tools-dropdown').style.display = 'none';
@@ -4630,37 +4999,62 @@ function applyIPadMode() {
 
 // ── THEMES ──
 const THEMES = [
-  { id: 'dark', name: 'Dark', colors: ['#0d0f14','#5b8def','#7c6af5'] },
-  { id: 'midnight', name: 'Midnight', colors: ['#070a10','#4fc3f7','#7986cb'] },
-  { id: 'forest', name: 'Forest', colors: ['#0a110d','#4dc97e','#3dd6b5'] },
-  { id: 'crimson', name: 'Crimson', colors: ['#110a0d','#f05d6a','#f0924d'] },
-  { id: 'violet', name: 'Violet', colors: ['#0e0a18','#a97ef5','#7c6af5'] },
-  { id: 'slate', name: 'Slate', colors: ['#10131a','#8eaed4','#a8bbd4'] },
+  { id: 'dark',      name: 'Dark',       desc: 'Classic dark',    colors: ['#0d0f14','#5b8def','#7c6af5'] },
+  { id: 'midnight',  name: 'Midnight',   desc: 'Deep blue',       colors: ['#070a10','#4fc3f7','#7986cb'] },
+  { id: 'forest',    name: 'Forest',     desc: 'Dark green',      colors: ['#0a110d','#4dc97e','#3dd6b5'] },
+  { id: 'crimson',   name: 'Crimson',    desc: 'Blood red',       colors: ['#110a0d','#f05d6a','#f0924d'] },
+  { id: 'violet',    name: 'Violet',     desc: 'Deep purple',     colors: ['#0e0a18','#a97ef5','#7c6af5'] },
+  { id: 'slate',     name: 'Slate',      desc: 'Cool grey-blue',  colors: ['#10131a','#8eaed4','#a8bbd4'] },
+  { id: 'obsidian',  name: 'Obsidian',   desc: 'True black',      colors: ['#050507','#e8c56d','#d4a24e'] },
+  { id: 'ocean',     name: 'Ocean',      desc: 'Teal depths',     colors: ['#060f14','#00d4ff','#0099cc'] },
+  { id: 'lava',      name: 'Lava',       desc: 'Molten orange',   colors: ['#120800','#ff6b35','#ff4500'] },
+  { id: 'rose',      name: 'Rose',       desc: 'Warm pink',       colors: ['#14080e','#ff79c6','#bd93f9'] },
+  { id: 'dracula',   name: 'Dracula',    desc: 'Iconic dark',     colors: ['#282a36','#ff79c6','#bd93f9'] },
+  { id: 'monokai',   name: 'Monokai',    desc: 'Warm contrast',   colors: ['#272822','#a6e22e','#f92672'] },
+  { id: 'nord',      name: 'Nord',       desc: 'Arctic palette',  colors: ['#2e3440','#88c0d0','#81a1c1'] },
+  { id: 'solarized', name: 'Solarized',  desc: 'Precision tones', colors: ['#002b36','#268bd2','#2aa198'] },
 ];
 const THEME_VARS = {
-  dark:     { '--bg0':'#0d0f14','--bg1':'#12151c','--bg2':'#181c26','--bg3':'#1f2433','--bg4':'#252b3b','--bg5':'#2c3449','--border':'#2e3650','--border2':'#3a4460','--accent':'#5b8def','--accent2':'#7c6af5','--accent3':'#3dd6b5','--accent-glow':'rgba(91,141,239,0.18)' },
-  midnight: { '--bg0':'#070a10','--bg1':'#0d1018','--bg2':'#111520','--bg3':'#161b28','--bg4':'#1c2233','--bg5':'#22293d','--border':'#243050','--border2':'#304068','--accent':'#4fc3f7','--accent2':'#7986cb','--accent3':'#80cbc4','--accent-glow':'rgba(79,195,247,0.16)' },
-  forest:   { '--bg0':'#0a110d','--bg1':'#0f1812','--bg2':'#141f18','--bg3':'#1a281e','--bg4':'#203024','--bg5':'#27392b','--border':'#2a4030','--border2':'#355040','--accent':'#4dc97e','--accent2':'#3dd6b5','--accent3':'#a5d6a7','--accent-glow':'rgba(77,201,126,0.16)' },
-  crimson:  { '--bg0':'#110a0d','--bg1':'#180f12','--bg2':'#1f1418','--bg3':'#281a1e','--bg4':'#321f24','--bg5':'#3d252b','--border':'#50242c','--border2':'#682f38','--accent':'#f05d6a','--accent2':'#f0924d','--accent3':'#f0c94d','--accent-glow':'rgba(240,93,106,0.16)' },
-  violet:   { '--bg0':'#0e0a18','--bg1':'#120e20','--bg2':'#171228','--bg3':'#1d1832','--bg4':'#231e3c','--bg5':'#2a2448','--border':'#352e60','--border2':'#443c78','--accent':'#a97ef5','--accent2':'#7c6af5','--accent3':'#c084fc','--accent-glow':'rgba(169,126,245,0.18)' },
-  slate:    { '--bg0':'#10131a','--bg1':'#151922','--bg2':'#1a1f2c','--bg3':'#202636','--bg4':'#272e40','--bg5':'#2e364c','--border':'#3a4460','--border2':'#4a5678','--accent':'#8eaed4','--accent2':'#a8bbd4','--accent3':'#90caf9','--accent-glow':'rgba(142,174,212,0.16)' },
+  dark:      { '--bg0':'#0d0f14','--bg1':'#12151c','--bg2':'#181c26','--bg3':'#1f2433','--bg4':'#252b3b','--bg5':'#2c3449','--border':'#2e3650','--border2':'#3a4460','--accent':'#5b8def','--accent2':'#7c6af5','--accent3':'#3dd6b5','--accent-glow':'rgba(91,141,239,0.18)','--red':'#f05d6a','--green':'#4dc97e','--yellow':'#f0c94d','--orange':'#f0924d','--purple':'#a97ef5','--text0':'#e8eaf2','--text1':'#b8bdcc','--text2':'#7c839a','--text3':'#4a5068' },
+  midnight:  { '--bg0':'#070a10','--bg1':'#0d1018','--bg2':'#111520','--bg3':'#161b28','--bg4':'#1c2233','--bg5':'#22293d','--border':'#243050','--border2':'#304068','--accent':'#4fc3f7','--accent2':'#7986cb','--accent3':'#80cbc4','--accent-glow':'rgba(79,195,247,0.16)','--red':'#ef5350','--green':'#66bb6a','--yellow':'#ffee58','--orange':'#ffa726','--purple':'#ab47bc','--text0':'#eceff1','--text1':'#b0bec5','--text2':'#607d8b','--text3':'#37474f' },
+  forest:    { '--bg0':'#0a110d','--bg1':'#0f1812','--bg2':'#141f18','--bg3':'#1a281e','--bg4':'#203024','--bg5':'#27392b','--border':'#2a4030','--border2':'#355040','--accent':'#4dc97e','--accent2':'#3dd6b5','--accent3':'#a5d6a7','--accent-glow':'rgba(77,201,126,0.16)','--red':'#ef9a9a','--green':'#69f0ae','--yellow':'#ffff8d','--orange':'#ffcc80','--purple':'#ce93d8','--text0':'#e8f5e9','--text1':'#a5d6a7','--text2':'#4caf50','--text3':'#2e7d32' },
+  crimson:   { '--bg0':'#110a0d','--bg1':'#180f12','--bg2':'#1f1418','--bg3':'#281a1e','--bg4':'#321f24','--bg5':'#3d252b','--border':'#50242c','--border2':'#682f38','--accent':'#f05d6a','--accent2':'#f0924d','--accent3':'#f0c94d','--accent-glow':'rgba(240,93,106,0.16)','--red':'#ff5252','--green':'#69f0ae','--yellow':'#ffd740','--orange':'#ff6d00','--purple':'#ea80fc','--text0':'#fce4ec','--text1':'#f48fb1','--text2':'#e91e63','--text3':'#880e4f' },
+  violet:    { '--bg0':'#0e0a18','--bg1':'#120e20','--bg2':'#171228','--bg3':'#1d1832','--bg4':'#231e3c','--bg5':'#2a2448','--border':'#352e60','--border2':'#443c78','--accent':'#a97ef5','--accent2':'#7c6af5','--accent3':'#c084fc','--accent-glow':'rgba(169,126,245,0.18)','--red':'#fc6666','--green':'#69f0ae','--yellow':'#ffe082','--orange':'#ffab40','--purple':'#ea80fc','--text0':'#ede7f6','--text1':'#ce93d8','--text2':'#9c27b0','--text3':'#4a148c' },
+  slate:     { '--bg0':'#10131a','--bg1':'#151922','--bg2':'#1a1f2c','--bg3':'#202636','--bg4':'#272e40','--bg5':'#2e364c','--border':'#3a4460','--border2':'#4a5678','--accent':'#8eaed4','--accent2':'#a8bbd4','--accent3':'#90caf9','--accent-glow':'rgba(142,174,212,0.16)','--red':'#ef9a9a','--green':'#a5d6a7','--yellow':'#fff176','--orange':'#ffcc80','--purple':'#ce93d8','--text0':'#eceff1','--text1':'#b0bec5','--text2':'#78909c','--text3':'#455a64' },
+  obsidian:  { '--bg0':'#050507','--bg1':'#0a0a0c','--bg2':'#0f0f12','--bg3':'#141418','--bg4':'#1a1a1f','--bg5':'#202028','--border':'#2a2a35','--border2':'#38384a','--accent':'#e8c56d','--accent2':'#d4a24e','--accent3':'#f0e0a0','--accent-glow':'rgba(232,197,109,0.18)','--red':'#ff6b6b','--green':'#6bff9e','--yellow':'#ffe566','--orange':'#ffaa44','--purple':'#c084fc','--text0':'#f5f0e8','--text1':'#c8c0a8','--text2':'#888070','--text3':'#504840' },
+  ocean:     { '--bg0':'#060f14','--bg1':'#0a161e','--bg2':'#0d1d28','--bg3':'#122434','--bg4':'#172c3e','--bg5':'#1d3548','--border':'#1e4060','--border2':'#265078','--accent':'#00d4ff','--accent2':'#0099cc','--accent3':'#00ffcc','--accent-glow':'rgba(0,212,255,0.16)','--red':'#ff6b80','--green':'#00ff99','--yellow':'#ffe566','--orange':'#ff8c42','--purple':'#c77dff','--text0':'#e0f7fa','--text1':'#80deea','--text2':'#00838f','--text3':'#004d56' },
+  lava:      { '--bg0':'#120800','--bg1':'#1a0e00','--bg2':'#221500','--bg3':'#2c1c00','--bg4':'#362400','--bg5':'#422c00','--border':'#5a3500','--border2':'#7a4800','--accent':'#ff6b35','--accent2':'#ff4500','--accent3':'#ffc107','--accent-glow':'rgba(255,107,53,0.18)','--red':'#ff1744','--green':'#76ff03','--yellow':'#ffd600','--orange':'#ff6d00','--purple':'#d500f9','--text0':'#fff3e0','--text1':'#ffcc80','--text2':'#ff8f00','--text3':'#e65100' },
+  rose:      { '--bg0':'#14080e','--bg1':'#1c0e18','--bg2':'#241424','--bg3':'#2e1a2e','--bg4':'#382038','--bg5':'#422844','--border':'#6a2060','--border2':'#8a2878','--accent':'#ff79c6','--accent2':'#bd93f9','--accent3':'#ff92d0','--accent-glow':'rgba(255,121,198,0.18)','--red':'#ff5555','--green':'#50fa7b','--yellow':'#f1fa8c','--orange':'#ffb86c','--purple':'#bd93f9','--text0':'#fce4ec','--text1':'#f48fb1','--text2':'#c2185b','--text3':'#880e4f' },
+  dracula:   { '--bg0':'#1e2029','--bg1':'#21222c','--bg2':'#282a36','--bg3':'#323443','--bg4':'#3e4053','--bg5':'#44475a','--border':'#44475a','--border2':'#6272a4','--accent':'#ff79c6','--accent2':'#bd93f9','--accent3':'#8be9fd','--accent-glow':'rgba(255,121,198,0.16)','--red':'#ff5555','--green':'#50fa7b','--yellow':'#f1fa8c','--orange':'#ffb86c','--purple':'#bd93f9','--text0':'#f8f8f2','--text1':'#d0d0d8','--text2':'#6272a4','--text3':'#44475a' },
+  monokai:   { '--bg0':'#1c1e17','--bg1':'#23261a','--bg2':'#272822','--bg3':'#32342a','--bg4':'#3d4033','--bg5':'#494c3c','--border':'#555840','--border2':'#75785c','--accent':'#a6e22e','--accent2':'#f92672','--accent3':'#66d9e8','--accent-glow':'rgba(166,226,46,0.16)','--red':'#f92672','--green':'#a6e22e','--yellow':'#e6db74','--orange':'#fd971f','--purple':'#ae81ff','--text0':'#f8f8f2','--text1':'#cfcfc2','--text2':'#75715e','--text3':'#4e4d3b' },
+  nord:      { '--bg0':'#242831','--bg1':'#2e3440','--bg2':'#3b4252','--bg3':'#434c5e','--bg4':'#4c566a','--bg5':'#575f70','--border':'#4c566a','--border2':'#616e86','--accent':'#88c0d0','--accent2':'#81a1c1','--accent3':'#8fbcbb','--accent-glow':'rgba(136,192,208,0.16)','--red':'#bf616a','--green':'#a3be8c','--yellow':'#ebcb8b','--orange':'#d08770','--purple':'#b48ead','--text0':'#eceff4','--text1':'#d8dee9','--text2':'#4c566a','--text3':'#3b4252' },
+  solarized: { '--bg0':'#002028','--bg1':'#002b36','--bg2':'#073642','--bg3':'#0a4050','--bg4':'#0d4e60','--bg5':'#105c72','--border':'#155c6e','--border2':'#1a7080','--accent':'#268bd2','--accent2':'#2aa198','--accent3':'#859900','--accent-glow':'rgba(38,139,210,0.16)','--red':'#dc322f','--green':'#859900','--yellow':'#b58900','--orange':'#cb4b16','--purple':'#6c71c4','--text0':'#fdf6e3','--text1':'#93a1a1','--text2':'#586e75','--text3':'#073642' },
 };
 let currentTheme = 'dark';
 function buildThemeGrid() {
   const grid = document.getElementById('theme-grid');
-  if (!grid || grid.childElementCount > 0) return;
+  if (!grid) return;
+  grid.innerHTML = '';
   THEMES.forEach(t => {
     const card = document.createElement('div');
     card.className = 'theme-card' + (t.id === currentTheme ? ' active-theme' : '');
     card.id = 'theme-card-' + t.id;
     card.onclick = () => applyTheme(t.id);
-    const prev = document.createElement('div');
-    prev.className = 'theme-card-preview';
-    prev.style.background = `linear-gradient(135deg, ${t.colors[0]} 0%, ${t.colors[1]} 50%, ${t.colors[2]} 100%)`;
-    const name = document.createElement('div');
-    name.className = 'theme-card-name';
-    name.textContent = t.name;
-    card.appendChild(prev); card.appendChild(name);
+    card.innerHTML = `
+      <div class="theme-card-preview" style="background:linear-gradient(135deg,${t.colors[0]} 0%,${t.colors[1]} 55%,${t.colors[2]} 100%)">
+        <div style="display:flex;gap:4px;padding:6px">
+          <div style="width:8px;height:8px;border-radius:50%;background:${t.colors[1]};opacity:0.9"></div>
+          <div style="width:8px;height:8px;border-radius:50%;background:${t.colors[2]};opacity:0.7"></div>
+          <div style="width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.3)"></div>
+        </div>
+        <div style="padding:0 6px 6px;display:flex;flex-direction:column;gap:3px">
+          <div style="height:4px;border-radius:2px;background:${t.colors[1]};opacity:0.8;width:70%"></div>
+          <div style="height:4px;border-radius:2px;background:rgba(255,255,255,0.2);width:90%"></div>
+          <div style="height:4px;border-radius:2px;background:rgba(255,255,255,0.12);width:55%"></div>
+        </div>
+      </div>
+      <div class="theme-card-name">${t.name}</div>
+      <div style="font-size:9px;color:var(--text3);text-align:center;padding:0 4px 4px;line-height:1.2">${t.desc}</div>`;
     grid.appendChild(card);
   });
 }
@@ -4686,9 +5080,857 @@ window.openModal = function(id) {
 
 // iPad forced mode CSS
 const ipadStyle = document.createElement('style');
-ipadStyle.textContent = `body.ipad-forced .tb-btn{height:36px;padding:0 14px} body.ipad-forced .tree-item{padding:8px 10px} body.ipad-forced .editor-tab{height:34px} body.ipad-forced #code-editor{font-size:14px;line-height:24px} body.ipad-forced .ac-item{padding:10px 12px} body.ipad-forced .ph-btn{width:34px;height:34px} body.ipad-forced .pv-ctrl{width:38px;height:38px;font-size:14px} body.ipad-forced .ctx-item{padding:10px 12px;font-size:13px} body.ipad-forced .modal-btn{height:40px;font-size:14px} body.ipad-forced .tbx-btn{height:36px;font-size:13px} body.ipad-forced .tbx-input{height:36px;font-size:13px} body.ipad-forced .tbx-select{height:36px;font-size:13px}`;
+ipadStyle.textContent = `
+body.ipad-forced .tb-btn, body.is-ipad .tb-btn{height:36px;padding:0 14px}
+body.ipad-forced .tree-item, body.is-ipad .tree-item{padding:8px 10px;min-height:36px}
+body.ipad-forced .editor-tab, body.is-ipad .editor-tab{height:34px}
+body.ipad-forced #code-editor, body.is-ipad #code-editor{font-size:14px;line-height:24px}
+body.is-ipad #highlight-overlay{font-size:14px;line-height:24px}
+body.ipad-forced .ac-item, body.is-ipad .ac-item{padding:10px 12px}
+body.ipad-forced .ph-btn, body.is-ipad .ph-btn{width:36px;height:36px}
+body.ipad-forced .pv-ctrl, body.is-ipad .pv-ctrl{width:38px;height:38px;font-size:14px}
+body.ipad-forced .ctx-item, body.is-ipad .ctx-item{padding:10px 14px;font-size:13px}
+body.ipad-forced .modal-btn, body.is-ipad .modal-btn{height:40px;font-size:14px}
+body.ipad-forced .tbx-btn, body.is-ipad .tbx-btn{height:36px;font-size:13px}
+body.ipad-forced .tbx-input, body.is-ipad .tbx-input{height:36px;font-size:13px}
+body.ipad-forced .tbx-select, body.is-ipad .tbx-select{height:36px;font-size:13px}
+body.ipad-forced .sidebar-tab, body.is-ipad .sidebar-tab{height:36px}
+body.ipad-forced .btm-tab, body.is-ipad .btm-tab{height:34px;padding:0 14px}
+body.is-ipad #sidebar{width:220px;min-width:220px}
+@media (pointer:coarse) and (min-width:601px) {
+  .tree-item{padding:8px 10px;min-height:36px}
+  .tb-btn{min-height:36px}
+  .ctx-item{padding:10px 14px;font-size:13px}
+}`;
 document.head.appendChild(ipadStyle);
 
+  </script>
+
+  <!-- GRID SNAP VISUAL EDITOR -->
+  <div class="modal-backdrop" id="gridsnap-modal" style="z-index:1200">
+    <div class="modal"
+      style="width:min(780px,96vw);max-height:92vh;display:flex;flex-direction:column;padding:0;overflow:hidden">
+      <div class="modal-title"
+        style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0">
+        <i class="fa-solid fa-border-all" style="color:var(--accent3)"></i>
+        Visual UI Editor
+        <span style="font-size:11px;color:var(--text2);font-weight:400;margin-left:4px">— drag, resize, configure elements</span>
+        <span id="gse-snap-badge" style="display:none;background:var(--accent3);color:#0a1a10;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;margin-left:auto">SNAP ON</span>
+      </div>
+      <div style="display:flex;flex:1;overflow:hidden;min-height:0">
+        <!-- Left panel: controls -->
+        <div id="gse-controls"
+          style="width:220px;min-width:220px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;padding:12px;gap:0">
+          <!-- Element selector -->
+          <div
+            style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">
+            Selected Element</div>
+          <select id="gse-element-select" style="width:100%;height:30px;background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--text0);font-size:12px;font-family:Syne,sans-serif;margin-bottom:12px;padding:0 8px" onchange="gseSelectElement(this.value)">
+            <option value="el-MainFrame">MainFrame</option>
+            <option value="el-HealthBar">HealthBar</option>
+            <option value="el-Hotbar">Hotbar</option>
+            <option value="el-MiniMap">MiniMap</option>
+          </select>
+
+          <!-- Grid snap controls -->
+          <div
+            style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px;margin-bottom:10px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+              <span style="font-size:11px;font-weight:700;color:var(--text1)"><i class="fa-solid fa-border-all" style="color:var(--accent3);margin-right:4px"></i>Grid Snap</span>
+              <button id="gse-snap-toggle" onclick="gseToggleSnap()" style="height:22px;padding:0 10px;background:var(--bg5);border:1px solid var(--border2);border-radius:4px;color:var(--text2);font-size:10px;font-family:Syne,sans-serif;font-weight:700;cursor:pointer">OFF</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+              <span style="font-size:11px;color:var(--text2);width:50px">Size</span>
+              <input id="gse-grid-size" type="range" min="4" max="64" value="16" oninput="gseUpdateGrid()" style="flex:1">
+              <span id="gse-grid-size-val" style="font-size:11px;color:var(--text1);width:28px;text-align:right">16</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <span style="font-size:11px;color:var(--text2);width:50px">Show</span>
+              <button id="gse-grid-vis-btn" onclick="gseToggleGridVis()" style="height:22px;padding:0 10px;background:var(--bg4);border:1px solid var(--border);border-radius:4px;color:var(--text2);font-size:10px;font-family:Syne,sans-serif;cursor:pointer">Grid Lines</button>
+            </div>
+          </div>
+
+          <!-- Position & Size -->
+          <div
+            style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px;margin-bottom:10px">
+            <div style="font-size:11px;font-weight:700;color:var(--text1);margin-bottom:8px">
+              <i class="fa-solid fa-up-down-left-right" style="color:var(--accent);margin-right:4px"></i>Transform
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:5px">
+              <div>
+                <div style="font-size:10px;color:var(--text3);margin-bottom:2px">X (px)</div>
+                <input id="gse-x" type="number" value="50" oninput="gseApplyTransform()" style="width:100%;height:26px;background:var(--bg4);border:1px solid var(--border);border-radius:4px;color:var(--text0);font-size:11px;font-family:JetBrains Mono,monospace;padding:0 6px">
+              </div>
+              <div>
+                <div style="font-size:10px;color:var(--text3);margin-bottom:2px">Y (px)</div>
+                <input id="gse-y" type="number" value="60" oninput="gseApplyTransform()" style="width:100%;height:26px;background:var(--bg4);border:1px solid var(--border);border-radius:4px;color:var(--text0);font-size:11px;font-family:JetBrains Mono,monospace;padding:0 6px">
+              </div>
+              <div>
+                <div style="font-size:10px;color:var(--text3);margin-bottom:2px">W (px)</div>
+                <input id="gse-w" type="number" value="320" oninput="gseApplyTransform()" style="width:100%;height:26px;background:var(--bg4);border:1px solid var(--border);border-radius:4px;color:var(--text0);font-size:11px;font-family:JetBrains Mono,monospace;padding:0 6px">
+              </div>
+              <div>
+                <div style="font-size:10px;color:var(--text3);margin-bottom:2px">H (px)</div>
+                <input id="gse-h" type="number" value="220" oninput="gseApplyTransform()" style="width:100%;height:26px;background:var(--bg4);border:1px solid var(--border);border-radius:4px;color:var(--text0);font-size:11px;font-family:JetBrains Mono,monospace;padding:0 6px">
+              </div>
+            </div>
+          </div>
+
+          <!-- Appearance -->
+          <div
+            style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px;margin-bottom:10px">
+            <div style="font-size:11px;font-weight:700;color:var(--text1);margin-bottom:8px">
+              <i class="fa-solid fa-palette" style="color:var(--accent2);margin-right:4px"></i>Appearance
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+              <span style="font-size:11px;color:var(--text2);width:60px">BG Color</span>
+              <input id="gse-bgcolor" type="color" value="#0f1423" oninput="gseApplyStyle()" style="width:36px;height:26px;border-radius:4px;border:1px solid var(--border);cursor:pointer;background:none">
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+              <span style="font-size:11px;color:var(--text2);width:60px">Opacity</span>
+              <input id="gse-opacity" type="range" min="0" max="100" value="92" oninput="gseApplyStyle()" style="flex:1">
+              <span id="gse-opacity-val" style="font-size:11px;color:var(--text1);width:28px;text-align:right">92%</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+              <span style="font-size:11px;color:var(--text2);width:60px">Radius</span>
+              <input id="gse-radius" type="range" min="0" max="40" value="12" oninput="gseApplyStyle()" style="flex:1">
+              <span id="gse-radius-val" style="font-size:11px;color:var(--text1);width:28px;text-align:right">12</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <span style="font-size:11px;color:var(--text2);width:60px">Border</span>
+              <input id="gse-border-color" type="color" value="#5b8def" oninput="gseApplyStyle()" style="width:36px;height:26px;border-radius:4px;border:1px solid var(--border);cursor:pointer;background:none">
+              <input id="gse-border-opacity" type="range" min="0" max="100" value="30" oninput="gseApplyStyle()" style="flex:1">
+              <span id="gse-border-opacity-val" style="font-size:11px;color:var(--text1);width:28px;text-align:right">30%</span>
+            </div>
+          </div>
+
+          <!-- ScreenGui position anchor -->
+          <div
+            style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px;margin-bottom:10px">
+            <div style="font-size:11px;font-weight:700;color:var(--text1);margin-bottom:8px">
+              <i class="fa-solid fa-anchor" style="color:var(--yellow);margin-right:4px"></i>Anchor in ScreenGui
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:6px"
+              id="gse-anchor-grid"></div>
+            <div style="font-size:10px;color:var(--text3)" id="gse-anchor-label">AnchorPoint: 0,0</div>
+          </div>
+
+          <!-- Undo/Redo -->
+          <div style="display:flex;gap:6px;margin-bottom:10px">
+            <button onclick="gseUndo()" style="flex:1;height:30px;background:var(--bg4);border:1px solid var(--border);border-radius:5px;color:var(--text1);font-size:11px;font-family:Syne,sans-serif;font-weight:700;cursor:pointer"><i class="fa-solid fa-rotate-left"></i> Undo</button>
+            <button onclick="gseRedo()" style="flex:1;height:30px;background:var(--bg4);border:1px solid var(--border);border-radius:5px;color:var(--text1);font-size:11px;font-family:Syne,sans-serif;font-weight:700;cursor:pointer"><i class="fa-solid fa-rotate-right"></i> Redo</button>
+          </div>
+        </div>
+
+        <!-- Right: visual canvas -->
+        <div style="flex:1;display:flex;flex-direction:column;background:var(--bg0);overflow:hidden;min-width:0">
+          <div
+            style="padding:8px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;background:var(--bg1);flex-shrink:0;flex-wrap:wrap">
+            <span style="font-size:11px;color:var(--text2)"><i class="fa-solid fa-display" style="margin-right:4px;color:var(--accent)"></i>Visual Canvas</span>
+            <div style="display:flex;gap:4px;margin-left:6px">
+              <button onclick="gseAddElement()" title="Add element" style="height:24px;padding:0 8px;background:var(--accent);border:none;border-radius:4px;color:#fff;font-size:10px;font-family:Syne,sans-serif;font-weight:700;cursor:pointer"><i class="fa-solid fa-plus"></i> Add</button>
+              <button onclick="gseDeleteSelected()" title="Delete selected" style="height:24px;padding:0 8px;background:var(--bg4);border:1px solid var(--border);border-radius:4px;color:var(--red);font-size:10px;font-family:Syne,sans-serif;font-weight:700;cursor:pointer"><i class="fa-solid fa-trash"></i></button>
+              <button onclick="gseDuplicateSelected()" title="Duplicate selected" style="height:24px;padding:0 8px;background:var(--bg4);border:1px solid var(--border);border-radius:4px;color:var(--text1);font-size:10px;font-family:Syne,sans-serif;font-weight:700;cursor:pointer"><i class="fa-solid fa-copy"></i></button>
+              <button onclick="gseLockSelected()" id="gse-lock-btn" title="Lock/unlock selected" style="height:24px;padding:0 8px;background:var(--bg4);border:1px solid var(--border);border-radius:4px;color:var(--text1);font-size:10px;font-family:Syne,sans-serif;font-weight:700;cursor:pointer"><i class="fa-solid fa-lock-open"></i></button>
+            </div>
+            <div style="margin-left:auto;display:flex;gap:4px;align-items:center">
+              <span style="font-size:10px;color:var(--text3)">Zoom</span>
+              <button onclick="gseZoomOut()" style="height:22px;width:22px;background:var(--bg4);border:1px solid var(--border);border-radius:4px;color:var(--text1);font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center"><i class="fa-solid fa-minus"></i></button>
+              <span id="gse-zoom-label" style="font-size:10px;color:var(--text1);width:36px;text-align:center">100%</span>
+              <button onclick="gseZoomIn()" style="height:22px;width:22px;background:var(--bg4);border:1px solid var(--border);border-radius:4px;color:var(--text1);font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center"><i class="fa-solid fa-plus"></i></button>
+              <button onclick="gseResetView()" style="height:22px;padding:0 8px;background:var(--bg4);border:1px solid var(--border);border-radius:4px;color:var(--text1);font-size:10px;cursor:pointer">Reset</button>
+            </div>
+          </div>
+          <!-- Canvas ruler hints -->
+          <div id="gse-canvas-wrap" style="flex:1;overflow:hidden;position:relative;cursor:default"
+            onwheel="gseCanvasWheel(event)">
+            <canvas id="gse-grid-canvas"
+              style="position:absolute;inset:0;pointer-events:none;width:100%;height:100%"></canvas>
+            <!-- Rulers -->
+            <div id="gse-ruler-h"
+              style="position:absolute;top:0;left:20px;right:0;height:20px;background:var(--bg2);border-bottom:1px solid var(--border);z-index:2;overflow:hidden;pointer-events:none">
+            </div>
+            <div id="gse-ruler-v"
+              style="position:absolute;top:20px;left:0;width:20px;bottom:0;background:var(--bg2);border-right:1px solid var(--border);z-index:2;overflow:hidden;pointer-events:none">
+            </div>
+            <div id="gse-canvas" style="position:absolute;inset:0;overflow:hidden;transform-origin:top left"></div>
+            <!-- Crosshair cursor indicator -->
+            <div id="gse-crosshair" style="display:none;position:absolute;pointer-events:none;z-index:10">
+              <div style="position:absolute;width:1px;height:100vh;background:rgba(91,141,239,0.2);top:-50vh;left:0">
+              </div>
+              <div style="position:absolute;height:1px;width:100vw;background:rgba(91,141,239,0.2);left:-50vw;top:0">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom bar -->
+      <div
+        style="padding:10px 18px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;background:var(--bg1);flex-shrink:0">
+        <span id="gse-status" style="font-size:11px;color:var(--text2);flex:1">Select an element and modify properties</span>
+        <button onclick="gseDiscard()" style="height:32px;padding:0 16px;background:var(--bg4);border:1px solid var(--border);border-radius:5px;color:var(--text1);font-size:12px;font-family:Syne,sans-serif;font-weight:700;cursor:pointer">Discard</button>
+        <button onclick="gseSave()" style="height:32px;padding:0 20px;background:var(--accent);border:none;border-radius:5px;color:#fff;font-size:12px;font-family:Syne,sans-serif;font-weight:700;cursor:pointer"><i class="fa-solid fa-floppy-disk"></i> Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LAYER MANAGER MODAL -->
+  <div class="modal-backdrop" id="layer-modal" style="z-index:1100">
+    <div class="modal" style="width:min(400px,95vw)">
+      <div class="modal-title"><i class="fa-solid fa-layer-group" style="color:var(--purple)"></i> Layer Manager</div>
+      <div id="layer-list"
+        style="display:flex;flex-direction:column;gap:4px;margin-bottom:14px;max-height:260px;overflow-y:auto"></div>
+      <div style="display:flex;gap:8px">
+        <button class="modal-btn" style="flex:1" onclick="closeModal('layer-modal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALIGN TOOL MODAL -->
+  <div class="modal-backdrop" id="align-modal" style="z-index:1100">
+    <div class="modal" style="width:min(380px,95vw)">
+      <div class="modal-title"><i class="fa-solid fa-align-center" style="color:var(--accent)"></i> Align &amp;
+        Distribute</div>
+      <div style="font-size:11px;color:var(--text2);margin-bottom:10px">Applies to preview elements. Click to snap.
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px">
+        <button class="tbx-btn" onclick="alignAction('left')"><i class="fa-solid fa-align-left"></i> Left</button>
+        <button class="tbx-btn" onclick="alignAction('centerH')"><i class="fa-solid fa-align-center"></i> Center H</button>
+        <button class="tbx-btn" onclick="alignAction('right')"><i class="fa-solid fa-align-right"></i> Right</button>
+        <button class="tbx-btn" onclick="alignAction('top')"><i class="fa-solid fa-arrow-up"></i> Top</button>
+        <button class="tbx-btn" onclick="alignAction('centerV')"><i class="fa-solid fa-arrows-up-down"></i> Center V</button>
+        <button class="tbx-btn" onclick="alignAction('bottom')"><i class="fa-solid fa-arrow-down"></i> Bottom</button>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="modal-btn" style="flex:1" onclick="closeModal('align-modal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRANSFORM PANEL MODAL -->
+  <div class="modal-backdrop" id="transform-modal" style="z-index:1100">
+    <div class="modal" style="width:min(380px,95vw)">
+      <div class="modal-title"><i class="fa-solid fa-up-down-left-right" style="color:var(--orange)"></i> Transform
+        Panel</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+        <div>
+          <div style="font-size:11px;color:var(--text2);margin-bottom:4px">Rotate (deg)</div>
+          <input id="tfm-rotate" type="range" min="-180" max="180" value="0" oninput="tfmApply()" style="width:100%"><span id="tfm-rotate-val" style="font-size:11px;color:var(--text1)">0°</span>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text2);margin-bottom:4px">Scale</div>
+          <input id="tfm-scale" type="range" min="50" max="200" value="100" oninput="tfmApply()" style="width:100%"><span id="tfm-scale-val" style="font-size:11px;color:var(--text1)">1.0×</span>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text2);margin-bottom:4px">Skew X</div>
+          <input id="tfm-skewx" type="range" min="-30" max="30" value="0" oninput="tfmApply()" style="width:100%"><span id="tfm-skewx-val" style="font-size:11px;color:var(--text1)">0°</span>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text2);margin-bottom:4px">Skew Y</div>
+          <input id="tfm-skewy" type="range" min="-30" max="30" value="0" oninput="tfmApply()" style="width:100%"><span id="tfm-skewy-val" style="font-size:11px;color:var(--text1)">0°</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="modal-btn" onclick="tfmReset()" style="flex:1">Reset</button>
+        <button class="modal-btn" style="flex:1" onclick="closeModal('transform-modal')">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MEASURE TOOL MODAL -->
+  <div class="modal-backdrop" id="measure-modal" style="z-index:1100">
+    <div class="modal" style="width:min(380px,95vw)">
+      <div class="modal-title"><i class="fa-solid fa-ruler" style="color:var(--red)"></i> Measure Tool</div>
+      <div style="font-size:12px;color:var(--text1);margin-bottom:12px">Enter two screen positions to measure the
+        distance and generate a UDim2 offset.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+        <div>
+          <div style="font-size:11px;color:var(--text2);margin-bottom:3px">Point A — X</div><input id="msr-ax" type="number" value="0" style="width:100%;height:28px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text0);font-size:12px;padding:0 8px">
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text2);margin-bottom:3px">Point A — Y</div><input id="msr-ay" type="number" value="0" style="width:100%;height:28px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text0);font-size:12px;padding:0 8px">
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text2);margin-bottom:3px">Point B — X</div><input id="msr-bx" type="number" value="320" style="width:100%;height:28px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text0);font-size:12px;padding:0 8px">
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text2);margin-bottom:3px">Point B — Y</div><input id="msr-by" type="number" value="220" style="width:100%;height:28px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text0);font-size:12px;padding:0 8px">
+        </div>
+      </div>
+      <button onclick="msrCalc()" style="width:100%;height:32px;background:var(--accent);border:none;border-radius:5px;color:#fff;font-size:12px;font-family:Syne,sans-serif;font-weight:700;cursor:pointer;margin-bottom:10px">Calculate</button>
+      <div id="msr-result"
+        style="background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:10px;font-size:12px;font-family:JetBrains Mono,monospace;color:var(--accent3);min-height:40px">
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="modal-btn" style="flex:1" onclick="closeModal('measure-modal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ─── TOOLS TOGGLES ───────────────────────────────────────────
+  const toolsState = { rulers: false, guides: false, darkbg: false, outlines: false };
+  function toolsToggle(name) {
+    document.getElementById('tools-dropdown').style.display = 'none';
+    toolsState[name] = !toolsState[name];
+    const badge = document.getElementById('tools-' + name + '-badge');
+    if (badge) badge.style.display = toolsState[name] ? '' : 'none';
+    if (name === 'darkbg') {
+      document.getElementById('preview-bg').style.background = toolsState.darkbg ? '#080a0e' : '';
+    }
+    if (name === 'outlines') {
+      document.querySelectorAll('.preview-ui-el').forEach(el => {
+        el.style.outline = toolsState.outlines ? '1px dashed rgba(91,141,239,0.6)' : '';
+      });
+    }
+    showToast(name + ' ' + (toolsState[name] ? 'ON' : 'OFF'), 'ok');
+  }
+
+  function copyCanvasScreenshot() {
+    document.getElementById('tools-dropdown').style.display = 'none';
+    showToast('Canvas screenshot copied (use browser screenshot for now)', 'ok');
+    addLog('info', 'Screenshot tool triggered');
+  }
+
+  // ─── LAYER MANAGER ───────────────────────────────────────────
+  function openLayerManager() {
+    document.getElementById('tools-dropdown').style.display = 'none';
+    const list = document.getElementById('layer-list');
+    list.innerHTML = '';
+    const layers = [
+      { id:'el-MiniMap', name:'MiniMap', icon:'fa-map', color:'var(--accent3)' },
+      { id:'el-Hotbar', name:'Hotbar', icon:'fa-gamepad', color:'var(--accent)' },
+      { id:'el-HealthBar', name:'HealthBar', icon:'fa-heart', color:'var(--red)' },
+      { id:'el-MainFrame', name:'MainFrame', icon:'fa-square', color:'var(--accent2)' },
+    ];
+    layers.forEach(l => {
+      const el = document.getElementById(l.id);
+      const visible = !el || el.style.display !== 'none';
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;cursor:pointer';
+      row.innerHTML = `<i class="fa-solid ${l.icon}" style="color:${l.color};width:14px"></i><span style="flex:1;font-size:12px;color:var(--text0)">${l.name}</span><button onclick="lyrToggle('${l.id}',this)" style="height:22px;padding:0 8px;background:${visible?'var(--accent-glow)':'var(--bg5)'};border:1px solid ${visible?'var(--accent)':'var(--border)'};border-radius:4px;color:${visible?'var(--accent)':'var(--text3)'};font-size:10px;font-family:Syne,sans-serif;cursor:pointer">${visible?'Visible':'Hidden'}</button>`;
+      list.appendChild(row);
+    });
+    openModal('layer-modal');
+  }
+  function lyrToggle(id, btn) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const nowVisible = el.style.display !== 'none';
+    el.style.display = nowVisible ? 'none' : '';
+    btn.textContent = nowVisible ? 'Hidden' : 'Visible';
+    btn.style.background = nowVisible ? 'var(--bg5)' : 'var(--accent-glow)';
+    btn.style.borderColor = nowVisible ? 'var(--border)' : 'var(--accent)';
+    btn.style.color = nowVisible ? 'var(--text3)' : 'var(--accent)';
+  }
+
+  // ─── ALIGN TOOL ──────────────────────────────────────────────
+  function openAlignTool() {
+    document.getElementById('tools-dropdown').style.display = 'none';
+    openModal('align-modal');
+  }
+  function alignAction(dir) {
+    const canvas = document.getElementById('preview-canvas');
+    const cw = canvas.offsetWidth, ch = canvas.offsetHeight;
+    const selected = document.getElementById('el-MainFrame');
+    if (!selected) return;
+    const w = selected.offsetWidth, h = selected.offsetHeight;
+    if (dir === 'left') selected.style.left = '0px';
+    else if (dir === 'right') selected.style.left = (cw - w) + 'px';
+    else if (dir === 'centerH') selected.style.left = ((cw - w) / 2) + 'px';
+    else if (dir === 'top') selected.style.top = '0px';
+    else if (dir === 'bottom') selected.style.top = (ch - h) + 'px';
+    else if (dir === 'centerV') selected.style.top = ((ch - h) / 2) + 'px';
+    showToast('Aligned: ' + dir, 'ok');
+  }
+
+  // ─── TRANSFORM PANEL ─────────────────────────────────────────
+  function openTransformTool() {
+    document.getElementById('tools-dropdown').style.display = 'none';
+    openModal('transform-modal');
+  }
+  function tfmApply() {
+    const rot = document.getElementById('tfm-rotate').value;
+    const scale = document.getElementById('tfm-scale').value / 100;
+    const skewx = document.getElementById('tfm-skewx').value;
+    const skewy = document.getElementById('tfm-skewy').value;
+    document.getElementById('tfm-rotate-val').textContent = rot + '°';
+    document.getElementById('tfm-scale-val').textContent = scale.toFixed(2) + '×';
+    document.getElementById('tfm-skewx-val').textContent = skewx + '°';
+    document.getElementById('tfm-skewy-val').textContent = skewy + '°';
+    const el = document.getElementById('el-MainFrame');
+    if (el) el.style.transform = `rotate(${rot}deg) scale(${scale}) skew(${skewx}deg,${skewy}deg)`;
+  }
+  function tfmReset() {
+    ['tfm-rotate','tfm-scale','tfm-skewx','tfm-skewy'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = id === 'tfm-scale' ? 100 : 0;
+    });
+    tfmApply();
+    const el = document.getElementById('el-MainFrame');
+    if (el) el.style.transform = '';
+  }
+
+  // ─── MEASURE TOOL ────────────────────────────────────────────
+  function openMeasureTool() {
+    document.getElementById('tools-dropdown').style.display = 'none';
+    openModal('measure-modal');
+  }
+  function msrCalc() {
+    const ax = parseFloat(document.getElementById('msr-ax').value)||0;
+    const ay = parseFloat(document.getElementById('msr-ay').value)||0;
+    const bx = parseFloat(document.getElementById('msr-bx').value)||0;
+    const by = parseFloat(document.getElementById('msr-by').value)||0;
+    const dx = bx - ax, dy = by - ay;
+    const dist = Math.sqrt(dx*dx + dy*dy).toFixed(2);
+    document.getElementById('msr-result').innerHTML =
+      `Distance: <b>${dist}px</b><br>ΔX: ${dx}px  ΔY: ${dy}px<br>UDim2.new(0, ${Math.round(dx)}, 0, ${Math.round(dy)})<br>UDim2.new(0, ${Math.round(ax)}, 0, ${Math.round(ay)}) → UDim2.new(0, ${Math.round(bx)}, 0, ${Math.round(by)})`;
+  }
+
+  // ─── GRID SNAP VISUAL EDITOR ─────────────────────────────────
+  let gseSnapOn = false;
+  let gseGridSize = 16;
+  let gseGridVis = true;
+  let gseSelectedId = 'el-MainFrame';
+  let gseHistory = [];
+  let gseHistoryIdx = -1;
+  let gseOriginalStyles = {};
+  let gseCanvasEls = {};
+  let gseZoom = 1;
+  let gseLockedEls = new Set();
+  let gseElCounter = 0;
+
+  // ── New GSE helper functions ──
+  function gseZoomIn()  { gseZoom = Math.min(gseZoom * 1.2, 3); gseApplyZoom(); }
+  function gseZoomOut() { gseZoom = Math.max(gseZoom / 1.2, 0.25); gseApplyZoom(); }
+  function gseResetView() { gseZoom = 1; gseApplyZoom(); }
+  function gseApplyZoom() {
+    document.getElementById('gse-zoom-label').textContent = Math.round(gseZoom * 100) + '%';
+    gseDrawGrid();
+  }
+  function gseCanvasWheel(e) {
+    e.preventDefault();
+    if (e.ctrlKey || e.metaKey) {
+      gseZoom = Math.max(0.25, Math.min(3, gseZoom * (e.deltaY < 0 ? 1.1 : 0.9)));
+      gseApplyZoom();
+    }
+  }
+
+  function gseAddElement() {
+    gseElCounter++;
+    const id = 'el-gse-new-' + gseElCounter;
+    const canvas = document.getElementById('gse-canvas');
+    const w = canvas.offsetWidth;
+    const h = canvas.offsetHeight;
+    const nx = Math.round((w/2 - 60) / gseGridSize) * gseGridSize;
+    const ny = Math.round((h/2 - 30) / gseGridSize) * gseGridSize;
+    const label = 'Frame' + gseElCounter;
+    // Add to selector
+    const sel = document.getElementById('gse-element-select');
+    const opt = document.createElement('option');
+    opt.value = id; opt.textContent = label; sel.appendChild(opt);
+    // Build element on canvas
+    const div = document.createElement('div');
+    div.id = 'gse-' + id;
+    div.style.cssText = `position:absolute;left:${nx}px;top:${ny}px;width:120px;height:60px;background:rgba(37,43,59,0.9);border:1.5px solid rgba(91,141,239,0.4);border-radius:8px;cursor:move;box-sizing:border-box;display:flex;align-items:center;justify-content:center;user-select:none`;
+    div.innerHTML = `<span style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.5);font-family:Syne,sans-serif;pointer-events:none">${label}</span>`;
+    div.addEventListener('mousedown', e => gseDragStart(e, div, id));
+    div.addEventListener('touchstart', e => gseDragStart(e, div, id), { passive:false });
+    div.onclick = () => gseSelectElement(id);
+    const rh = document.createElement('div');
+    rh.style.cssText = 'position:absolute;right:0;bottom:0;width:14px;height:14px;cursor:se-resize;background:rgba(91,141,239,0.8);border-radius:2px 0 6px 0';
+    rh.addEventListener('mousedown', e => { e.stopPropagation(); gseResizeStart(e, div, id); });
+    rh.addEventListener('touchstart', e => { e.stopPropagation(); gseResizeStart(e, div, id); }, { passive:false });
+    div.appendChild(rh);
+    canvas.appendChild(div);
+    gseCanvasEls[id] = div;
+    gseSelectElement(id);
+    gsePushHistory();
+    showToast('Element added: ' + label, 'ok');
+  }
+
+  function gseDeleteSelected() {
+    if (!gseSelectedId || !gseCanvasEls[gseSelectedId]) { showToast('No element selected', 'warn'); return; }
+    if (gseLockedEls.has(gseSelectedId)) { showToast('Element is locked', 'warn'); return; }
+    gseCanvasEls[gseSelectedId].remove();
+    delete gseCanvasEls[gseSelectedId];
+    // Remove from selector
+    const sel = document.getElementById('gse-element-select');
+    const opt = sel.querySelector(`option[value="${gseSelectedId}"]`);
+    if (opt) opt.remove();
+    gseSelectedId = '';
+    document.getElementById('gse-status').textContent = 'Element deleted';
+    gsePushHistory();
+    showToast('Element deleted', 'ok');
+  }
+
+  function gseDuplicateSelected() {
+    const src = gseCanvasEls[gseSelectedId];
+    if (!src) { showToast('No element selected', 'warn'); return; }
+    gseElCounter++;
+    const newId = 'el-gse-dup-' + gseElCounter;
+    const label = src.querySelector('span') ? src.querySelector('span').textContent + '_Copy' : 'Copy' + gseElCounter;
+    const div = src.cloneNode(true);
+    div.id = 'gse-' + newId;
+    div.style.left = (parseInt(src.style.left)||0) + 20 + 'px';
+    div.style.top  = (parseInt(src.style.top)||0)  + 20 + 'px';
+    if (div.querySelector('span')) div.querySelector('span').textContent = label;
+    div.addEventListener('mousedown', e => gseDragStart(e, div, newId));
+    div.addEventListener('touchstart', e => gseDragStart(e, div, newId), { passive:false });
+    div.onclick = () => gseSelectElement(newId);
+    const rh = div.querySelector('[style*="se-resize"]');
+    if (rh) {
+      const newRh = rh.cloneNode(true);
+      rh.replaceWith(newRh);
+      newRh.addEventListener('mousedown', e => { e.stopPropagation(); gseResizeStart(e, div, newId); });
+    }
+    document.getElementById('gse-canvas').appendChild(div);
+    gseCanvasEls[newId] = div;
+    const sel = document.getElementById('gse-element-select');
+    const opt = document.createElement('option');
+    opt.value = newId; opt.textContent = label; sel.appendChild(opt);
+    gseSelectElement(newId);
+    gsePushHistory();
+    showToast('Duplicated!', 'ok');
+  }
+
+  function gseLockSelected() {
+    if (!gseSelectedId) return;
+    const btn = document.getElementById('gse-lock-btn');
+    if (gseLockedEls.has(gseSelectedId)) {
+      gseLockedEls.delete(gseSelectedId);
+      btn.innerHTML = '<i class="fa-solid fa-lock-open"></i>';
+      btn.style.color = 'var(--text1)';
+      if (gseCanvasEls[gseSelectedId]) gseCanvasEls[gseSelectedId].style.cursor = 'move';
+      showToast('Unlocked', 'ok');
+    } else {
+      gseLockedEls.add(gseSelectedId);
+      btn.innerHTML = '<i class="fa-solid fa-lock"></i>';
+      btn.style.color = 'var(--yellow)';
+      if (gseCanvasEls[gseSelectedId]) gseCanvasEls[gseSelectedId].style.cursor = 'not-allowed';
+      showToast('Locked', 'ok');
+    }
+  }
+
+  function openGridSnapEditor() {
+    document.getElementById('tools-dropdown').style.display = 'none';
+    gseOriginalStyles = {};
+    ['el-MainFrame','el-HealthBar','el-Hotbar','el-MiniMap'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) gseOriginalStyles[id] = { left: el.style.left, top: el.style.top, width: el.style.width||el.offsetWidth+'px', height: el.style.height||el.offsetHeight+'px', background: el.style.background, borderRadius: el.style.borderRadius, border: el.style.border };
+    });
+    gseHistory = [];
+    gseHistoryIdx = -1;
+    gseBuildCanvas();
+    gseSelectElement('el-MainFrame');
+    gseBuildAnchorGrid();
+    document.getElementById('gse-grid-size').value = gseGridSize;
+    document.getElementById('gse-grid-size-val').textContent = gseGridSize;
+    document.getElementById('gse-snap-toggle').textContent = gseSnapOn ? 'ON' : 'OFF';
+    document.getElementById('gse-snap-toggle').style.background = gseSnapOn ? 'var(--accent3)' : 'var(--bg5)';
+    document.getElementById('gse-snap-toggle').style.color = gseSnapOn ? '#0a1a10' : 'var(--text2)';
+    openModal('gridsnap-modal');
+    setTimeout(() => { gseDrawGrid(); gseDrawRulers(); }, 60);
+  }
+
+  function gseBuildCanvas() {
+    const canvas = document.getElementById('gse-canvas');
+    canvas.innerHTML = '';
+    gseCanvasEls = {};
+    const defs = [
+      { id:'el-MainFrame', left:'50px', top:'60px', width:'320px', height:'220px', style:'background:rgba(15,20,35,0.92);border-radius:12px;border:1.5px solid rgba(91,141,239,0.3)', label:'MainFrame' },
+      { id:'el-HealthBar', left:'10px', top:'10px', width:'120px', height:'28px', style:'background:rgba(10,20,15,0.85);border-radius:6px;border:1px solid rgba(77,201,126,0.3)', label:'HealthBar' },
+      { id:'el-Hotbar', left:'30%', top:'88%', width:'40%', height:'40px', style:'background:rgba(15,18,28,0.9);border-radius:8px;border:1px solid rgba(91,141,239,0.2)', label:'Hotbar' },
+      { id:'el-MiniMap', left:'86%', top:'10px', width:'100px', height:'100px', style:'background:rgba(10,12,18,0.9);border-radius:8px;border:1px solid rgba(91,141,239,0.25)', label:'MiniMap' },
+    ];
+    defs.forEach(d => {
+      const orig = document.getElementById(d.id);
+      const div = document.createElement('div');
+      div.id = 'gse-' + d.id;
+      div.style.cssText = `position:absolute;left:${orig?orig.style.left||d.left:d.left};top:${orig?orig.style.top||d.top:d.top};width:${orig?orig.style.width||(orig.offsetWidth+'px')||d.width:d.width};height:${orig?orig.style.height||(orig.offsetHeight+'px')||d.height:d.height};${d.style};cursor:move;box-sizing:border-box;display:flex;align-items:center;justify-content:center;user-select:none`;
+      div.innerHTML = `<span style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.4);font-family:Syne,sans-serif;pointer-events:none">${d.label}</span>`;
+      div.addEventListener('mousedown', e => gseDragStart(e, div, d.id));
+      div.addEventListener('touchstart', e => gseDragStart(e, div, d.id), { passive:false });
+      div.onclick = () => gseSelectElement(d.id);
+      canvas.appendChild(div);
+      gseCanvasEls[d.id] = div;
+
+      // resize handle
+      const rh = document.createElement('div');
+      rh.style.cssText = 'position:absolute;right:0;bottom:0;width:12px;height:12px;cursor:se-resize;background:rgba(91,141,239,0.7);border-radius:2px 0 4px 0';
+      rh.addEventListener('mousedown', e => { e.stopPropagation(); gseResizeStart(e, div, d.id); });
+      div.appendChild(rh);
+    });
+  }
+
+  function gseSelectElement(id) {
+    gseSelectedId = id;
+    document.getElementById('gse-element-select').value = id;
+    Object.entries(gseCanvasEls).forEach(([k, el]) => {
+      el.style.outline = k === id ? '2px solid var(--accent)' : '';
+    });
+    const el = gseCanvasEls[id];
+    if (!el) return;
+    document.getElementById('gse-x').value = parseInt(el.style.left)||0;
+    document.getElementById('gse-y').value = parseInt(el.style.top)||0;
+    document.getElementById('gse-w').value = parseInt(el.style.width)||100;
+    document.getElementById('gse-h').value = parseInt(el.style.height)||50;
+    document.getElementById('gse-status').textContent = 'Editing: ' + id.replace('el-','');
+  }
+
+  let gseDragging = false, gseDragEl = null, gseDragId = '', gseDragOX = 0, gseDragOY = 0, gseDragElX = 0, gseDragElY = 0;
+  function gseDragStart(e, div, id) {
+    if (e.target.style.cursor === 'se-resize') return;
+    if (gseLockedEls && gseLockedEls.has(id)) { showToast('Element is locked', 'warn'); return; }
+    gseSelectElement(id);
+    gseDragging = true; gseDragEl = div; gseDragId = id;
+    const p = e.touches ? e.touches[0] : e;
+    gseDragOX = p.clientX; gseDragOY = p.clientY;
+    gseDragElX = parseInt(div.style.left)||0;
+    gseDragElY = parseInt(div.style.top)||0;
+    e.preventDefault();
+  }
+  document.getElementById('gridsnap-modal') && (() => {})();
+  function gseOnMove(e) {
+    if (!gseDragging && !gseResizing) return;
+    const p = e.touches ? e.touches[0] : e;
+    if (gseDragging && gseDragEl) {
+      let nx = gseDragElX + (p.clientX - gseDragOX);
+      let ny = gseDragElY + (p.clientY - gseDragOY);
+      if (gseSnapOn) { nx = Math.round(nx/gseGridSize)*gseGridSize; ny = Math.round(ny/gseGridSize)*gseGridSize; }
+      nx = Math.max(0, nx); ny = Math.max(0, ny);
+      gseDragEl.style.left = nx + 'px'; gseDragEl.style.top = ny + 'px';
+      document.getElementById('gse-x').value = nx; document.getElementById('gse-y').value = ny;
+    }
+    if (gseResizing && gseResizeEl) {
+      let nw = gseResizeW0 + (p.clientX - gseResizeOX);
+      let nh = gseResizeH0 + (p.clientY - gseResizeOY);
+      if (gseSnapOn) { nw = Math.round(nw/gseGridSize)*gseGridSize; nh = Math.round(nh/gseGridSize)*gseGridSize; }
+      nw = Math.max(40, nw); nh = Math.max(20, nh);
+      gseResizeEl.style.width = nw + 'px'; gseResizeEl.style.height = nh + 'px';
+      document.getElementById('gse-w').value = nw; document.getElementById('gse-h').value = nh;
+    }
+  }
+  function gseOnUp() {
+    if (gseDragging || gseResizing) gsePushHistory();
+    gseDragging = false; gseDragEl = null;
+    gseResizing = false; gseResizeEl = null;
+  }
+  document.addEventListener('mousemove', gseOnMove);
+  document.addEventListener('touchmove', gseOnMove, { passive: false });
+  document.addEventListener('mouseup', gseOnUp);
+  document.addEventListener('touchend', gseOnUp);
+
+  let gseResizing = false, gseResizeEl = null, gseResizeId = '', gseResizeOX = 0, gseResizeOY = 0, gseResizeW0 = 0, gseResizeH0 = 0;
+  function gseResizeStart(e, div, id) {
+    gseSelectElement(id);
+    gseResizing = true; gseResizeEl = div; gseResizeId = id;
+    const p = e.touches ? e.touches[0] : e;
+    gseResizeOX = p.clientX; gseResizeOY = p.clientY;
+    gseResizeW0 = parseInt(div.style.width)||div.offsetWidth;
+    gseResizeH0 = parseInt(div.style.height)||div.offsetHeight;
+    e.preventDefault();
+  }
+
+  function gseApplyTransform() {
+    const el = gseCanvasEls[gseSelectedId]; if (!el) return;
+    const x = parseInt(document.getElementById('gse-x').value)||0;
+    const y = parseInt(document.getElementById('gse-y').value)||0;
+    const w = parseInt(document.getElementById('gse-w').value)||40;
+    const h = parseInt(document.getElementById('gse-h').value)||20;
+    el.style.left = x+'px'; el.style.top = y+'px'; el.style.width = w+'px'; el.style.height = h+'px';
+    gsePushHistory();
+  }
+
+  function gseApplyStyle() {
+    const el = gseCanvasEls[gseSelectedId]; if (!el) return;
+    const bg = document.getElementById('gse-bgcolor').value;
+    const op = document.getElementById('gse-opacity').value;
+    const r = document.getElementById('gse-radius').value;
+    const bc = document.getElementById('gse-border-color').value;
+    const bop = document.getElementById('gse-border-opacity').value;
+    document.getElementById('gse-opacity-val').textContent = op + '%';
+    document.getElementById('gse-radius-val').textContent = r;
+    document.getElementById('gse-border-opacity-val').textContent = bop + '%';
+    const rgb = bg.match(/\w\w/g).map(x=>parseInt(x,16));
+    el.style.background = `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${op/100})`;
+    el.style.borderRadius = r + 'px';
+    const brgb = bc.match(/\w\w/g).map(x=>parseInt(x,16));
+    el.style.border = `1.5px solid rgba(${brgb[0]},${brgb[1]},${brgb[2]},${bop/100})`;
+    gsePushHistory();
+  }
+
+  function gseToggleSnap() {
+    gseSnapOn = !gseSnapOn;
+    const btn = document.getElementById('gse-snap-toggle');
+    btn.textContent = gseSnapOn ? 'ON' : 'OFF';
+    btn.style.background = gseSnapOn ? 'var(--accent3)' : 'var(--bg5)';
+    btn.style.color = gseSnapOn ? '#0a1a10' : 'var(--text2)';
+    document.getElementById('gse-snap-badge').style.display = gseSnapOn ? '' : 'none';
+    document.getElementById('tools-gridsnap-badge').style.display = gseSnapOn ? '' : 'none';
+    showToast('Grid Snap ' + (gseSnapOn ? 'ON' : 'OFF'), 'ok');
+  }
+
+  function gseUpdateGrid() {
+    gseGridSize = parseInt(document.getElementById('gse-grid-size').value)||16;
+    document.getElementById('gse-grid-size-val').textContent = gseGridSize;
+    gseDrawGrid();
+    gseDrawRulers();
+  }
+
+  function gseToggleGridVis() {
+    gseGridVis = !gseGridVis;
+    const btn = document.getElementById('gse-grid-vis-btn');
+    btn.style.color = gseGridVis ? 'var(--accent3)' : 'var(--text2)';
+    btn.style.borderColor = gseGridVis ? 'var(--accent3)' : 'var(--border)';
+    gseDrawGrid();
+  }
+
+  function gseDrawGrid() {
+    const canvas = document.getElementById('gse-grid-canvas');
+    const wrap = document.getElementById('gse-canvas-wrap');
+    if (!canvas || !wrap) return;
+    canvas.width = wrap.offsetWidth; canvas.height = wrap.offsetHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Always draw subtle dot pattern for reference
+    ctx.fillStyle = 'rgba(91,141,239,0.08)';
+    for (let x = 0; x < canvas.width; x += gseGridSize) {
+      for (let y = 0; y < canvas.height; y += gseGridSize) {
+        ctx.fillRect(x, y, 1, 1);
+      }
+    }
+    if (!gseGridVis) return;
+    // Major grid lines every 4 cells
+    const major = gseGridSize * 4;
+    ctx.strokeStyle = 'rgba(91,141,239,0.18)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < canvas.width; x += major) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+    }
+    for (let y = 0; y < canvas.height; y += major) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+    }
+    // Minor grid lines
+    ctx.strokeStyle = 'rgba(91,141,239,0.06)';
+    ctx.lineWidth = 0.5;
+    for (let x = 0; x < canvas.width; x += gseGridSize) {
+      if (x % major === 0) continue;
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+    }
+    for (let y = 0; y < canvas.height; y += gseGridSize) {
+      if (y % major === 0) continue;
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+    }
+    // Center crosshair
+    const cx = canvas.width / 2; const cy = canvas.height / 2;
+    ctx.strokeStyle = 'rgba(91,141,239,0.25)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4,4]);
+    ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, canvas.height); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(canvas.width, cy); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  function gseDrawRulers() {
+    const hRuler = document.getElementById('gse-ruler-h');
+    const vRuler = document.getElementById('gse-ruler-v');
+    if (!hRuler || !vRuler) return;
+    const wrap = document.getElementById('gse-canvas-wrap');
+    if (!wrap) return;
+    const w = wrap.offsetWidth;
+    const h = wrap.offsetHeight;
+    // Horizontal ruler
+    let hHtml = '';
+    for (let x = 0; x <= w; x += gseGridSize * 4) {
+      hHtml += `<div style="position:absolute;left:${x}px;top:0;height:100%;display:flex;flex-direction:column;align-items:flex-start">
+        <div style="width:1px;height:8px;background:var(--border2)"></div>
+        <div style="font-size:8px;color:var(--text3);transform:translateX(-50%);white-space:nowrap;margin-top:1px">${x}</div>
+      </div>`;
+    }
+    hRuler.innerHTML = hHtml;
+    // Vertical ruler
+    let vHtml = '';
+    for (let y = 0; y <= h; y += gseGridSize * 4) {
+      vHtml += `<div style="position:absolute;top:${y}px;left:0;width:100%;display:flex;align-items:flex-start">
+        <div style="height:1px;width:8px;background:var(--border2)"></div>
+        <div style="font-size:7px;color:var(--text3);writing-mode:vertical-rl;margin-left:1px">${y}</div>
+      </div>`;
+    }
+    vRuler.innerHTML = vHtml;
+  }
+
+  function gseBuildAnchorGrid() {
+    const grid = document.getElementById('gse-anchor-grid');
+    grid.innerHTML = '';
+    [[0,0],[0.5,0],[1,0],[0,0.5],[0.5,0.5],[1,0.5],[0,1],[0.5,1],[1,1]].forEach(([x,y]) => {
+      const b = document.createElement('button');
+      b.style.cssText = 'height:26px;background:var(--bg4);border:1px solid var(--border);border-radius:4px;color:var(--text1);font-size:9px;cursor:pointer;font-family:Syne,sans-serif';
+      b.textContent = `${x},${y}`;
+      b.onclick = () => { document.getElementById('gse-anchor-label').textContent = `AnchorPoint: ${x},${y}`; showToast(`AnchorPoint set: ${x},${y}`, 'ok'); };
+      grid.appendChild(b);
+    });
+  }
+
+  function gsePushHistory() {
+    const state = {};
+    Object.entries(gseCanvasEls).forEach(([id, el]) => {
+      state[id] = { left: el.style.left, top: el.style.top, width: el.style.width, height: el.style.height, background: el.style.background, borderRadius: el.style.borderRadius, border: el.style.border };
+    });
+    gseHistory = gseHistory.slice(0, gseHistoryIdx + 1);
+    gseHistory.push(state);
+    gseHistoryIdx = gseHistory.length - 1;
+  }
+
+  function gseUndo() {
+    if (gseHistoryIdx <= 0) { showToast('Nothing to undo', 'warn'); return; }
+    gseHistoryIdx--;
+    gseRestoreHistory(gseHistory[gseHistoryIdx]);
+  }
+  function gseRedo() {
+    if (gseHistoryIdx >= gseHistory.length - 1) { showToast('Nothing to redo', 'warn'); return; }
+    gseHistoryIdx++;
+    gseRestoreHistory(gseHistory[gseHistoryIdx]);
+  }
+  function gseRestoreHistory(state) {
+    Object.entries(state).forEach(([id, s]) => {
+      const el = gseCanvasEls[id]; if (!el) return;
+      Object.assign(el.style, s);
+    });
+    gseSelectElement(gseSelectedId);
+  }
+
+  function gseSave() {
+    Object.entries(gseCanvasEls).forEach(([id, cel]) => {
+      const realEl = document.getElementById(id);
+      if (!realEl) return;
+      realEl.style.left = cel.style.left;
+      realEl.style.top = cel.style.top;
+      realEl.style.width = cel.style.width;
+      realEl.style.height = cel.style.height;
+      if (cel.style.background) realEl.style.background = cel.style.background;
+      if (cel.style.borderRadius) realEl.style.borderRadius = cel.style.borderRadius;
+      if (cel.style.border) realEl.style.border = cel.style.border;
+    });
+    closeModal('gridsnap-modal');
+    showToast('Layout saved to preview!', 'ok');
+    addLog('success', 'Grid Snap editor changes applied to preview');
+  }
+
+  function gseDiscard() {
+    Object.entries(gseOriginalStyles).forEach(([id, s]) => {
+      const el = document.getElementById(id); if (!el) return;
+      Object.assign(el.style, s);
+    });
+    closeModal('gridsnap-modal');
+    showToast('Changes discarded', 'warn');
+  }
+
+  window.addEventListener('resize', () => {
+    const modal = document.getElementById('gridsnap-modal');
+    if (modal && modal.classList.contains('open')) { gseDrawGrid(); gseDrawRulers(); }
+  });
   </script>
 </body>
 
