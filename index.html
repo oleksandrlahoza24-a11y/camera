@@ -4,10 +4,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>RobloxUI Studio</title>
+  <title>RblxUI Studio</title>
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%235b8def'/><stop offset='100%25' stop-color='%237c6af5'/></linearGradient></defs><rect width='32' height='32' rx='7' fill='url(%23g)'/><rect x='7' y='9' width='6' height='6' rx='1.5' fill='white' opacity='0.9'/><rect x='15' y='9' width='10' height='2' rx='1' fill='white' opacity='0.6'/><rect x='15' y='13' width='7' height='2' rx='1' fill='white' opacity='0.4'/><rect x='7' y='17' width='18' height='2' rx='1' fill='white' opacity='0.3'/><rect x='7' y='21' width='13' height='2' rx='1' fill='white' opacity='0.25'/></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link
-    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Syne:wght@400;600;700;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Syne:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
@@ -39,6 +41,20 @@
       --tab-h: 36px;
       --radius: 6px;
       --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+      --theme-transition: background 0.4s ease, border-color 0.4s ease, color 0.3s ease;
+    }
+
+    /* ── THEME TRANSITION ── */
+    * {
+      transition: var(--theme-transition);
+    }
+
+    #code-editor,
+    #highlight-overlay,
+    #line-numbers,
+    .preview-ui-el,
+    #preview-bg {
+      transition: none !important;
     }
 
     *,
@@ -80,12 +96,13 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 800;
       color: var(--text0);
-      letter-spacing: -0.3px;
+      letter-spacing: -0.5px;
       padding-right: 16px;
       border-right: 1px solid var(--border);
+      text-decoration: none;
     }
 
     #topbar .logo .logo-icon {
@@ -98,6 +115,15 @@
       justify-content: center;
       font-size: 13px;
       color: #fff;
+      box-shadow: 0 2px 10px rgba(91, 141, 239, 0.35);
+      flex-shrink: 0;
+    }
+
+    #topbar .logo .logo-text-main {
+      background: linear-gradient(90deg, var(--text0), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .tb-group {
@@ -826,6 +852,73 @@
 
     .preview-ui-el.selected {
       border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent);
+    }
+
+    .preview-ui-el.multi-selected {
+      border-color: var(--accent3);
+      box-shadow: 0 0 0 1px var(--accent3);
+    }
+
+    /* Multi-select toolbar */
+    #multi-select-bar {
+      display: none;
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(13, 15, 20, 0.92);
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      padding: 5px 8px;
+      gap: 4px;
+      align-items: center;
+      z-index: 20;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      flex-wrap: wrap;
+      max-width: calc(100% - 20px);
+      justify-content: center;
+    }
+
+    #multi-select-bar.visible {
+      display: flex;
+    }
+
+    .msb-btn {
+      height: 26px;
+      padding: 0 10px;
+      border-radius: 5px;
+      border: 1px solid var(--border);
+      background: var(--bg3);
+      color: var(--text1);
+      font-size: 11px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.12s;
+      white-space: nowrap;
+    }
+
+    .msb-btn:hover {
+      background: var(--bg4);
+      color: var(--text0);
+    }
+
+    .msb-btn.danger:hover {
+      background: rgba(240, 93, 106, 0.15);
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    .msb-count {
+      font-size: 11px;
+      color: var(--accent3);
+      font-family: 'JetBrains Mono', monospace;
+      padding: 0 4px;
     }
 
     .preview-ui-el .resize-handle {
@@ -1933,42 +2026,106 @@
 
     .theme-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
       margin-bottom: 16px;
     }
 
     .theme-card {
       border: 2px solid var(--border);
-      border-radius: 8px;
+      border-radius: 10px;
       cursor: pointer;
-      transition: all 0.15s;
+      transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.18s, box-shadow 0.18s;
       overflow: hidden;
       background: var(--bg3);
+      position: relative;
+    }
+
+    .theme-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, transparent 60%);
+      pointer-events: none;
     }
 
     .theme-card:hover {
       border-color: var(--accent);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
     }
 
     .theme-card.active-theme {
       border-color: var(--accent);
-      box-shadow: 0 0 0 1px var(--accent);
+      box-shadow: 0 0 0 1px var(--accent), 0 4px 20px rgba(91, 141, 239, 0.25);
+    }
+
+    .theme-card.active-theme::before {
+      content: '✓';
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      font-size: 11px;
+      color: #fff;
+      background: var(--accent);
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+      font-weight: 900;
     }
 
     .theme-card-preview {
-      height: 52px;
+      height: 60px;
       width: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .theme-card-preview-bar {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      right: 8px;
+      height: 3px;
+      border-radius: 2px;
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .theme-card-preview-bar2 {
+      position: absolute;
+      top: 17px;
+      left: 8px;
+      width: 55%;
+      height: 3px;
+      border-radius: 2px;
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .theme-card-preview-dot {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
     }
 
     .theme-card-name {
       font-size: 11px;
       font-weight: 700;
       color: var(--text0);
-      text-align: center;
-      padding: 5px 4px 2px;
+      padding: 5px 8px 2px;
+    }
+
+    .theme-card-desc {
+      font-size: 9px;
+      color: var(--text3);
+      padding: 0 8px 5px;
+      font-family: 'JetBrains Mono', monospace;
     }
 
     .settings-row {
@@ -2079,7 +2236,7 @@
   <div id="topbar">
     <div class="logo">
       <div class="logo-icon"><i class="fa-solid fa-cubes-stacked"></i></div>
-      RblxUI Studio
+      <span class="logo-text-main">RblxUI</span> Studio
     </div>
     <div class="tb-group" style="position:relative">
             <button class="tb-btn" onclick="newFile()"><i class="fa-solid fa-plus"></i> New</button>
@@ -2181,6 +2338,7 @@
     <div class="tb-group">
       <button class="tb-btn" onclick="openToolbox()" id="toolbox-tb-btn" title="Toolbox"><i class="fa-solid fa-toolbox"></i> Toolbox</button>
       <button class="tb-btn" onclick="openModal('settings-modal')" title="Settings"><i class="fa-solid fa-gear"></i></button>
+      <button class="tb-btn" onclick="openAIPanel()" id="ai-panel-btn" title="AI Assistant" style="background:linear-gradient(135deg,rgba(91,141,239,0.18),rgba(124,106,245,0.18));border-color:var(--accent2);color:var(--accent2);"><i class="fa-solid fa-wand-magic-sparkles"></i> AI</button>
       <button class="tb-btn success" onclick="openExportModal()"><i class="fa-solid fa-rocket"></i> Deploy</button>
     </div>
   </div>
@@ -2692,6 +2850,15 @@
               </div>
             </div>
 
+            <div id="multi-select-bar">
+              <span class="msb-count" id="msb-count">0 selected</span>
+              <button class="msb-btn" onclick="moveSelectedEls('up')"><i class="fa-solid fa-arrow-up"></i> Up</button>
+              <button class="msb-btn" onclick="moveSelectedEls('down')"><i class="fa-solid fa-arrow-down"></i> Down</button>
+              <button class="msb-btn" onclick="moveSelectedEls('left')"><i class="fa-solid fa-arrow-left"></i> Left</button>
+              <button class="msb-btn" onclick="moveSelectedEls('right')"><i class="fa-solid fa-arrow-right"></i> Right</button>
+              <button class="msb-btn danger" onclick="deleteSelectedEls()"><i class="fa-solid fa-trash"></i> Delete</button>
+              <button class="msb-btn" onclick="clearMultiSelect()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
             <div id="preview-zoom">100%</div>
             <div id="preview-controls">
               <button class="pv-ctrl" onclick="zoomIn()" title="Zoom in"><i class="fa-solid fa-plus"></i></button>
@@ -3164,6 +3331,8 @@ let pvDragging = false, pvDragStartX = 0, pvDragStartY = 0;
 let elDragging = null, elDragOffX = 0, elDragOffY = 0;
 let elResizing = null, elResizeStartW = 0, elResizeStartH = 0, elResizeStartX = 0, elResizeStartY = 0;
 let selectedEl = null;
+let multiSelectedEls = new Set();
+let lastTouchMoveTime = 0;
 
 // ─────────────────────────────────────────────
 // EDITOR INIT
@@ -3879,7 +4048,59 @@ function filterWorkspace(q) {
 }
 
 // ─────────────────────────────────────────────
-// PREVIEW – PAN & ZOOM
+// MULTI-SELECT
+// ─────────────────────────────────────────────
+function toggleMultiSelect(el) {
+if (multiSelectedEls.has(el)) {
+multiSelectedEls.delete(el);
+el.classList.remove('multi-selected');
+} else {
+multiSelectedEls.add(el);
+el.classList.add('multi-selected');
+}
+updateMultiSelectBar();
+}
+
+function clearMultiSelect() {
+multiSelectedEls.forEach(el => el.classList.remove('multi-selected'));
+multiSelectedEls.clear();
+updateMultiSelectBar();
+}
+
+function updateMultiSelectBar() {
+const bar = document.getElementById('multi-select-bar');
+const count = document.getElementById('msb-count');
+if (multiSelectedEls.size > 0) {
+bar.classList.add('visible');
+count.textContent = multiSelectedEls.size + ' selected';
+} else {
+bar.classList.remove('visible');
+}
+}
+
+function deleteSelectedEls() {
+if (multiSelectedEls.size === 0) return;
+multiSelectedEls.forEach(el => el.remove());
+multiSelectedEls.clear();
+updateMultiSelectBar();
+showToast('Deleted ' + multiSelectedEls.size + ' elements', 'warn');
+addLog('warn', 'Multi-delete applied');
+}
+
+function moveSelectedEls(dir) {
+const step = 8;
+multiSelectedEls.forEach(el => {
+const x = parseInt(el.style.left) || 0;
+const y = parseInt(el.style.top) || 0;
+if (dir === 'up') el.style.top = (y - step) + 'px';
+if (dir === 'down') el.style.top = (y + step) + 'px';
+if (dir === 'left') el.style.left = (x - step) + 'px';
+if (dir === 'right') el.style.left = (x + step) + 'px';
+});
+}
+
+// ─────────────────────────────────────────────
+// PREVIEW — DRAG, RESIZE, ZOOM
 // ─────────────────────────────────────────────
 const viewport = document.getElementById('preview-viewport');
 const canvas = document.getElementById('preview-canvas');
@@ -4790,7 +5011,26 @@ document.addEventListener('keydown', e => {
   if ((e.ctrlKey || e.metaKey) && e.key === 'f' && document.activeElement !== editor) {
     e.preventDefault(); toggleSearch();
   }
-  if (e.key === 'Escape') { ctxMenu.classList.remove('open'); }
+  if (e.key === 'Escape') {
+    ctxMenu.classList.remove('open');
+    clearMultiSelect();
+  }
+  // Delete key removes multi-selected elements
+  if ((e.key === 'Delete' || e.key === 'Backspace') && document.activeElement !== editor && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+    if (multiSelectedEls.size > 0) {
+      const count = multiSelectedEls.size;
+      multiSelectedEls.forEach(el => el.remove());
+      multiSelectedEls.clear();
+      updateMultiSelectBar();
+      showToast(`Deleted ${count} element(s)`, 'warn');
+    }
+  }
+  // Arrow keys move multi-selected
+  if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key) && multiSelectedEls.size > 0 && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+    e.preventDefault();
+    const dir = e.key.replace('Arrow','').toLowerCase();
+    moveSelectedEls(dir);
+  }
 });
 
 addLog('info', 'Workspace loaded — 3 scripts, 2 UI elements');
@@ -5013,6 +5253,12 @@ const THEMES = [
   { id: 'monokai',   name: 'Monokai',    desc: 'Warm contrast',   colors: ['#272822','#a6e22e','#f92672'] },
   { id: 'nord',      name: 'Nord',       desc: 'Arctic palette',  colors: ['#2e3440','#88c0d0','#81a1c1'] },
   { id: 'solarized', name: 'Solarized',  desc: 'Precision tones', colors: ['#002b36','#268bd2','#2aa198'] },
+  { id: 'neon',      name: 'Neon',       desc: 'Cyberpunk glow',  colors: ['#08001a','#ff00ff','#00ffff'] },
+  { id: 'amber',     name: 'Amber',      desc: 'Warm terminal',   colors: ['#0d0800','#ffb300','#ff8f00'] },
+  { id: 'matrix',    name: 'Matrix',     desc: 'Green on black',  colors: ['#000a00','#00ff41','#003b00'] },
+  { id: 'tokyo',     name: 'Tokyo Night',desc: 'Neon city',       colors: ['#1a1b26','#7aa2f7','#bb9af7'] },
+  { id: 'copper',    name: 'Copper',     desc: 'Metallic warm',   colors: ['#110e08','#b87333','#cd7f32'] },
+  { id: 'arctic',    name: 'Arctic',     desc: 'Ice blue white',  colors: ['#f0f4f8','#2563eb','#7c3aed'] },
 ];
 const THEME_VARS = {
   dark:      { '--bg0':'#0d0f14','--bg1':'#12151c','--bg2':'#181c26','--bg3':'#1f2433','--bg4':'#252b3b','--bg5':'#2c3449','--border':'#2e3650','--border2':'#3a4460','--accent':'#5b8def','--accent2':'#7c6af5','--accent3':'#3dd6b5','--accent-glow':'rgba(91,141,239,0.18)','--red':'#f05d6a','--green':'#4dc97e','--yellow':'#f0c94d','--orange':'#f0924d','--purple':'#a97ef5','--text0':'#e8eaf2','--text1':'#b8bdcc','--text2':'#7c839a','--text3':'#4a5068' },
@@ -5029,6 +5275,12 @@ const THEME_VARS = {
   monokai:   { '--bg0':'#1c1e17','--bg1':'#23261a','--bg2':'#272822','--bg3':'#32342a','--bg4':'#3d4033','--bg5':'#494c3c','--border':'#555840','--border2':'#75785c','--accent':'#a6e22e','--accent2':'#f92672','--accent3':'#66d9e8','--accent-glow':'rgba(166,226,46,0.16)','--red':'#f92672','--green':'#a6e22e','--yellow':'#e6db74','--orange':'#fd971f','--purple':'#ae81ff','--text0':'#f8f8f2','--text1':'#cfcfc2','--text2':'#75715e','--text3':'#4e4d3b' },
   nord:      { '--bg0':'#242831','--bg1':'#2e3440','--bg2':'#3b4252','--bg3':'#434c5e','--bg4':'#4c566a','--bg5':'#575f70','--border':'#4c566a','--border2':'#616e86','--accent':'#88c0d0','--accent2':'#81a1c1','--accent3':'#8fbcbb','--accent-glow':'rgba(136,192,208,0.16)','--red':'#bf616a','--green':'#a3be8c','--yellow':'#ebcb8b','--orange':'#d08770','--purple':'#b48ead','--text0':'#eceff4','--text1':'#d8dee9','--text2':'#4c566a','--text3':'#3b4252' },
   solarized: { '--bg0':'#002028','--bg1':'#002b36','--bg2':'#073642','--bg3':'#0a4050','--bg4':'#0d4e60','--bg5':'#105c72','--border':'#155c6e','--border2':'#1a7080','--accent':'#268bd2','--accent2':'#2aa198','--accent3':'#859900','--accent-glow':'rgba(38,139,210,0.16)','--red':'#dc322f','--green':'#859900','--yellow':'#b58900','--orange':'#cb4b16','--purple':'#6c71c4','--text0':'#fdf6e3','--text1':'#93a1a1','--text2':'#586e75','--text3':'#073642' },
+  neon:      { '--bg0':'#08001a','--bg1':'#0d0025','--bg2':'#110030','--bg3':'#160040','--bg4':'#1b0050','--bg5':'#200060','--border':'#3a006f','--border2':'#5500a0','--accent':'#ff00ff','--accent2':'#00ffff','--accent3':'#ff66ff','--accent-glow':'rgba(255,0,255,0.18)','--red':'#ff0055','--green':'#00ff88','--yellow':'#ffff00','--orange':'#ff8800','--purple':'#cc00ff','--text0':'#ffffff','--text1':'#e0aaff','--text2':'#9933ff','--text3':'#440088' },
+  amber:     { '--bg0':'#0d0800','--bg1':'#140f00','--bg2':'#1a1400','--bg3':'#221900','--bg4':'#2a2000','--bg5':'#332800','--border':'#4a3800','--border2':'#664e00','--accent':'#ffb300','--accent2':'#ff8f00','--accent3':'#ffe082','--accent-glow':'rgba(255,179,0,0.18)','--red':'#ff3d00','--green':'#64dd17','--yellow':'#ffd600','--orange':'#ff6d00','--purple':'#d500f9','--text0':'#fff8e1','--text1':'#ffecb3','--text2':'#ff8f00','--text3':'#e65100' },
+  matrix:    { '--bg0':'#000a00','--bg1':'#000e00','--bg2':'#001200','--bg3':'#001800','--bg4':'#001e00','--bg5':'#002500','--border':'#003800','--border2':'#004d00','--accent':'#00ff41','--accent2':'#00cc33','--accent3':'#39ff14','--accent-glow':'rgba(0,255,65,0.18)','--red':'#ff2200','--green':'#00ff41','--yellow':'#ccff00','--orange':'#88ff00','--purple':'#00ffaa','--text0':'#e0ffe0','--text1':'#80ff80','--text2':'#006600','--text3':'#003300' },
+  tokyo:     { '--bg0':'#13141f','--bg1':'#1a1b26','--bg2':'#1f2335','--bg3':'#24283b','--bg4':'#2d324a','--bg5':'#363b54','--border':'#3d4166','--border2':'#545c8a','--accent':'#7aa2f7','--accent2':'#bb9af7','--accent3':'#7dcfff','--accent-glow':'rgba(122,162,247,0.16)','--red':'#f7768e','--green':'#9ece6a','--yellow':'#e0af68','--orange':'#ff9e64','--purple':'#bb9af7','--text0':'#c0caf5','--text1':'#a9b1d6','--text2':'#565f89','--text3':'#3b4261' },
+  copper:    { '--bg0':'#110e08','--bg1':'#181208','--bg2':'#1e1710','--bg3':'#271e14','--bg4':'#30251a','--bg5':'#3a2d20','--border':'#5c3d1a','--border2':'#7a5020','--accent':'#b87333','--accent2':'#cd7f32','--accent3':'#ffc87a','--accent-glow':'rgba(184,115,51,0.18)','--red':'#c0392b','--green':'#27ae60','--yellow':'#f39c12','--orange':'#d35400','--purple':'#8e44ad','--text0':'#fdf2e3','--text1':'#d4ac7a','--text2':'#8b6914','--text3':'#4a3800' },
+  arctic:    { '--bg0':'#f0f4f8','--bg1':'#e8edf5','--bg2':'#dde3ee','--bg3':'#d0d8e8','--bg4':'#c5cfe0','--bg5':'#b8c4d8','--border':'#b0bcd4','--border2':'#9aaac8','--accent':'#2563eb','--accent2':'#7c3aed','--accent3':'#0891b2','--accent-glow':'rgba(37,99,235,0.14)','--red':'#dc2626','--green':'#16a34a','--yellow':'#ca8a04','--orange':'#ea580c','--purple':'#7c3aed','--text0':'#0f172a','--text1':'#1e293b','--text2':'#475569','--text3':'#94a3b8' },
 };
 let currentTheme = 'dark';
 function buildThemeGrid() {
@@ -5042,18 +5294,22 @@ function buildThemeGrid() {
     card.onclick = () => applyTheme(t.id);
     card.innerHTML = `
       <div class="theme-card-preview" style="background:linear-gradient(135deg,${t.colors[0]} 0%,${t.colors[1]} 55%,${t.colors[2]} 100%)">
-        <div style="display:flex;gap:4px;padding:6px">
-          <div style="width:8px;height:8px;border-radius:50%;background:${t.colors[1]};opacity:0.9"></div>
-          <div style="width:8px;height:8px;border-radius:50%;background:${t.colors[2]};opacity:0.7"></div>
-          <div style="width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.3)"></div>
+        <div class="theme-card-preview-bar"></div>
+        <div class="theme-card-preview-bar2"></div>
+        <div class="theme-card-preview-dot" style="background:${t.colors[2]}"></div>
+        <div style="display:flex;gap:3px;padding:28px 8px 0">
+          <div style="width:6px;height:6px;border-radius:50%;background:${t.colors[1]};opacity:0.9"></div>
+          <div style="width:6px;height:6px;border-radius:50%;background:${t.colors[2]};opacity:0.7"></div>
+          <div style="width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.3)"></div>
         </div>
         <div style="padding:0 6px 6px;display:flex;flex-direction:column;gap:3px">
           <div style="height:4px;border-radius:2px;background:${t.colors[1]};opacity:0.8;width:70%"></div>
           <div style="height:4px;border-radius:2px;background:rgba(255,255,255,0.2);width:90%"></div>
           <div style="height:4px;border-radius:2px;background:rgba(255,255,255,0.12);width:55%"></div>
         </div>
-      </div>
-      <div class="theme-card-name">${t.name}</div>
+            </div>
+            <div class="theme-card-name">${t.name}</div>
+            <div class="theme-card-desc">${t.desc}</div>
       <div style="font-size:9px;color:var(--text3);text-align:center;padding:0 4px 4px;line-height:1.2">${t.desc}</div>`;
     grid.appendChild(card);
   });
@@ -5932,6 +6188,887 @@ document.head.appendChild(ipadStyle);
     if (modal && modal.classList.contains('open')) { gseDrawGrid(); gseDrawRulers(); }
   });
   </script>
+
+  <!-- ══════════════════════════════════════════
+       AI ASSISTANT PANEL + STYLES + LOGIC
+  ══════════════════════════════════════════ -->
+  <style>
+    /* ══════════════════════════════════════════
+       GEMINI AI PANEL — Modern Google-Themed UI
+    ══════════════════════════════════════════ */
+
+    /* Google color stroke animation */
+    @keyframes google-stroke {
+      0% {
+        stroke-dashoffset: 300;
+      }
+
+      100% {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    @keyframes gemini-shimmer {
+      0% {
+        background-position: -200% center;
+      }
+
+      100% {
+        background-position: 200% center;
+      }
+    }
+
+    @keyframes gemini-rotate {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes ai-float {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-3px);
+      }
+    }
+
+    /* ── AI Panel Slide-in ── */
+    #ai-panel {
+      position: fixed;
+      bottom: 0;
+      right: 0;
+      width: min(440px, 100vw);
+      height: min(640px, 85vh);
+      background: #0c0d11;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-bottom: none;
+      border-right: none;
+      border-radius: 16px 0 0 0;
+      display: flex;
+      flex-direction: column;
+      z-index: 800;
+      box-shadow: -12px -12px 60px rgba(0, 0, 0, 0.7), -4px -4px 0 rgba(66, 133, 244, 0.08);
+      transform: translateY(110%);
+      transition: transform 0.36s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+    }
+
+    #ai-panel.open {
+      transform: translateY(0);
+    }
+
+    /* Header with Google stripe animation */
+    #ai-panel-header {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 0 16px;
+      height: 54px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      flex-shrink: 0;
+      background: #0e0f14;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Animated Google-color border on top */
+    #ai-panel-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #4285f4 0%, #ea4335 25%, #fbbc04 50%, #34a853 75%, #4285f4 100%);
+      background-size: 200% 100%;
+      animation: gemini-shimmer 3s linear infinite;
+    }
+
+    /* Gemini logo icon — animated ring */
+    .ai-gemini-icon {
+      width: 34px;
+      height: 34px;
+      flex-shrink: 0;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ai-gemini-icon svg {
+      position: absolute;
+      inset: 0;
+      animation: gemini-rotate 6s linear infinite;
+    }
+
+    .ai-gemini-icon .ai-gemini-inner {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #4285f4, #8ab4f8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: #fff;
+      z-index: 1;
+      animation: ai-float 3s ease-in-out infinite;
+    }
+
+    .ai-header-title {
+      flex: 1;
+    }
+
+    .ai-header-title-main {
+      font-size: 13px;
+      font-weight: 800;
+      color: #e8eaf2;
+      letter-spacing: -0.2px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .ai-gemini-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 7px;
+      border-radius: 20px;
+      background: linear-gradient(90deg, #4285f4, #ea4335, #fbbc04, #34a853);
+      background-size: 200% 100%;
+      animation: gemini-shimmer 4s linear infinite;
+      color: #fff;
+      letter-spacing: 0.3px;
+    }
+
+    .ai-header-sub {
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.3);
+      font-family: 'JetBrains Mono', monospace;
+      margin-top: 1px;
+    }
+
+    .ai-header-close {
+      width: 28px;
+      height: 28px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 6px;
+      color: rgba(255, 255, 255, 0.4);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      transition: all 0.15s;
+    }
+
+    .ai-header-close:hover {
+      background: rgba(234, 67, 53, 0.15);
+      border-color: rgba(234, 67, 53, 0.4);
+      color: #ea4335;
+    }
+
+    /* Messages area */
+    #ai-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      scroll-behavior: smooth;
+      background: #0c0d11;
+    }
+
+    #ai-messages::-webkit-scrollbar {
+      width: 3px;
+    }
+
+    #ai-messages::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    #ai-messages::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+    }
+
+    .ai-msg {
+      display: flex;
+      gap: 9px;
+      align-items: flex-start;
+      animation: ai-msg-in 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes ai-msg-in {
+      from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.97);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .ai-msg.user {
+      flex-direction: row-reverse;
+    }
+
+    .ai-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      flex-shrink: 0;
+    }
+
+    .ai-avatar.bot {
+      background: linear-gradient(135deg, #1a3a6e, #2d5cba);
+      border: 1px solid rgba(66, 133, 244, 0.4);
+      color: #8ab4f8;
+    }
+
+    .ai-avatar.user {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .ai-bubble {
+      max-width: 83%;
+      padding: 10px 13px;
+      border-radius: 12px;
+      font-size: 12.5px;
+      line-height: 1.6;
+    }
+
+    .ai-msg.bot .ai-bubble {
+      background: #161820;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-top-left-radius: 3px;
+      color: #c8d0e8;
+    }
+
+    .ai-msg.user .ai-bubble {
+      background: linear-gradient(135deg, #1a3a6e, #4285f4);
+      border: 1px solid rgba(66, 133, 244, 0.3);
+      color: #e8f0fe;
+      border-top-right-radius: 3px;
+    }
+
+    .ai-bubble code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 1px 5px;
+      border-radius: 3px;
+      color: #8ab4f8;
+    }
+
+    /* Google-colored pill chips for suggestions */
+    .ai-suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      padding: 0 14px 8px;
+    }
+
+    .ai-suggestion-chip {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: rgba(66, 133, 244, 0.08);
+      border: 1px solid rgba(66, 133, 244, 0.2);
+      color: #8ab4f8;
+      cursor: pointer;
+      transition: all 0.14s;
+      font-family: 'Inter', 'Syne', sans-serif;
+    }
+
+    .ai-suggestion-chip:hover {
+      background: rgba(66, 133, 244, 0.2);
+      border-color: rgba(66, 133, 244, 0.5);
+      color: #c2d7ff;
+    }
+
+    /* Status row */
+    .ai-status-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 14px 3px;
+      font-size: 10.5px;
+      color: rgba(255, 255, 255, 0.28);
+      font-family: 'JetBrains Mono', monospace;
+      flex-shrink: 0;
+      background: #0c0d11;
+    }
+
+    .ai-status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      flex-shrink: 0;
+      transition: background 0.3s;
+    }
+
+    .ai-status-dot.thinking {
+      background: #4285f4;
+      animation: ai-pulse 0.9s ease-in-out infinite;
+    }
+
+    .ai-status-dot.ok {
+      background: #34a853;
+    }
+
+    .ai-status-dot.error {
+      background: #ea4335;
+    }
+
+    .ai-status-dot.quota {
+      background: #fbbc04;
+    }
+
+    @keyframes ai-pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(66, 133, 244, 0.4);
+      }
+
+      50% {
+        opacity: 0.7;
+        transform: scale(0.8);
+        box-shadow: 0 0 0 4px rgba(66, 133, 244, 0);
+      }
+    }
+
+    /* Input row */
+    #ai-input-row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+      padding: 10px 14px 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      background: #0e0f14;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    #ai-input-row::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 14px;
+      right: 14px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(66, 133, 244, 0.3), transparent);
+    }
+
+    #ai-input {
+      flex: 1;
+      min-height: 38px;
+      max-height: 110px;
+      padding: 9px 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      color: #e8eaf2;
+      font-size: 12.5px;
+      font-family: 'Inter', 'Syne', sans-serif;
+      outline: none;
+      resize: none;
+      line-height: 1.5;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    #ai-input:focus {
+      border-color: rgba(66, 133, 244, 0.5);
+      background: rgba(66, 133, 244, 0.05);
+    }
+
+    #ai-input::placeholder {
+      color: rgba(255, 255, 255, 0.22);
+    }
+
+    #ai-send-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #1a56c4, #4285f4);
+      border: 1px solid rgba(66, 133, 244, 0.4);
+      color: #fff;
+      cursor: pointer;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: opacity 0.15s, transform 0.12s, box-shadow 0.15s;
+      box-shadow: 0 2px 12px rgba(66, 133, 244, 0.3);
+    }
+
+    #ai-send-btn:hover {
+      opacity: 0.9;
+      transform: scale(0.96);
+      box-shadow: 0 4px 20px rgba(66, 133, 244, 0.5);
+    }
+
+    #ai-send-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* Thinking animation — Google dots */
+    .ai-thinking-bubble {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+      padding: 8px 4px;
+    }
+
+    .ai-thinking-bubble span {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      display: block;
+      animation: ai-bounce 1.2s ease-in-out infinite;
+    }
+
+    .ai-thinking-bubble span:nth-child(1) {
+      background: #4285f4;
+      animation-delay: 0s;
+    }
+
+    .ai-thinking-bubble span:nth-child(2) {
+      background: #ea4335;
+      animation-delay: 0.15s;
+    }
+
+    .ai-thinking-bubble span:nth-child(3) {
+      background: #fbbc04;
+      animation-delay: 0.3s;
+    }
+
+    @keyframes ai-bounce {
+
+      0%,
+      80%,
+      100% {
+        transform: translateY(0) scale(1);
+      }
+
+      40% {
+        transform: translateY(-8px) scale(1.1);
+      }
+    }
+
+    .ai-action-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 20px;
+      background: rgba(52, 168, 83, 0.1);
+      border: 1px solid rgba(52, 168, 83, 0.3);
+      color: #34a853;
+      font-size: 11px;
+      margin: 4px 2px 0;
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+
+    .ai-action-chip:hover {
+      background: rgba(52, 168, 83, 0.2);
+      color: #5dc87a;
+    }
+
+    .ai-quota-banner {
+      background: rgba(251, 188, 4, 0.08);
+      border: 1px solid rgba(251, 188, 4, 0.3);
+      border-radius: 10px;
+      padding: 10px 13px;
+      font-size: 12px;
+      color: #fbbc04;
+      display: flex;
+      gap: 9px;
+      align-items: flex-start;
+    }
+
+    .ai-quota-banner i {
+      margin-top: 1px;
+      flex-shrink: 0;
+    }
+
+    .ai-clear-btn {
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.25);
+      cursor: pointer;
+      font-size: 11px;
+      font-family: 'Syne', sans-serif;
+      padding: 0 4px;
+      transition: color 0.12s;
+    }
+
+    .ai-clear-btn:hover {
+      color: #ea4335;
+    }
+
+    /* Responsive AI panel */
+    @media (max-width: 600px) {
+      #ai-panel {
+        width: 100vw;
+        height: 70vh;
+        border-radius: 16px 16px 0 0;
+        border-left: none;
+      }
+    }
+  </style>
+
+  <!-- AI PANEL HTML -->
+  <div id="ai-panel">
+    <div id="ai-panel-header">
+      <div class="ai-gemini-icon">
+        <svg viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg" width="34" height="34">
+          <circle cx="17" cy="17" r="15" stroke="url(#gring)" stroke-width="1.5" stroke-dasharray="20 8 10 8"
+            stroke-linecap="round" />
+          <defs>
+            <linearGradient id="gring" x1="0" y1="0" x2="34" y2="34" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#4285f4" />
+              <stop offset="33%" stop-color="#ea4335" />
+              <stop offset="66%" stop-color="#fbbc04" />
+              <stop offset="100%" stop-color="#34a853" />
+            </linearGradient>
+          </defs>
+        </svg>
+        <div class="ai-gemini-inner"><i class="fa-solid fa-sparkles" style="font-size:10px"></i></div>
+      </div>
+      <div class="ai-header-title">
+        <div class="ai-header-title-main">
+          Gemini <span class="ai-gemini-badge">2.0 Flash</span>
+        </div>
+        <div class="ai-header-sub">Roblox UI · Code · Scripts</div>
+      </div>
+      <button class="ai-clear-btn" onclick="aiClearChat()" title="Clear chat"><i class="fa-solid fa-trash-can"></i></button>
+      <button class="ai-header-close" onclick="closeAIPanel()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div id="ai-messages">
+      <div class="ai-msg bot">
+        <div class="ai-avatar bot"><i class="fa-solid fa-sparkles"></i></div>
+        <div class="ai-bubble">
+          Hey — I'm <strong>Gemini</strong>, your Roblox UI co-pilot.<br><br>
+          I can edit code, add UI elements, write Lua scripts, and restructure your entire interface. Just tell me what you need.
+        </div>
+      </div>
+    </div>
+
+    <div class="ai-suggestions" id="ai-suggestions">
+      <span class="ai-suggestion-chip" onclick="aiSuggest('Add a health bar with gradient')">+ Health bar</span>
+      <span class="ai-suggestion-chip" onclick="aiSuggest('Make the buttons rounded with hover effects')">Hover effects</span>
+      <span class="ai-suggestion-chip" onclick="aiSuggest('Add a fade-in animation to MainFrame')">Fade in anim</span>
+      <span class="ai-suggestion-chip" onclick="aiSuggest('Add a close button with X icon')">Close button</span>
+    </div>
+
+    <div class="ai-status-row">
+      <div class="ai-status-dot ok" id="ai-status-dot"></div>
+      <span id="ai-status-text">Ready</span>
+    </div>
+
+    <div id="ai-input-row">
+      <textarea id="ai-input" placeholder="Describe what you want to build or change…" rows="1" onkeydown="aiInputKeydown(event)" oninput="aiAutoResize(this)"></textarea>
+      <button id="ai-send-btn" onclick="aiSend()" title="Send (Enter)"><i class="fa-solid fa-arrow-up"></i></button>
+    </div>
+  </div>
+
+  <script>
+    // ── AI PANEL LOGIC ──────────────────────────────────────────
+  const GEMINI_API_KEY = 'AIzaSyAhM4UlFY1qvZs5P2yeMLdw_DbGB44udU8';
+  const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+
+  let aiPanelOpen = false;
+  let aiThinking = false;
+  let aiChatHistory = [];
+  let aiThinkingEl = null;
+
+  function openAIPanel() {
+    aiPanelOpen = true;
+    document.getElementById('ai-panel').classList.add('open');
+    document.getElementById('ai-panel-btn').classList.add('active-mode');
+    setTimeout(() => document.getElementById('ai-input').focus(), 350);
+  }
+
+  function closeAIPanel() {
+    aiPanelOpen = false;
+    document.getElementById('ai-panel').classList.remove('open');
+    document.getElementById('ai-panel-btn').classList.remove('active-mode');
+  }
+
+  function aiAutoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 110) + 'px';
+  }
+
+  function aiInputKeydown(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); aiSend(); }
+  }
+
+  function aiSetStatus(state, text) {
+    const dot = document.getElementById('ai-status-dot');
+    const txt = document.getElementById('ai-status-text');
+    dot.className = 'ai-status-dot ' + state;
+    txt.textContent = text;
+  }
+
+  function aiAppendMsg(role, html) {
+    const msgs = document.getElementById('ai-messages');
+    const isUser = role === 'user';
+    const div = document.createElement('div');
+    div.className = 'ai-msg ' + (isUser ? 'user' : 'bot');
+    div.innerHTML = `
+      <div class="ai-avatar ${isUser ? 'user' : 'bot'}">
+        <i class="fa-solid ${isUser ? 'fa-user' : 'fa-wand-magic-sparkles'}"></i>
+      </div>
+      <div class="ai-bubble">${html}</div>
+    `;
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+    return div;
+  }
+
+  function aiShowThinking() {
+    const msgs = document.getElementById('ai-messages');
+    const div = document.createElement('div');
+    div.className = 'ai-msg bot';
+    div.id = 'ai-thinking-indicator';
+    div.innerHTML = `
+      <div class="ai-avatar bot"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+      <div class="ai-bubble" style="padding:8px 12px;">
+        <div class="ai-thinking-bubble">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+    `;
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+    aiThinkingEl = div;
+  }
+
+  function aiRemoveThinking() {
+    if (aiThinkingEl) { aiThinkingEl.remove(); aiThinkingEl = null; }
+  }
+
+  function aiClearChat() {
+    aiChatHistory = [];
+    const msgs = document.getElementById('ai-messages');
+    msgs.innerHTML = `
+      <div class="ai-msg bot">
+        <div class="ai-avatar bot"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+        <div class="ai-bubble">Chat cleared! What would you like to build or edit?</div>
+      </div>
+    `;
+    aiSetStatus('ok', 'Ready');
+  }
+
+  function aiGetEditorCode() {
+    const ed = document.getElementById('code-editor');
+    return ed ? ed.value : '';
+  }
+
+  function aiApplyCodeToEditor(newCode) {
+    const ed = document.getElementById('code-editor');
+    if (!ed) return false;
+    ed.value = newCode;
+    ed.dispatchEvent(new Event('input'));
+    if (typeof updatePreview === 'function') updatePreview();
+    if (typeof updateHighlight === 'function') updateHighlight();
+    if (typeof updateLineNumbers === 'function') updateLineNumbers();
+    return true;
+  }
+
+  async function aiSend() {
+    const input = document.getElementById('ai-input');
+    const prompt = input.value.trim();
+    if (!prompt || aiThinking) return;
+
+    input.value = '';
+    input.style.height = 'auto';
+    aiAppendMsg('user', escapeHtml(prompt));
+
+    aiThinking = true;
+    document.getElementById('ai-send-btn').disabled = true;
+    aiSetStatus('thinking', 'Thinking…');
+    aiShowThinking();
+
+    const currentCode = aiGetEditorCode();
+
+    const systemContext = `You are an expert AI assistant embedded inside RobloxUI Studio — a Roblox UI code editor that writes Lua scripts using the Roblox ScreenGui / Frame / TextLabel / TextButton / ImageLabel hierarchy.
+
+The user's current code in the editor is shown below. When asked to edit, add elements, change styles, or modify anything in the UI, you MUST return the COMPLETE updated code — not just a snippet.
+
+IMPORTANT RULES:
+1. Always reply with a short friendly explanation of what you did.
+2. If you are making code changes, include the FULL updated code wrapped in exactly this format:
+   <<<CODE_START>>>
+   (full code here)
+   <<<CODE_END>>>
+3. If the user just asks a question with no code changes needed, answer conversationally without the code block.
+4. Keep your explanation concise (2-4 sentences max).
+5. Never include markdown code fences like \`\`\` — use only the <<<CODE_START>>> markers.
+6. You can create new elements, scripts, animations, or restructure the entire UI.
+
+CURRENT EDITOR CODE:
+\`\`\`lua
+${currentCode.slice(0, 8000)}
+\`\`\``;
+
+    const messages = [
+      ...aiChatHistory,
+      { role: 'user', parts: [{ text: prompt }] }
+    ];
+
+    try {
+      const res = await fetch(GEMINI_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          system_instruction: { parts: [{ text: systemContext }] },
+          contents: messages,
+          generationConfig: { temperature: 0.7, maxOutputTokens: 8192 }
+        })
+      });
+
+      aiRemoveThinking();
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        const msg = err?.error?.message || '';
+        const status = res.status;
+
+        if (status === 429 || msg.toLowerCase().includes('quota') || msg.toLowerCase().includes('rate')) {
+          aiAppendMsg('bot', `<div class="ai-quota-banner"><i class="fa-solid fa-triangle-exclamation"></i><div><strong>Quota reached.</strong> The Gemini Flash model has run out of free requests for now. Wait a minute and try again, or check your API quota at <code>aistudio.google.com</code>.</div></div>`);
+          aiSetStatus('quota', 'Quota limit hit');
+        } else if (status === 400) {
+          aiAppendMsg('bot', `<span style="color:var(--red)"><i class="fa-solid fa-circle-exclamation"></i> Bad request: ${escapeHtml(msg || 'Check your prompt.')}</span>`);
+          aiSetStatus('error', 'Bad request');
+        } else if (status === 401 || status === 403) {
+          aiAppendMsg('bot', `<span style="color:var(--red)"><i class="fa-solid fa-key"></i> API key invalid or unauthorized. Double-check your Gemini API key.</span>`);
+          aiSetStatus('error', 'Auth error');
+        } else {
+          aiAppendMsg('bot', `<span style="color:var(--red)"><i class="fa-solid fa-circle-exclamation"></i> Error ${status}: ${escapeHtml(msg || 'Unknown error.')}</span>`);
+          aiSetStatus('error', 'Error ' + status);
+        }
+        aiThinking = false;
+        document.getElementById('ai-send-btn').disabled = false;
+        addLog('error', 'AI error: ' + (msg || status));
+        return;
+      }
+
+      const data = await res.json();
+      const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+      // Save to history
+      aiChatHistory.push({ role: 'user', parts: [{ text: prompt }] });
+      aiChatHistory.push({ role: 'model', parts: [{ text: rawText }] });
+      if (aiChatHistory.length > 20) aiChatHistory = aiChatHistory.slice(-20);
+
+      // Parse code block
+      const codeMatch = rawText.match(/<<<CODE_START>>>([\s\S]*?)<<<CODE_END>>>/);
+      let explanation = rawText.replace(/<<<CODE_START>>>[\s\S]*?<<<CODE_END>>>/g, '').trim();
+      if (!explanation) explanation = 'Done! Code applied to the editor.';
+
+      // Render explanation
+      const explanationHtml = escapeHtml(explanation).replace(/\n/g, '<br>');
+      let bubbleHtml = explanationHtml;
+
+      if (codeMatch) {
+        const newCode = codeMatch[1].trim();
+        const applied = aiApplyCodeToEditor(newCode);
+        if (applied) {
+          bubbleHtml += `<br><br><span style="color:var(--green);font-size:11px"><i class="fa-solid fa-circle-check"></i> Code applied to editor!</span>
+          <br><div style="margin-top:6px"><span class="ai-action-chip" onclick="aiUndoLast()"><i class="fa-solid fa-rotate-left"></i> Undo</span></div>`;
+          aiSetStatus('ok', 'Code applied ✓');
+          addLog('success', 'AI applied code changes');
+          showToast('AI applied code changes!', 'ok');
+        } else {
+          bubbleHtml += `<br><span style="color:var(--yellow);font-size:11px"><i class="fa-solid fa-triangle-exclamation"></i> Could not apply — editor not found.</span>`;
+          aiSetStatus('error', 'Apply failed');
+        }
+      } else {
+        aiSetStatus('ok', 'Ready');
+      }
+
+      aiAppendMsg('bot', bubbleHtml);
+
+    } catch (e) {
+      aiRemoveThinking();
+      if (e.name === 'TypeError' && e.message.includes('fetch')) {
+        aiAppendMsg('bot', `<div class="ai-quota-banner"><i class="fa-solid fa-wifi"></i><div><strong>Network error.</strong> Could not reach the Gemini API. Check your internet connection.</div></div>`);
+        aiSetStatus('error', 'Network error');
+      } else {
+        aiAppendMsg('bot', `<span style="color:var(--red)"><i class="fa-solid fa-circle-exclamation"></i> Unexpected error: ${escapeHtml(e.message)}</span>`);
+        aiSetStatus('error', 'Failed');
+      }
+      addLog('error', 'AI exception: ' + e.message);
+    }
+
+    aiThinking = false;
+    document.getElementById('ai-send-btn').disabled = false;
+  }
+
+  let aiLastCode = null;
+  function aiUndoLast() {
+    if (aiLastCode !== null) {
+      aiApplyCodeToEditor(aiLastCode);
+      showToast('AI change undone', 'warn');
+    }
+  }
+
+  // Backup code before each AI edit
+  const _origAiApply = aiApplyCodeToEditor;
+  function aiApplyCodeToEditor(newCode) {
+    aiLastCode = aiGetEditorCode();
+    return _origAiApply(newCode);
+  }
+
+  function aiSuggest(text) {
+    const input = document.getElementById('ai-input');
+    input.value = text;
+    aiAutoResize(input);
+    aiSend();
+  }
+
+  function escapeHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // Close panel on Escape
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && aiPanelOpen) closeAIPanel();
+  });
+  </script>
 </body>
+
+</html>
 
 </html>
